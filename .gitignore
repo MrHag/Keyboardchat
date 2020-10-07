@@ -2,4 +2,8 @@
 
 /server/node_modules/
 
-/public/
+/public/bundle.css
+/public/bundle.js
+/public/index.htmle
+
+Keyboardchat.code-workspace
