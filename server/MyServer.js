@@ -5,11 +5,11 @@ const { func } = require('prop-types');
 const { getuid } = require('process');
 var cors = require('cors');
 
-const Room = require("./Room.js");
-const User = require("./User.js");
+const Room = require("./room.js");
+const User = require("./user.js");
 
-const MessageBody = require("./MessageBody.js");
-const ResponceBody = require("./ResponceBody.js");
+const messageBody = require("./messageBody.js");
+const responceBody = require("./responceBody.js");
 
 
 var corsOptions = {
@@ -17,7 +17,7 @@ var corsOptions = {
     optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 
-const Path = './public/';
+const Path = '../public/';
 
 var app = express();
 app.get('/', (req, res) => {
@@ -39,6 +39,7 @@ var globalRoom = new Room("global");
 
 var user_list = [];
 var room_list = [];
+
 
 function GetUser(ws)
 {
@@ -73,14 +74,14 @@ function SendMessage(to, message, name, ava)
         ava = "images/unknown.png";
 
     console.log(to + " " + message + " " + name + " " + ava);
-    body = new MessageBody(name, message, ava);
+    body = new messageBody(name, message, ava);
     io.to(to).emit('chat', body);
 }
 
 function service_message(ws, type, data) {
 
     console.log(type + ": " + data);
-    resp = new ResponceBody(type, data, false);
+    resp = new responceBody(type, data, false);
     console.log("This is our responce = ", resp);
     io.to(ws.id).emit('responce', resp);
 }
@@ -88,14 +89,14 @@ function service_message(ws, type, data) {
 function access_error(ws, data) {
 
     console.log("access error: " + data);
-    resp = new ResponceBody("accessError", data, true);
+    resp = new responceBody("accessError", data, true);
     io.to(ws.id).emit('responce', resp);
 }
 
 function error_message(ws, data, type) {
 
     console.log("error: " + data);
-    resp = new ResponceBody(type, data, true);
+    resp = new responceBody(type, data, true);
     io.to(ws.id).emit('responce', resp);
 }
 

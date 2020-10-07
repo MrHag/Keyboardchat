@@ -1,0 +1,22 @@
+@import '../../styles/globals.scss';
+
+.chat {
+    @include flex-layout(column, flex-end, center);
+    position: relative;
+    width: 75%;
+    height: 100%;
+    border-left: 2px solid black;
+
+    &__history {
+        @include flex-layout(column, flex-start, flex-start);
+        box-sizing: border-box;
+        padding: 16px;
+        height: 100%;
+        width: 100%;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+}

@@ -1,1 +1,7 @@
-/node_modules/
+/client/node_modules/
+/client/.vscode/
+/client/keyboard-chat.code-workspace
+
+/server/node_modules/
+
+/public/
