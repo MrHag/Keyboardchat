@@ -1,10 +1,10 @@
 ## Keyboardchat
-This is chat build in react + nodejs.
+This is chat that build in react + nodejs.
 
 ## Install
-* Clone repository
+* Download repository
 
-## Start by npm
+## Quick start by npm
 * select root folder
 * ``` npm install ```
 * ``` npm start ```
