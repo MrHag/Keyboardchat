@@ -6,7 +6,8 @@
   "dependencies": {},
   "devDependencies": {},
   "scripts": {
-    "start": "npm --prefix ./client/ run build-pro && npm --prefix ./server/ run start"
+    "start": "npm --prefix ./client/ run build-pro && npm --prefix ./server/ run start",
+    "install": "cd server/ && npm install && cd ../client/ && npm install"
   },
   "repository": {
     "type": "git",
