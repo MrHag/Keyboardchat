@@ -27,7 +27,7 @@ const ChatInput = () => {
     
     return (
         <div className="chat-input">
-            <TextareaAutosize className="chat-input__area" variant="outlined" rowsMax={4} rowsMin={4} value={text} autoFocus={true}
+            <TextareaAutosize className="chat-input__area" variant="outlined" rowsMax={4} rowsMin={4} value={text} autoFocus={true} placeholder="Your message"
                     onChange={e => setText(e.target.value)} onKeyDown={e => onChatKeydown(e)}></TextareaAutosize>
             <div className="chat-input__controls">
                 <IconButton className="chat-input__send" onClick={sendMessage}><FontAwesomeIcon icon={FontAwesomeIcons.faPaperPlane}></FontAwesomeIcon></IconButton>
