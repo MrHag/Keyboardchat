@@ -11,16 +11,23 @@ const Login = ({onLogin}) => {
     const [login, setLogin] = useState('');
     
     const onLoginHandler = () => {
-        Socket.emit('auth', {
-            name: undefined,
-        });
+        let request = {
+            name: login
+        };
+        Socket.emit('auth', request);
     }
 
     useEffect(() => {
-        Socket.on('response', data => {
-            console.log("data = ", data);
+        Socket.on('responce', data => {
+            console.log("Auth data = ", data);
+            if (data.type === 'authSucc') {
+                console.log("Authorization success!");
+                onLogin();
+            } else {
+                console.error("Authorization failed!");
+            }
         });
-        return () => Socket.off('response');
+        return () => Socket.off('responce');
     })
 
     return (
