@@ -41,7 +41,7 @@ $msg-content-border-radius: 16px;
         border-radius: $msg-content-border-radius;
         max-width: 100%;
         margin-left: calc(32px + 16px);
-        overflow-wrap: break-word;
+        word-break: break-word;
 
         &::after {
             content: '';
