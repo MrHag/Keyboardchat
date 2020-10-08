@@ -27,17 +27,13 @@ const Chat = () => {
 
     const onNewMessage = data => {
         setMessages([...messages, data]);
+        historyRef.current.scrollTop = historyRef.current.scrollHeight;
     }
 
     useEffect(() => {
-        historyRef.current.scrollTop = historyRef.current.scrollHeight;
-    }, [messages]);
-
-    useEffect(() => {
-        
         Socket.on('chat', onNewMessage);
         return () => Socket.off('chat', onNewMessage);
-    }, [onNewMessage])
+    });
 
     return (
         <div className="chat">
