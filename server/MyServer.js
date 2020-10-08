@@ -10,7 +10,6 @@ const User = require("./user.js");
 
 const messageBody = require("./messageBody.js");
 const responceBody = require("./responceBody.js");
-const room = require('./room.js');
 
 
 var corsOptions = {
@@ -83,21 +82,21 @@ function service_message(ws, type, data) {
     console.log(type + ": " + data);
     resp = new responceBody(type, data, false);
     console.log("This is our responce = ", resp);
-    io.to(ws.id).emit('responce', resp);
+    io.to(ws.id).emit('response', resp);
 }
 
 function access_error(ws, data) {
 
     console.log("access error: " + data);
     resp = new responceBody("accessError", data, true);
-    io.to(ws.id).emit('responce', resp);
+    io.to(ws.id).emit('response', resp);
 }
 
 function error_message(ws, data, type) {
 
     console.log("error: " + data);
     resp = new responceBody(type, data, true);
-    io.to(ws.id).emit('responce', resp);
+    io.to(ws.id).emit('response', resp);
 }
 
 function joinroom(ws, room) {
@@ -136,7 +135,7 @@ function WebSocket(io) {
 
         ws.on("auth", data => {
 
-            if (data == undefined || data.name.length == null) {
+            if (data == null || data.name == null) {
                 service_message(ws, "authFail", "incorrect nickname");
                 return;
             }
