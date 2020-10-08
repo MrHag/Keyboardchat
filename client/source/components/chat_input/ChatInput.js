@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import Socket from '../../Socket';
-import { TextareaAutosize, IconButton  } from '@material-ui/core/';
+import { TextareaAutosize, IconButton } from '@material-ui/core/';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
