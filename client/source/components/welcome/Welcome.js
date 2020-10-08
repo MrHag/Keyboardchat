@@ -12,9 +12,16 @@ const Login = ({onLogin}) => {
     
     const onLoginHandler = () => {
         Socket.emit('auth', {
-            name: login,
+            name: undefined,
         });
     }
+
+    useEffect(() => {
+        Socket.on('response', data => {
+            console.log("data = ", data);
+        });
+        return () => Socket.off('response');
+    })
 
     return (
         <div className="login">

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 
-import Chat from '../chat/Chat';
+import { Chat, RoomPanel } from '../index';
 
 import './Home.scss';
 
 const Home = () => {
     return (
         <div className="home">
+            <RoomPanel></RoomPanel>
             <Chat></Chat>
         </div>
     )
