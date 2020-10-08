@@ -40,7 +40,6 @@ var globalRoom = new Room("global");
 var user_list = [];
 var room_list = [];
 
-
 function GetUser(ws)
 {
     for (var key in user_list) {
@@ -83,21 +82,21 @@ function service_message(ws, type, data) {
     console.log(type + ": " + data);
     resp = new responceBody(type, data, false);
     console.log("This is our responce = ", resp);
-    io.to(ws.id).emit('responce', resp);
+    io.to(ws.id).emit('response', resp);
 }
 
 function access_error(ws, data) {
 
     console.log("access error: " + data);
     resp = new responceBody("accessError", data, true);
-    io.to(ws.id).emit('responce', resp);
+    io.to(ws.id).emit('response', resp);
 }
 
 function error_message(ws, data, type) {
 
     console.log("error: " + data);
     resp = new responceBody(type, data, true);
-    io.to(ws.id).emit('responce', resp);
+    io.to(ws.id).emit('response', resp);
 }
 
 function joinroom(ws, room) {
@@ -136,7 +135,7 @@ function WebSocket(io) {
 
         ws.on("auth", data => {
 
-            if (data == undefined || data.name.length == null) {
+            if (data == null || data.name == null) {
                 service_message(ws, "authFail", "incorrect nickname");
                 return;
             }
@@ -197,6 +196,41 @@ function WebSocket(io) {
             let room = new Room(req.name, req.password);
             room_list.push(room);
             joinroom(ws, room);
+
+        });
+
+        ws.on('GetRooms', req => {
+            var rooms = Array.from(room_list, (room) => { var obj = { name: room.name, qual: 0 }; return obj; });
+
+            if (req != null && req.room != null) {
+                for (var key in rooms) {
+                    let room = rooms[key];
+
+                    for (var i = req.room.length; i >= 0; i--) {
+                        var str = req.room.substring(0, i);
+
+                        if (room.name.includes(str)) {
+                            room.qual = str.length;
+                            break;
+                        }
+
+                    }
+
+                    if (room.qual === 0) {
+                        rooms.splice(key, 1);
+                    }
+
+                }
+                rooms.sort((a, b) => { b.qual - a.qual });
+            }
+
+            var outrooms = Array.from(rooms, (room) => room.name);
+
+            console.log(room_list);
+            console.log(rooms);
+            console.log(outrooms);
+
+            service_message(ws, "rooms", outrooms);
 
         });
 

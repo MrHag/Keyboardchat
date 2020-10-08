@@ -10,6 +10,8 @@ $msg-content-border-radius: 16px;
 
     &__user {
         margin-bottom: 8px;
+        display: flex;
+        align-items: center;
     }
 
     &__name {
@@ -22,8 +24,8 @@ $msg-content-border-radius: 16px;
 
     &__av {
         border-radius: 50%;
-        width: 32px;
-        height: 32px;
+        width: 40px;
+        height: 40px;
         margin-right: 16px;
     }
 
@@ -36,11 +38,10 @@ $msg-content-border-radius: 16px;
         background-color: $msg-content-bg-color;
         position: relative;
         padding: 16px;
-        
         border-radius: $msg-content-border-radius;
         max-width: 100%;
         margin-left: calc(32px + 16px);
-        overflow-wrap: break-word;
+        word-break: break-word;
 
         &::after {
             content: '';
