@@ -10,6 +10,7 @@ const User = require("./user.js");
 
 const messageBody = require("./messageBody.js");
 const responceBody = require("./responceBody.js");
+const room = require('./room.js');
 
 
 var corsOptions = {
@@ -39,7 +40,6 @@ var globalRoom = new Room("global");
 
 var user_list = [];
 var room_list = [];
-
 
 function GetUser(ws)
 {
@@ -197,6 +197,41 @@ function WebSocket(io) {
             let room = new Room(req.name, req.password);
             room_list.push(room);
             joinroom(ws, room);
+
+        });
+
+        ws.on('GetRooms', req => {
+            var rooms = Array.from(room_list, (room) => { var obj = { name: room.name, qual: 0 }; return obj; });
+
+            if (req != null && req.room != null) {
+                for (var key in rooms) {
+                    let room = rooms[key];
+
+                    for (var i = req.room.length; i >= 0; i--) {
+                        var str = req.room.substring(0, i);
+
+                        if (room.name.includes(str)) {
+                            room.qual = str.length;
+                            break;
+                        }
+
+                    }
+
+                    if (room.qual === 0) {
+                        rooms.splice(key, 1);
+                    }
+
+                }
+                rooms.sort((a, b) => { b.qual - a.qual });
+            }
+
+            var outrooms = Array.from(rooms, (room) => room.name);
+
+            console.log(room_list);
+            console.log(rooms);
+            console.log(outrooms);
+
+            service_message(ws, "rooms", outrooms);
 
         });
 
