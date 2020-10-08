@@ -25,6 +25,34 @@
         }
       }
 
+    },
+
+    "GetRooms": {
+      "request": {
+        "header": "getRooms",
+        "body": {
+          "room": {
+            "varTypes": [
+              ":string:",
+              ":null:"
+            ]
+            }
+        },
+        "desctiption": "Send string to get rooms by name. Send null to get all rooms."
+      },
+
+      "response": {
+        "header": "response",
+        "body": {
+          "type": {
+            "varType": ":string:",
+            "varEnum": "rooms"
+          },
+          "message": ":Array(:string:):",
+          "error": ":bool:"
+        }
+      }
+
     }
 
   }

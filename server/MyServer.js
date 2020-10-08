@@ -106,10 +106,7 @@ function joinroom(ws, room) {
     if (!AuthCheckReport(user))
         return false;
 
-    if (user.room != null) {
-        SendMessage(user.room.name, user.name + " disconnected", "Server", "images/server.jpg");
-        ws.leave(user.room.name);
-    }
+    leaveroom(ws, user.room);
 
     user.room = null;
 
@@ -124,6 +121,29 @@ function joinroom(ws, room) {
         user.room = room;
         return true;
     });
+}
+
+function leaveroom(ws, room) {
+
+    var user = GetUser(ws);
+
+    if (!AuthCheckReport(user))
+        return false;
+
+    if (room != null) {
+        SendMessage(room.name, user.name + " disconnected", "Server", "images/server.jpg");
+        room.RemoveUser(user);
+        ws.leave(room.name);
+
+        if (room.users.length == 0) {
+            for (var key in room_list) {
+                let froom = room_list[key];
+                if (froom == room)
+                    room_list.slice(key, 1);
+            }
+        }
+    }
+
 }
 
 function WebSocket(io) {
@@ -199,7 +219,7 @@ function WebSocket(io) {
 
         });
 
-        ws.on('GetRooms', req => {
+        ws.on('getRooms', req => {
             var rooms = Array.from(room_list, (room) => { var obj = { name: room.name, qual: 0 }; return obj; });
 
             if (req != null && req.room != null) {
@@ -246,9 +266,7 @@ function WebSocket(io) {
                 return;
 
             if (user.client == ws) {
-                SendMessage(user.room.name, user.name + ' disconnected', "Server", "images/server.jpg");
-                if (user.room !== null);
-                    user.room.RemoveUser(user);
+                leaveroom(ws, user.room);
                 DeleteUser(ws);
             }
 
