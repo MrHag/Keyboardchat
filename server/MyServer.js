@@ -108,16 +108,14 @@ function joinroom(ws, room) {
 
     leaveroom(ws, user.room);
 
-    user.room = null;
-
     ws.join(room.name, (err) => {
 
         if (err) {
             console.error(err);
             return false;
         }
-        console.log(room.name);
         SendMessage(room.name, user.name + " connected", "Server", "images/server.jpg");
+        room.AddUser(user);
         user.room = room;
         return true;
     });
@@ -138,10 +136,14 @@ function leaveroom(ws, room) {
         if (room.users.length == 0) {
             for (var key in room_list) {
                 let froom = room_list[key];
-                if (froom == room)
-                    room_list.slice(key, 1);
+                if (froom == room) {
+                    room_list.splice(key, 1);
+                    console.log("delete room: ", froom.name);
+                    break;
+                }
             }
         }
+        user.room = null;
     }
 
 }
@@ -185,6 +187,7 @@ function WebSocket(io) {
                 return;         
 
             console.log("Message = ", data);
+            console.log("from = ", user.room.name);
             SendMessage(user.room.name, data.message, user.name);
             
         });
@@ -197,11 +200,13 @@ function WebSocket(io) {
             }
 
             if (req.password == null)
-                req.password == "";
+                req.password = "";
             
             for (var key in room_list) {
                 let room = room_list[key];
                 if (room.name === req.name) {
+                    console.log(room.password);
+                    console.log(req.password);
                     if (room.password !== "") {
                         joinroom(ws, room);
                     }
@@ -215,6 +220,7 @@ function WebSocket(io) {
 
             let room = new Room(req.name, req.password);
             room_list.push(room);
+            console.log("create room: ", room.name);
             joinroom(ws, room);
 
         });
@@ -237,7 +243,7 @@ function WebSocket(io) {
                     }
 
                     if (room.qual === 0) {
-                        rooms.splice(key, 1);
+                        rooms.splice(key);
                     }
 
                 }
@@ -246,9 +252,9 @@ function WebSocket(io) {
 
             var outrooms = Array.from(rooms, (room) => room.name);
 
-            console.log(room_list);
-            console.log(rooms);
-            console.log(outrooms);
+            //console.log(room_list);
+            //console.log(rooms);
+            //console.log(outrooms);
 
             service_message(ws, "rooms", outrooms);
 
