@@ -32,13 +32,16 @@ const Chat = () => {
 
     useEffect(() => {
         Socket.on('chat', onNewMessage);
+        historyRef.current.scrollTop = historyRef.current.scrollHeight;
         return () => Socket.off('chat', onNewMessage);
     });
 
     return (
         <div className="chat">
-            <div ref={historyRef} className="chat__history">
-                { messages.map((msg, index) => <ChatMessage key={index} msg={msg}></ChatMessage>) }
+            <div className="chat__history-wrapper">
+                <div ref={historyRef} className="chat__history">
+                    { messages.map((msg, index) => <ChatMessage key={index} msg={msg}></ChatMessage>) }
+                </div>
             </div>
             <ChatInput></ChatInput>
         </div>

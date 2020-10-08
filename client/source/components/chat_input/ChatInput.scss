@@ -4,25 +4,29 @@
     @include flex-layout(column, flex-end);
     position: relative;
     font-size: 16px;
-    width: 100%;
-    resize: none;
+    margin-bottom: 8px;;
+    width: 90%;
+    border-radius: 8px;
+    box-shadow: 0px 0px 8px gray;
+    padding: 8px;
 
     &__area {
         min-width: 100%;
         max-width: 100%;
-        padding: 0;
         border: none;
+        scrollbar-width: 0px;    
+        font-size: 18px;
         
         &:focus {
-            border: none;
+            outline: none;
         }
     }
 
     &__controls {
-        @include flex-layout(row, center, center);
         position: absolute;
-        right: 0px;
-        top: 7px;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
     }
 
     &__send {

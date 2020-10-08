@@ -7,9 +7,11 @@ const ChatMessage = (props) => {
     const msg = MessageBody.fromJSON(props.msg);
     return (
         <div className="chat-msg">
-            <img className="chat-msg__av" src={msg.avatar}></img>
-            <div className="chat-msg__content">
+            <div className="chat-msg__user">
+                <img className="chat-msg__av" src={msg.avatar}></img>
                 <span className="chat-msg__name">{msg.name}</span>
+            </div>
+            <div className="chat-msg__content">
                 <span className="chat-msg__text">{msg.message}</span>
             </div>
         </div>

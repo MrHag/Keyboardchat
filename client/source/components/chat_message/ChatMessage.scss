@@ -1,53 +1,55 @@
 @import '../../styles/globals.scss';
 
+$msg-content-bg-color: #f0f0f0;
+$msg-content-border-radius: 16px;
+
 .chat-msg {
-    @include flex-layout(row, flex-start, flex-start);
-    margin: 4px;
-    max-width: 90%;
+    @include flex-layout(column, center, flex-start);
+    margin: 16px 0px 16px 0px;
+    max-width: 100%;
+
+    &__user {
+        margin-bottom: 8px;
+    }
 
     &__name {
-        font-size: 24px;
-        font-weight: bold;
+        font-size: 20px;
+        font-style: italic;
+        font-weight: 500;
         display: inline-block;
         z-index: 2;
     }
 
     &__av {
-        margin-top: 8px;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
         margin-right: 16px;
     }
 
     &__text {
         max-width: 100%;
-        margin-top: 8px;
     }
 
     &__content {
         @include flex-layout(column, flex-start, flex-start);
-        background-color: #b2b2ff;
+        background-color: $msg-content-bg-color;
         position: relative;
-        padding: 8px;
-        border-radius: 16px;
+        padding: 16px;
+        
+        border-radius: $msg-content-border-radius;
         max-width: 100%;
+        margin-left: calc(32px + 16px);
         overflow-wrap: break-word;
-        box-shadow: 2px 2px 1px gray;
 
         &::after {
             content: '';
             position: absolute;
-            left: -10px;
-            width: 0;
             top: 0;
-            border: 40px solid transparent;
-            border-right-color: #b2b2ff;
-            border-left: 0;
-            border-top: 0;
+            left: 0;
+            width: $msg-content-border-radius;
+            height: $msg-content-border-radius;
+            background-color: $msg-content-bg-color;
         }
-    }
-
-    img {
-        border-radius: 50%;
-        width: 32px;
-        height: 32px;
     }
 }
