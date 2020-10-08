@@ -13,6 +13,7 @@ const Chat = () => {
     const historyRef = React.useRef();
 
     const onNewMessage = data => {
+        //console.log("Message data = ", data);
         setMessages([...messages, data]);
         historyRef.current.scrollTop = historyRef.current.scrollHeight;
     }
