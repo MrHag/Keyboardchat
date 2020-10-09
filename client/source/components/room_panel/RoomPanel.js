@@ -36,7 +36,7 @@ const RoomPanel = () => {
             const rooms = data.message.map(room => {
                 return { name: room }
             });
-            //setRooms(rooms);
+            setRooms(rooms);
             console.log("Room list = ", rooms);
         })
         Socket.emit('getRooms', {});
