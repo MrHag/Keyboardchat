@@ -12,28 +12,27 @@
     }
 
     &__list {
+        @include flex-layout(column, center, center);
         overflow: scroll;
         max-height: 95%;
 
         overflow-y: scroll;
         overflow-x: hidden;
-        &::-webkit-scrollbar {
-            display: none;
-        }
     }
 }
 
 .room-item {
     @include flex-layout(column, center, center);
     height: 32px;
-    width: 100%;
-    margin: 16px 0;
+    width: 80%;
+    margin: 16px 0 16px 0;
     border-radius: 16px;
-    padding: 8px 0;
+    padding: 8px 0 8px 0;
     background-color: #f0f0f0;
 
     &__name {
         @include flex-layout(row, center, center);
+        text-align: center;
         font-weight: 600;
         font-size: 18px;
     }
