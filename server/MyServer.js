@@ -40,8 +40,6 @@ var globalRoom = new Room("global");
 var user_list = [];
 var room_list = [];
 
-const fakeRooms = require("./fake.js").rooms;
-
 fakeRooms.forEach((room) => {
     room_list.push(new Room(room.name, null));
 });
