@@ -6,14 +6,7 @@ import { InputAdornment, TextField, IconButton } from '@material-ui/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
 import Socket from '../../Socket';
-
-const RoomItem = ({name}) => {
-    return (
-        <div className="room-item">
-            <div className="room-item__name">{name}</div>
-        </div>
-    )
-}
+import { RoomItem } from '../../components';
 
 try {
     var fake_rooms = require('../../../fake_data/fake.json').rooms;
@@ -29,15 +22,11 @@ const RoomPanel = () => {
     const [rooms, setRooms] = useState((fake_rooms) ? fake_rooms : []);
 
     useEffect(() => {
-        CreateRoom("HelloWorld");
-        CreateRoom("PPPP");
-        CreateRoom("LastRoom");
         Socket.on('response', data => {
             const rooms = data.message.map(room => {
                 return { name: room }
             });
-            //setRooms(rooms);
-            console.log("Room list = ", rooms);
+            setRooms(rooms);
         })
         Socket.emit('getRooms', {});
         return () => { Socket.off("response") }

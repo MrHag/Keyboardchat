@@ -20,24 +20,3 @@
         overflow-x: hidden;
     }
 }
-
-.room-item {
-    @include flex-layout(column, center, center);
-    height: 32px;
-    width: 80%;
-    margin: 16px 0 16px 0;
-    border-radius: 16px;
-    padding: 8px 0 8px 0;
-    background-color: #f0f0f0;
-
-    &__name {
-        @include flex-layout(row, center, center);
-        text-align: center;
-        font-weight: 600;
-        font-size: 18px;
-    }
-
-    &:hover {
-        cursor: pointer;
-    }
-}

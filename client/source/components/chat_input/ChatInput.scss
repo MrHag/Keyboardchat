@@ -2,10 +2,10 @@
 
 .chat-input {
     @include flex-layout(column, flex-end);
+    box-sizing: border-box;
     position: relative;
     font-size: 16px;
     margin-bottom: 8px;
-    ;
     width: 90%;
     border-radius: 8px;
     box-shadow: 0px 0px 8px gray;

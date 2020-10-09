@@ -21,3 +21,19 @@
         overflow-x: hidden;
     }
 }
+
+.room-header {
+    @include flex-layout(column, center, center);
+    position: absolute;
+    top: 8px;
+    width: 90%;
+    min-height: 40px;
+    border-radius: 8px;
+    background-color: #f0f0f0;
+
+    &__name {
+        font-weight: 600;
+        font-size: 24px;
+        margin: 0 0 0 16px;
+    }
+}
