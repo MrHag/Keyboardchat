@@ -15,7 +15,9 @@ const RoomItem = ({name}) => {
     )
 }
 
-const fake_rooms = undefined;//require('../../../fake_data/fake.json').rooms;
+try {
+    var fake_rooms = require('../../../fake_data/fake.json').rooms;
+} catch (err) { }
 
 const CreateRoom = (name) => {
     Socket.emit("JoinRoom", {

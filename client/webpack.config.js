@@ -3,6 +3,8 @@ const path = require('path');
 const htmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
+const isDevelopment = /development/.test(process.env.NODE_ENV);
+
 function CreateTemplateHTML(app_name)
 {
     return (
@@ -22,6 +24,29 @@ function CreateTemplateHTML(app_name)
 }
 
 const APP_NAME = 'Keyboardchat';
+
+function includePlugins() {
+    let plugins = [
+        new htmlWebpackPlugin({
+            templateContent: CreateTemplateHTML(APP_NAME)
+        }),
+        new MiniCssExtractPlugin({
+            filename: "bundle.css"
+        }),
+        new webpack.HotModuleReplacementPlugin()
+    ];
+    //Don't include fake data if you're building production version
+    if (!isDevelopment) {
+        console.log("Ignore fake.json!");
+        plugins.push(
+            new webpack.IgnorePlugin({
+                resourceRegExp: /fake\.json$/,
+            })
+        )
+    }
+
+    return plugins;
+}
 
 function generateConfig(output_path) {
     return {
@@ -58,15 +83,7 @@ function generateConfig(output_path) {
             }
         },
 
-        plugins: [
-            new htmlWebpackPlugin({
-                templateContent: CreateTemplateHTML(APP_NAME)
-            }),
-            new MiniCssExtractPlugin({
-                filename: "bundle.css"
-            }),
-            new webpack.HotModuleReplacementPlugin()
-        ],
+        plugins: includePlugins(),
         output: {
             path: path.resolve(__dirname, output_path),
             filename: "bundle.js"

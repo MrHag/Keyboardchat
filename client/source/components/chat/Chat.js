@@ -5,7 +5,10 @@ import { ChatMessage, ChatInput } from '../index';
 
 import './Chat.scss';
 
-const fake_messages = undefined; //require('../../../fake_data/fake.json').chat_messages;
+try {
+    var fake_messages = require('../../../fake_data/fake.json').chat_messages;
+    
+} catch (err) { }
 
 const Chat = () => {
     //Stores messages in JSON format
