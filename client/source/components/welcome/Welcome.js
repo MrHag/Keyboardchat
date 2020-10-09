@@ -18,9 +18,9 @@ const Login = ({onLogin}) => {
     }
 
     useEffect(() => {
-        Socket.on('response', data => {
+        Socket.on('auth', data => {
             console.log("Auth data = ", data);
-            if (data.type === 'authSucc') {
+            if (data.successful) {
                 console.log("Authorization success!");
                 onLogin();
             } else {
@@ -28,7 +28,7 @@ const Login = ({onLogin}) => {
             }
         });
         return () => Socket.off('response');
-    })
+    }, [])
 
     return (
         <div className="login">

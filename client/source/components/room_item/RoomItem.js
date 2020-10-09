@@ -5,29 +5,17 @@ import Socket from '../../Socket';
 
 import './RoomItem.scss';
 
-const RoomItem = ({name}) => {
-    const joinRoom = () => {
-        Socket.emit('JoinRoom', {
-            name: name
-        });
-    }
-
-    useEffect(() => {
-        Socket.on('response', (data) => {
-            console.log("On joint response = ", data);
-        });
-        return () => Socket.off('response');
-    }, []);
-
+const RoomItem = ({name, onRoomJoin}) => {
     return (
-        <div className="room-item">
-            <div className="room-item__name" onClick={_ => joinRoom()}>{name}</div>
+        <div onClick={e => onRoomJoin(name)} className="room-item">
+            <div className="room-item__name">{name}</div>
         </div>
     )
 }
 
 RoomItem.propType = {
-    name: PropTypes.string.isRequired
+    name: PropTypes.string.isRequired,
+    onRoomJoin: PropTypes.func.isRequired
 }
 
 export default RoomItem;

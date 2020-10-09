@@ -12,25 +12,39 @@ try {
     var fake_rooms = require('../../../fake_data/fake.json').rooms;
 } catch (err) { }
 
-const CreateRoom = (name) => {
-    Socket.emit("JoinRoom", {
-        name: name
-    });
-}
-
-const RoomPanel = () => {
+const RoomPanel =  () => {
     const [rooms, setRooms] = useState((fake_rooms) ? fake_rooms : []);
 
+    const joinRoom = (name) => {
+        Socket.emit('joinroom', {
+            name: name,
+            password: null
+        });
+    }
+
     useEffect(() => {
-        Socket.on('response', data => {
-            const rooms = data.message.map(room => {
-                return { name: room }
+        Socket.on('getrooms', data => {
+            const rooms = data.data.map(room => {
+                return { name: room.room }
             });
             setRooms(rooms);
-            console.log("Room list = ", rooms);
-        })
-        Socket.emit('getRooms', {});
-        return () => { Socket.off("response") }
+        });
+
+        Socket.on('roomchange', data => {
+            Socket.emit('getrooms', { room: null});
+        });
+
+        Socket.on('joinroom', (data) => {
+            console.error("Joinroom in RoomPanel unhandled!");
+            if (data.successful) {
+            }
+        });
+
+        Socket.emit('getrooms', {room: null});
+        return () => { 
+            Socket.off("getrooms");
+            Socket.off('joinroom');
+        }
     }, [])
 
     return (
@@ -44,9 +58,8 @@ const RoomPanel = () => {
                     )
                 }}
             />
-
             <div className="room-panel__list">
-                {rooms.map((room, index) => <RoomItem key={index} name={room.name}></RoomItem>)}
+                {rooms.map((room, index) => <RoomItem key={room.name + index} name={room.name} onRoomJoin={joinRoom}></RoomItem>)}
             </div>
         </div>
     )

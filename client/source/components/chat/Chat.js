@@ -24,27 +24,51 @@ RoomHeader.propTypes = {
 
 const Chat = () => {
     //Stores messages in JSON format
-    const [messages, setMessages] = useState((fake_messages) ? fake_messages : []);
+    const s = {
+        messages: (fake_messages) ? fake_messages : [],
+        room_name: 'Палата №1'
+    };
+
+    const [state, setState] = useState(s);
     const historyRef = React.useRef();
 
     const onNewMessage = data => {
-        //console.log("Message data = ", data);
-        setMessages([...messages, data]);
+        console.log("Message data = ", data);
+        setState({room_name: state.room_name, messages: [...state.messages, data]});
         historyRef.current.scrollTop = historyRef.current.scrollHeight;
     }
 
-    useEffect(() => {
+    const initSockets = () => {
         Socket.on('chat', onNewMessage);
+        Socket.on('joinroom', (data) => {
+            console.log("Chat joinroom data = ", data);
+            console.log("room name = ", data.data.room);
+            if (data.successful) {
+                setState({
+                    messages: [],
+                    room_name: data.data.room
+                });
+            }
+        });
+    }
+
+    const cleanSockets = () => {
+        Socket.off('chat');
+        Socket.off('joinroom');
+    }
+
+    useEffect(() => {
+        initSockets();
         historyRef.current.scrollTop = historyRef.current.scrollHeight;
-        return () => Socket.off('chat', onNewMessage);
-    });
+        return cleanSockets;
+    }, [onNewMessage]);
 
     return (
         <div className="chat">
-            <RoomHeader name="Палата №1"></RoomHeader>
+            <RoomHeader name={state.room_name}></RoomHeader>
             <div className="chat__history-wrapper">
                 <div ref={historyRef} className="chat__history">
-                    { messages.map((msg, index) => <ChatMessage key={index} msg={msg}></ChatMessage>) }
+                    { state.messages.map((msg, index) => <ChatMessage key={index} msg={msg}></ChatMessage>) }
                 </div>
             </div>
             <ChatInput></ChatInput>
