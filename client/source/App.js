@@ -8,8 +8,8 @@ import { Welcome, Home } from './components/';
 const App = () => {
     const [stage, setStage] = useState('logging');
 
-    let content = <Welcome onLogin={_ => setStage('logged')}></Welcome>;
-    //let content = <Home></Home>;
+    //let content = <Welcome onLogin={_ => setStage('logged')}></Welcome>;
+    let content = <Home></Home>;
     if (stage === 'logged') {
         content = <Home></Home>
     }

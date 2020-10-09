@@ -5,18 +5,32 @@
     width: 256px;
     height: 100%;
     padding: 8px;
+    box-sizing: border-box;
 
     & &__search {
         margin-bottom: 8px;
     }
+
+    &__list {
+        overflow: scroll;
+        max-height: 95%;
+
+        overflow-y: scroll;
+        overflow-x: hidden;
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
 }
 
 .room-item {
+    @include flex-layout(column, center, center);
     height: 32px;
     width: 100%;
     margin: 16px 0;
     border-radius: 16px;
-    background-color: lightblue;
+    padding: 8px 0;
+    background-color: #f0f0f0;
 
     &__name {
         @include flex-layout(row, center, center);
