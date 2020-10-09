@@ -10,6 +10,7 @@ const User = require("./user.js");
 
 const messageBody = require("./messageBody.js");
 const responceBody = require("./responceBody.js");
+const fake = require('./fake.js');
 
 
 var corsOptions = {
@@ -46,6 +47,16 @@ fakeRooms.forEach((room) => {
     room_list.push(new Room(room.name, null));
 });
 
+function validateDefaultText(text, length = 0) {
+    if (text.length < length)
+        return false;
+
+    if (text.match(/[\S]+/g) == null)
+        return false;
+
+    return true;
+}
+
 function GetUser(ws)
 {
     for (var key in user_list) {
@@ -68,7 +79,7 @@ function DeleteUser(ws) {
 function AuthCheckReport(user)
 {
     if (!user.Auth)
-        access_error(user.client, 'You are not Authorizate');
+        error_message(ws, "accessError", "You are not Authorizate");
 
     return user.Auth;
 }
@@ -83,26 +94,24 @@ function SendMessage(to, message, name, ava)
     io.to(to).emit('chat', body);
 }
 
-function service_message(ws, type, data) {
+
+function message(ws, type, data, error) {
 
     console.log(type + ": " + data);
-    resp = new responceBody(type, data, false);
+    resp = new responceBody(type, data, error);
     console.log("This is our responce = ", resp);
     io.to(ws.id).emit('response', resp);
 }
 
-function access_error(ws, data) {
+function service_message(ws, type, data) {
 
-    console.log("access error: " + data);
-    resp = new responceBody("accessError", data, true);
-    io.to(ws.id).emit('response', resp);
+    message(ws, type, data, false);
 }
 
 function error_message(ws, data, type) {
 
     console.log("error: " + data);
-    resp = new responceBody(type, data, true);
-    io.to(ws.id).emit('response', resp);
+    message(ws, type, data, true);
 }
 
 function joinroom(ws, room) {
@@ -168,6 +177,11 @@ function WebSocket(io) {
                 return;
             }
 
+            data.name = data.name.trim();
+
+            if (!validateDefaultText(data.name, 4))
+                return;
+
             var user = GetUser(ws);
 
             user.name = data.name;
@@ -181,16 +195,21 @@ function WebSocket(io) {
 
         ws.on('chat', (data) => {
 
-            var user = GetUser(ws);
-
-            if (user.client != ws)
+            if (data == null || data.message == null)
                 return;
+
+            var user = GetUser(ws);
 
             if (!AuthCheckReport(user))
                 return;
 
             if (user.room == null)
                 return;         
+
+            data.message = data.message.trim();
+
+            if (!validateDefaultText(data.message))
+                return;
 
             console.log("Message = ", data);
             console.log("from = ", user.room.name);

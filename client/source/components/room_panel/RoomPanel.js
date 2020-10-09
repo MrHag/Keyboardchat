@@ -27,6 +27,7 @@ const RoomPanel = () => {
                 return { name: room }
             });
             setRooms(rooms);
+            console.log("Room list = ", rooms);
         })
         Socket.emit('getRooms', {});
         return () => { Socket.off("response") }
