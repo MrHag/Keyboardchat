@@ -14,6 +14,7 @@
     &__history {
         @include flex-layout(column, flex-start, flex-start);
         box-sizing: border-box;
+        margin-top: 32px;
         
         height: 100%;
         width: 100%;
@@ -30,6 +31,7 @@
     min-height: 40px;
     border-radius: 8px;
     background-color: #f0f0f0;
+    z-index: 10;
 
     &__name {
         font-weight: 600;

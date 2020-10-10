@@ -8,6 +8,10 @@
     padding: 8px 0 8px 0;
     background-color: #f0f0f0;
 
+    &.active {
+        background-color: #b3b3b3;
+    }
+
     &__name {
         @include flex-layout(row, center, center);
         text-align: center;

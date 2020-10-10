@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import Socket from '../../Socket';
@@ -11,9 +11,10 @@ try {
 } catch (err) { }
 
 const RoomHeader = ({name}) => {
+    const room = (name === 'global') ? 'Палата №1' : name;
     return (
         <div className="room-header">
-            <h3 className="room-header__name">{name}</h3>
+            <h3 className="room-header__name">{room}</h3>
         </div>
     )
 };
@@ -38,10 +39,8 @@ const Chat = () => {
         historyRef.current.scrollTop = historyRef.current.scrollHeight;
     }
 
-    const initSockets = () => {
-        Socket.on('chat', onNewMessage);
-        Socket.on('joinroom', (data) => {
-            console.log("Chat joinroom data = ", data);
+    const socketJoinroom = data => {
+        console.log("Chat joinroom data = ", data);
             console.log("room name = ", data.data.room);
             if (data.successful) {
                 setState({
@@ -49,12 +48,16 @@ const Chat = () => {
                     room_name: data.data.room
                 });
             }
-        });
+    } 
+
+    const initSockets = () => {
+        Socket.on('chat', onNewMessage);
+        Socket.on('joinroom', socketJoinroom);
     }
 
     const cleanSockets = () => {
-        Socket.off('chat');
-        Socket.off('joinroom');
+        Socket.removeEventListener('chat', onNewMessage);
+        Socket.removeEventListener('joinroom', socketJoinroom);
     }
 
     useEffect(() => {

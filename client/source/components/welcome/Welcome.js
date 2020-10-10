@@ -18,6 +18,7 @@ const Login = ({onLogin}) => {
     }
 
     useEffect(() => {
+        // ??? Maybe you will must to replace Socket.off with Socket.off('responce', handleFunction)
         Socket.on('auth', data => {
             console.log("Auth data = ", data);
             if (data.successful) {

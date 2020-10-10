@@ -14,6 +14,7 @@ try {
 
 const RoomPanel =  () => {
     const [rooms, setRooms] = useState((fake_rooms) ? fake_rooms : []);
+    const [inRoom, setInRoom] = useState('global');
 
     const joinRoom = (name) => {
         Socket.emit('joinroom', {
@@ -22,29 +23,41 @@ const RoomPanel =  () => {
         });
     }
 
-    useEffect(() => {
-        Socket.on('getrooms', data => {
-            const rooms = data.data.map(room => {
-                return { name: room.room }
-            });
-            setRooms(rooms);
+    const socketGetrooms = (data) => {
+        const rooms = data.data.map(room => {
+            return { name: room.room }
         });
+        setRooms(rooms);
+    }
 
-        Socket.on('roomchange', data => {
-            Socket.emit('getrooms', { room: null});
-        });
+    const socketRoomchange = (data) => {
+        Socket.emit('getrooms', { room: null});
+    }
 
-        Socket.on('joinroom', (data) => {
-            console.error("Joinroom in RoomPanel unhandled!");
-            if (data.successful) {
-            }
-        });
-
-        Socket.emit('getrooms', {room: null});
-        return () => { 
-            Socket.off("getrooms");
-            Socket.off('joinroom');
+    const socketJoinroom = (data) => {
+        console.error("Hello world!");
+        if (data.successful) {
+            console.error("New room name = ", data.data.room);
+            setInRoom(data.data.room);
         }
+    }
+
+    const initSocketsListeners = () => {
+        Socket.on('getrooms', socketGetrooms);
+        Socket.on('roomchange', socketRoomchange);
+        Socket.on('joinroom', socketJoinroom);
+        Socket.emit('getrooms', {room: null});
+    }
+
+    const removeSocketListeners = () => {
+        Socket.removeEventListener("getrooms", socketGetrooms);
+        Socket.removeEventListener('joinroom', socketJoinroom);
+        Socket.removeEventListener('roomchange', socketRoomchange);
+    }
+
+    useEffect(() => {
+        initSocketsListeners();
+        return removeSocketListeners;
     }, [])
 
     return (
@@ -59,7 +72,16 @@ const RoomPanel =  () => {
                 }}
             />
             <div className="room-panel__list">
-                {rooms.map((room, index) => <RoomItem key={room.name + index} name={room.name} onRoomJoin={joinRoom}></RoomItem>)}
+                {
+                    rooms.map((room, index) => {
+                        const isActive = room.name === inRoom;
+                        console.log("IN room = ", inRoom);
+                        if (isActive) {
+                            console.error("IsActive room! ", room.name);
+                        }
+                        return <RoomItem key={room.name + index} name={room.name} active={isActive} onRoomJoin={joinRoom}></RoomItem>
+                    })
+                }
             </div>
         </div>
     )
