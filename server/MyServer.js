@@ -10,6 +10,7 @@ const responceBody = require("./responseBody.js");
 const Path = '../public/';
 
 const API = require("../API");
+const { compile } = require('ejs');
 
 const Calls = API.Calls;
 const SCalls = API.ServerCalls;
@@ -73,7 +74,7 @@ function DeleteUser(ws) {
 function AuthCheckReport(user)
 {
     if (!user.Auth)
-        error_message(ws, SCalls.Access.header, "You are not Authorized");
+        error_message(user.client, SCalls.Access.header, "You are not Authorized");
 
     return user.Auth;
 }
@@ -234,10 +235,13 @@ function WebSocket(io) {
 
             if (req.password == null)
                 req.password = "";
+
+            console.log("try to join:" + req.name + " " + req.password);
             
             for (let room of room_list) {
                 if (room.name === req.name) {
-                    if (room.password !== "") {
+                    console.log("roompass: "+room.password);
+                    if (room.password == "" || room.password == null) {
                         joinroom(ws, room);
                     }
                     else
@@ -260,7 +264,7 @@ function WebSocket(io) {
 
             let header = Calls.GetRooms.header;
 
-            let rooms = Array.from(room_list, (room) => { let obj = { name: room.name, qual: 0 }; return obj; });
+            let rooms = Array.from(room_list, (room) => { let obj = { name: room.name, password: room.password, qual: 0 }; return obj; });
 
             if (req != null && req.room != null) {
                 for (let key in rooms) {
@@ -287,6 +291,8 @@ function WebSocket(io) {
             let outrooms = Array.from(rooms, (room) => {
 
                 let pass = room.password;
+
+                console.log(room);
 
                 let haspass = true;
 
