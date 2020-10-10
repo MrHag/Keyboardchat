@@ -8,8 +8,14 @@ const RoomItem = ({active, name, onRoomJoin}) => {
     if (active) {
         console.log("Room item = ", name);
     }
+
+    const onClickHandler = (e) => {
+        if (!active)
+            onRoomJoin(name);
+    }
+
     return (
-        <div onClick={e => onRoomJoin(name)} className={classNames("room-item", {"active": active})}>
+        <div onClick={onClickHandler} className={classNames("room-item", {"active": active})}>
             <div className="room-item__name">{name}</div>
         </div>
     )

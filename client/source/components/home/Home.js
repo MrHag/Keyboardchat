@@ -3,12 +3,14 @@ import { Chat, RoomPanel } from '../index';
 
 import './Home.scss';
 
-import Socket from '../../Socket';
-
 const Home = () => {
+    const onCreateRoom = () => {
+        alert("Create room!");
+    }
+
     return (
         <div className="home">
-            <RoomPanel></RoomPanel>
+            <RoomPanel onCreateRoom={onCreateRoom}></RoomPanel>
             <Chat></Chat>
         </div>
     )

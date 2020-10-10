@@ -15,7 +15,7 @@
         @include flex-layout(column, flex-start, flex-start);
         box-sizing: border-box;
         margin-top: 32px;
-        
+        padding-bottom: 32px;
         height: 100%;
         width: 100%;
         overflow-y: scroll;

@@ -1,18 +1,33 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 
 import './RoomPanel.scss';
-import { InputAdornment, TextField, IconButton } from '@material-ui/core';
+import { InputAdornment, TextField, IconButton} from '@material-ui/core';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
+import { RoomItem, Button } from '../../components';
+
 import Socket from '../../Socket';
-import { RoomItem } from '../../components';
 
 try {
     var fake_rooms = require('../../../fake_data/fake.json').rooms;
 } catch (err) { }
 
-const RoomPanel =  () => {
+const RoomList = ({ inRoom, rooms, joinRoom }) => {
+    return (
+        <div className="room-panel__list">
+            {
+                rooms.map((room, index) => {
+                    const isActive = room.name === inRoom;
+                    return <RoomItem key={room.name + index} name={room.name} active={isActive} onRoomJoin={joinRoom}></RoomItem>
+                })
+            }
+        </div>
+    )
+}
+
+const RoomPanel = ({ onCreateRoom }) => {
     const [rooms, setRooms] = useState((fake_rooms) ? fake_rooms : []);
     const [inRoom, setInRoom] = useState('global');
 
@@ -71,20 +86,14 @@ const RoomPanel =  () => {
                     )
                 }}
             />
-            <div className="room-panel__list">
-                {
-                    rooms.map((room, index) => {
-                        const isActive = room.name === inRoom;
-                        console.log("IN room = ", inRoom);
-                        if (isActive) {
-                            console.error("IsActive room! ", room.name);
-                        }
-                        return <RoomItem key={room.name + index} name={room.name} active={isActive} onRoomJoin={joinRoom}></RoomItem>
-                    })
-                }
-            </div>
+            <RoomList inRoom={inRoom} rooms={rooms} joinRoom={joinRoom}></RoomList>
+            <Button onClick={onCreateRoom}>Create room</Button>
         </div>
     )
+}
+
+RoomPanel.propTypes = {
+    onCreateRoom: PropTypes.func.isRequired
 }
 
 export default RoomPanel;

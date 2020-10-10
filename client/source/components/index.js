@@ -5,3 +5,4 @@ export { default as Home } from './home/Home';
 export { default as Chat } from './chat/Chat';
 export { default as RoomPanel } from './room_panel/RoomPanel';
 export { default as RoomItem }  from './room_item/RoomItem';
+export { default as Button } from './button/Button'
