@@ -39,11 +39,16 @@ const room_list = [];
 const fakeRooms = require("./fake.js").rooms;
 
 fakeRooms.forEach((room) => {
-    room_list.push(new Room(room.name, null));
+    if (room.password == null)
+        room.password = null;
+    room_list.push(new Room(room.name, room.password));
 });
 
-function validateDefaultText(text, length = 0) {
-    if (text.length < length)
+function validateDefaultText(text, minlength = 0, maxlength = -1) {
+    if (text.length < minlength)
+        return false;
+
+    if (maxlength != -1 || text.length > maxlength)
         return false;
 
     if (text.match(/[\S]+/g) == null)
@@ -185,7 +190,7 @@ function WebSocket(io) {
 
             data.name = data.name.trim();
 
-            if (!validateDefaultText(data.name, 4)) {
+            if (!validateDefaultText(data.name, 4, 64)) {
                 service_message(ws, header, "badName", false);
                 return;
             }
@@ -216,7 +221,7 @@ function WebSocket(io) {
 
             data.message = data.message.trim();
 
-            if (!validateDefaultText(data.message))
+            if (!validateDefaultText(data.message, 1, 2000))
                 return;
 
             console.log("Message = ", data);
@@ -263,9 +268,10 @@ function WebSocket(io) {
                 return;
             }
 
-            if (!validateDefaultText(data.message), 64)
+            if (!validateDefaultText(req.name), 0, 64) {
                 service_message(ws, header, "badName", false);
                 return;
+            }
 
             if (req.password == null)
                 req.password = "";
