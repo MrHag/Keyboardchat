@@ -12,6 +12,7 @@ import { keys } from '@material-ui/core/styles/createBreakpoints';
 const CreationRoom = ({onComplete}) => {
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
+    const [err, setErr] = useState('');
 
     /*
         Пока joinroom всегда возвращает success. Если это изменится, то нужно будет хендлить ошибки здесь
@@ -28,6 +29,9 @@ const CreationRoom = ({onComplete}) => {
         console.log("Socket create room = ", data);
         if (data.successful) {
             onComplete();
+        } else {
+            //Here might be other types of errors
+            setErr('Room with this name already exist!');
         }
     }
 
@@ -49,6 +53,7 @@ const CreationRoom = ({onComplete}) => {
                 <h2 className="creation-room__header">Create room</h2>
                 <TextField onChange={e => setName(e.target.value)} className="creation-room__input" placeholder="Room name" onKeyDown={onInputKeydown} autoFocus></TextField>
                 <TextField onChange={e => setPassword(e.target.value)} className="creation-room__input" placeholder="Room password" onKeyDown={onInputKeydown}></TextField>
+                <p className="creation-room__error">{err}</p>
                 <div className="creation-room__buttons">
                     <Button onClick={onComplete}>Cancel</Button>
                     <Button onClick={onCreateBtn}>Create</Button>
