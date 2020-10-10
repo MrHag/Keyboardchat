@@ -20,7 +20,7 @@ const RoomList = ({ inRoom, rooms, joinRoom }) => {
             {
                 rooms.map((room, index) => {
                     const isActive = room.name === inRoom;
-                    return <RoomItem key={room.name + index} name={room.name} active={isActive} onRoomJoin={joinRoom}></RoomItem>
+                    return <RoomItem key={room.name + index} roomData={room} active={isActive} onRoomJoin={joinRoom}></RoomItem>
                 })
             }
         </div>
@@ -30,17 +30,21 @@ const RoomList = ({ inRoom, rooms, joinRoom }) => {
 const RoomPanel = ({ onCreateRoom }) => {
     const [rooms, setRooms] = useState((fake_rooms) ? fake_rooms : []);
     const [inRoom, setInRoom] = useState('global');
+    const [searchQuery, setSearchQuery] = useState('');
 
-    const joinRoom = (name) => {
+    const joinRoom = (name, password) => {
+        console.log("Trying to join room in RoomPanel: ");
+        console.log("name = ", name);
+        console.log("password = ", password);
         Socket.emit('joinroom', {
             name: name,
-            password: null
+            password: password
         });
     }
 
     const socketGetrooms = (data) => {
         const rooms = data.data.map(room => {
-            return { name: room.room }
+            return { name: room.room, haspass: room.haspass }
         });
         setRooms(rooms);
     }
@@ -75,13 +79,18 @@ const RoomPanel = ({ onCreateRoom }) => {
         return removeSocketListeners;
     }, [])
 
+    const onSearchBtn = () => {
+        const name = (searchQuery !== '') ? searchQuery : null;
+        Socket.emit('getrooms', {room: name});
+    }
+
     return (
         <div className="room-panel">
-            <TextField className="room-panel__search" placeholder="Type room name"
+            <TextField className="room-panel__search" placeholder="Type room name" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
                 InputProps={{
                     endAdornment: (
                         <InputAdornment position="start">
-                            <IconButton size="small"><FontAwesomeIcon icon={FontAwesomeIcons.faSearch}></FontAwesomeIcon></IconButton>
+                            <IconButton onClick={onSearchBtn} size="small"><FontAwesomeIcon icon={FontAwesomeIcons.faSearch}></FontAwesomeIcon></IconButton>
                         </InputAdornment>
                     )
                 }}
