@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { Button } from '../index';
@@ -17,12 +17,23 @@ const CreationRoom = ({onComplete}) => {
     */
 
     const onCreateBtn = () => {
-        Socket.emit('joinroom', {
+        Socket.emit('createroom', {
             name: name,
             password: (password.length === 0) ? null : password
         });
-        onComplete();
     }
+
+    const socketCreateRoom = (data) => {
+        console.log("Socket create room = ", data);
+        if (data.successful) {
+            onComplete();
+        }
+    }
+
+    useEffect(() => {
+        Socket.on('createroom', socketCreateRoom)
+        return () => Socket.removeEventListener('createroom', socketCreateRoom);
+    }, [])
 
     return (
         <div className="creation-room">

@@ -39,7 +39,7 @@ const room_list = [];
 const fakeRooms = require("./fake.js").rooms;
 
 fakeRooms.forEach((room) => {
-    room_list.push(new Room(room.name, null));
+    room_list.push(new Room(room.name, room.password));
 });
 
 function validateDefaultText(text, length = 0) {
@@ -263,9 +263,9 @@ function WebSocket(io) {
                 return;
             }
 
-            if (!validateDefaultText(data.message), 64)
-                service_message(ws, header, "badName", false);
-                return;
+            // if (!validateDefaultText(data.message), 64)
+            //     service_message(ws, header, "badName", false);
+            //     return;
 
             if (req.password == null)
                 req.password = "";

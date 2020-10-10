@@ -2,14 +2,21 @@
 
 .room-item {
     @include flex-layout(column, center, center);
-    height: 32px;
+    position: relative;
     width: 100%;
+    min-height: 76px;
     margin: 2px 0 2px 0;
     padding: 8px 0 8px 0;
     background-color: #f0f0f0;
 
     &.active {
         background-color: #b3b3b3;
+    }
+
+    &__content {
+        @include flex-layout(column, center,  center);
+        height: px;
+        padding-bottom: 8px;
     }
 
     &__name {
@@ -21,5 +28,28 @@
 
     &:hover {
         cursor: pointer;
+    }
+}
+
+.ri-form {
+    @include flex-layout(column, flex-start, center);
+    background-color: #f0f0f0;
+    top: 0;
+    position: absolute;
+    width: 100%;
+    z-index: 20;
+
+    .button {
+        width: 50%;
+    }
+
+    &__password {
+        width: 90%;
+    }
+
+    &__error {
+        color: red;
+        margin: 0;
+        margin-top: 8px;
     }
 }

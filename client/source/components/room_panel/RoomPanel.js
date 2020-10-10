@@ -20,7 +20,7 @@ const RoomList = ({ inRoom, rooms, joinRoom }) => {
             {
                 rooms.map((room, index) => {
                     const isActive = room.name === inRoom;
-                    return <RoomItem key={room.name + index} name={room.name} active={isActive} onRoomJoin={joinRoom}></RoomItem>
+                    return <RoomItem key={room.name + index} roomData={room} active={isActive} onRoomJoin={joinRoom}></RoomItem>
                 })
             }
         </div>
@@ -31,16 +31,19 @@ const RoomPanel = ({ onCreateRoom }) => {
     const [rooms, setRooms] = useState((fake_rooms) ? fake_rooms : []);
     const [inRoom, setInRoom] = useState('global');
 
-    const joinRoom = (name) => {
+    const joinRoom = (name, password) => {
+        console.log("Trying to join room in RoomPanel: ");
+        console.log("name = ", name);
+        console.log("password = ", password);
         Socket.emit('joinroom', {
             name: name,
-            password: null
+            password: password
         });
     }
 
     const socketGetrooms = (data) => {
         const rooms = data.data.map(room => {
-            return { name: room.room }
+            return { name: room.room, haspass: room.haspass }
         });
         setRooms(rooms);
     }
