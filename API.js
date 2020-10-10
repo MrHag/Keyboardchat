@@ -1,3 +1,5 @@
+const { error } = require("console");
+
 module.exports = {
     Calls: {
 
@@ -12,7 +14,15 @@ module.exports = {
 
             response: {
                 body: {
-                    data: ":string:",
+                    data: {
+                        successful: ":string:",
+                        unsuccessful: [
+                            "badName"
+                        ],
+                        error: [
+                            "invalidData"
+                        ]
+                    },
                     successful: true,
                     error: true
                 }
@@ -79,7 +89,50 @@ module.exports = {
 
             response: {
                 body: {
-                    data: ":string:",
+                    data: {
+                        successful: {
+                            message: ":string:",
+                            room: ":string:"
+                        },
+                        unsuccessful: [
+                            "invalidPass",
+                            "roomNotFound"
+                        ],
+                        error: [
+                            "invalidData"
+                        ]
+                    },
+                    successful: true,
+                    error: true
+                }
+            }
+        },
+
+        CreateRoom: {
+
+            header: "createroom",
+            request: {
+                body: {
+                    name: ":string:",
+                    password: [
+                        ":string:",
+                        null
+                    ]
+                }
+            },
+
+            response: {
+                body: {
+                    data: {
+                        successful: ":string:",
+                        unsuccessful: [
+                            "roomExists",
+                            "badName"
+                        ],
+                        error: [
+                            "invalidData"
+                        ]
+                    },
                     successful: true,
                     error: true
                 }
@@ -94,7 +147,12 @@ module.exports = {
             header: "access",
             response: {
                 body: {
-                    data: ":string:",
+                    data: {
+                        successful: ":string:",
+                        error: [
+                            "notAuth"
+                        ]
+                    },
                     successful: true,
                     error: true
                 }

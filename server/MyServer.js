@@ -10,7 +10,6 @@ const responceBody = require("./responseBody.js");
 const Path = '../public/';
 
 const API = require("../API");
-const { compile } = require('ejs');
 
 const Calls = API.Calls;
 const SCalls = API.ServerCalls;
@@ -74,7 +73,7 @@ function DeleteUser(ws) {
 function AuthCheckReport(user)
 {
     if (!user.Auth)
-        error_message(user.client, SCalls.Access.header, "You are not Authorized");
+        error_message(user.client, SCalls.Access.header, "notAuth");
 
     return user.Auth;
 }
@@ -180,14 +179,16 @@ function WebSocket(io) {
             let header = Calls.Authorization.header;
 
             if (data == null || data.name == null) {
-                service_message(ws, header, "Incorrect nickname", false);
+                error_message(ws, header, "invalidData");
                 return;
             }
 
             data.name = data.name.trim();
 
-            if (!validateDefaultText(data.name, 4))
+            if (!validateDefaultText(data.name, 4)) {
+                service_message(ws, header, "badName", false);
                 return;
+            }
 
             let user = GetUser(ws);
 
@@ -229,7 +230,7 @@ function WebSocket(io) {
             let header = Calls.JoinRoom.header;
 
             if (req == null || req.name == null) {
-                error_message(ws, header, "Cant join room");
+                error_message(ws, header, "invalidData");
                 return;
             }
 
@@ -241,13 +242,37 @@ function WebSocket(io) {
             for (let room of room_list) {
                 if (room.name === req.name) {
                     console.log("roompass: "+room.password);
-                    if (room.password == "" || room.password == null) {
+                    if (room.password == "" || room.password == null || room.password === req.password) {
                         joinroom(ws, room);
                     }
-                    else
-                    if (room.password === req.password) {
-                        joinroom(ws, room);
-                    }
+                    service_message(ws, header, "invalidPass", false);
+                    return;
+                }
+            }
+
+            service_message(ws, header, "roomNotFound", false);
+        });
+
+
+        ws.on(Calls.CreateRoom.header, req => {
+
+            let header = Calls.CreateRoom.header;
+
+            if (req == null || req.name == null) {
+                error_message(ws, header, "invalidData");
+                return;
+            }
+
+            if (!validateDefaultText(data.message), 64)
+                service_message(ws, header, "badName", false);
+                return;
+
+            if (req.password == null)
+                req.password = "";
+
+            for (let room of room_list) {
+                if (room.name === req.name) {
+                    service_message(ws, header, "roomExists", false);
                     return;
                 }
             }
@@ -255,6 +280,7 @@ function WebSocket(io) {
             let room = new Room(req.name, req.password);
             room_list.push(room);
             console.log("create room: ", room.name);
+            service_message(ws, header, "Created room", true);
             BroadCast(SCalls.RoomChange.header, "Created room", true, false);
             joinroom(ws, room);
 

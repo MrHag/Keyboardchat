@@ -7,7 +7,8 @@ module.exports =
         { "name": "Programming" },
         { "name": "Что-то интересное" },
         { "name": "Любим готовить" },
-        { "name": "Anime" },
-        { "name": "Physics" }
+        { "name": "Anime" }, 
+        { "name": "Physics" },
+        { "name": "ОЧЕНЬБОЛЬШОЕНАЗВАНИЕОЧЕНЬБОЛЬШОЕНАЗВАНИЕОЧЕНЬБОЛЬШОЕНАЗВАНИЕ" }
     ]
 }
