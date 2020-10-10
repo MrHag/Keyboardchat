@@ -37,7 +37,10 @@ const RoomItemForm = ({roomName, onCancel, onJoin}) => {
 
     return (
         <div className="ri-form">
-            <TextField className="ri-form__password" onChange={e => setPassword(e.target.value)} placeholder="Password"></TextField>
+            <TextField className="ri-form__password" onChange={e => setPassword(e.target.value)} placeholder="Password" autoFocus
+             onKeyDown={e => {
+                 if (e.key === 'Enter') onJoinBtn();
+             }}></TextField>
             <p className="ri-form__error">{err}</p>
             <div className="ri_form__buttons">
                 <Button onClick={onCancel}>Cancel</Button>
