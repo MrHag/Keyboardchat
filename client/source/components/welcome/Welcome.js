@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Input, Button } from '@material-ui/core';
+import { Input} from '@material-ui/core';
 
 import './Welcome.scss';
 import Socket from '../../Socket';
-import { keys } from '@material-ui/core/styles/createBreakpoints';
-
+import { Button } from '../index';
 
 const Login = ({onLogin}) => {
     const [login, setLogin] = useState('');
@@ -33,12 +32,12 @@ const Login = ({onLogin}) => {
 
     return (
         <div className="login">
-            <Input placeholder="Enter name" onChange={e => setLogin(e.target.value)} 
+            <Input className="login__login" placeholder="Enter name" onChange={e => setLogin(e.target.value)} 
                 onKeyDown={e => {
                     if (e.key == 'Enter')
                         onLoginHandler(e)
                 }} autoFocus={true}></Input>
-            <Button className="login__btn" variant="contained" color="primary" onClick={onLoginHandler}>Login</Button>
+            <Button className="button" variant="contained" color="secondary" onClick={onLoginHandler}>Login</Button>
         </div>
     )
 }

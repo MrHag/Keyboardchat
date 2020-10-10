@@ -6,12 +6,12 @@
 .login {
     width: 250px;
 
-    .MuiInput-root {
+    .button {
+        margin-top: 16px;
         width: 100%;
     }
 
-    .MuiButton-containedPrimary {
-        margin-top: 16px;
+    &__login {
         width: 100%;
     }
 }
