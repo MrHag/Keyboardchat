@@ -8,7 +8,8 @@ import { Button } from '../index';
 
 const Login = ({onLogin}) => {
     const [login, setLogin] = useState('');
-    
+    const [err, setErr] = useState('');
+
     const onLoginHandler = () => {
         let request = {
             name: login
@@ -16,18 +17,22 @@ const Login = ({onLogin}) => {
         Socket.emit('auth', request);
     }
 
-    useEffect(() => {
-        // ??? Maybe you will must to replace Socket.off with Socket.off('responce', handleFunction)
-        Socket.on('auth', data => {
-            console.log("Auth data = ", data);
-            if (data.successful) {
-                console.log("Authorization success!");
-                onLogin();
-            } else {
-                console.error("Authorization failed!");
+    const socketAuth = (data) => {
+        console.log("Auth response!");
+        if (data.successful) {
+            onLogin();
+        } else {
+            switch (data.data) {
+                case 'badName':
+                    setErr('Bad name!');
+                    break;
             }
-        });
-        return () => Socket.off('response');
+        }
+    }
+
+    useEffect(() => {
+        Socket.on('auth', socketAuth);
+        return () => Socket.removeEventListener('response', socketAuth);
     }, [])
 
     return (
@@ -37,7 +42,8 @@ const Login = ({onLogin}) => {
                     if (e.key == 'Enter')
                         onLoginHandler(e)
                 }} autoFocus={true}></Input>
-            <Button className="button" variant="contained" color="secondary" onClick={onLoginHandler}>Login</Button>
+            <p className="login__error">{err}</p>
+            <Button className="button" variant="contained" color="secondary" onClick={onLoginHandler} disabled={login.length === 0}>Login</Button>
         </div>
     )
 }

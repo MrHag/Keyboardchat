@@ -45,16 +45,18 @@ fakeRooms.forEach((room) => {
 });
 
 function validateDefaultText(text, minlength = 0, maxlength = -1) {
-    if (text.length < minlength)
-        return false;
-
-    if (maxlength != -1 || text.length > maxlength)
-        return false;
-
-    if (text.match(/[\S]+/g) == null)
-        return false;
-
     return true;
+    //Мешает кодить фронт.
+    // if (text.length < minlength)
+    //     return false;
+
+    // if (maxlength != -1 || text.length > maxlength)
+    //     return false;
+
+    // if (text.match(/[\S]+/g) == null)
+    //     return false;
+
+    // return true;
 }
 
 function GetUser(ws)
