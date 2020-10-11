@@ -2,11 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import './RoomPanel.scss';
-import { InputAdornment, TextField, IconButton} from '@material-ui/core';
+import { InputAdornment, TextField} from '@material-ui/core';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
-import { RoomItem, Button } from '../../components';
+
+import { RoomItem, Button, IconButton } from '../../components';
 
 import Socket from '../../Socket';
 
@@ -35,9 +36,6 @@ const RoomPanel = ({ onCreateRoom }) => {
     const [searchQuery, setSearchQuery] = useState('');
 
     const joinRoom = (name, password) => {
-        console.log("Trying to join room in RoomPanel: ");
-        console.log("name = ", name);
-        console.log("password = ", password);
         Socket.emit('joinroom', {
             name: name,
             password: password
@@ -56,9 +54,7 @@ const RoomPanel = ({ onCreateRoom }) => {
     }
 
     const socketJoinroom = (data) => {
-        console.error("Hello world!");
         if (data.successful) {
-            console.error("New room name = ", data.data.room);
             setInRoom(data.data.room);
         }
     }
@@ -81,18 +77,26 @@ const RoomPanel = ({ onCreateRoom }) => {
         return removeSocketListeners;
     }, [])
 
-    const onSearchBtn = () => {
-        const name = (searchQuery !== '') ? searchQuery : null;
+    const onClearSearchBtn = () => {
+        setSearchQuery('');
+        Socket.emit('getrooms', {room: null});
+    }
+
+    const onSearchChange = (e) => {
+        const name = (e.target.value !== '') ? e.target.value : null;
         Socket.emit('getrooms', {room: name});
+        setSearchQuery(e.target.value);
     }
 
     return (
         <div className="room-panel">
-            <TextField className="room-panel__search" placeholder="Type room name" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+            <TextField className="room-panel__search" placeholder="Type room name" value={searchQuery} onChange={onSearchChange}
                 InputProps={{
                     endAdornment: (
                         <InputAdornment position="start">
-                            <IconButton onClick={onSearchBtn} size="small"><FontAwesomeIcon icon={FontAwesomeIcons.faSearch}></FontAwesomeIcon></IconButton>
+                            <IconButton disabled={searchQuery===''} onClick={onClearSearchBtn} size="small">
+                                <FontAwesomeIcon icon={FontAwesomeIcons.faTrash}></FontAwesomeIcon>
+                            </IconButton>
                         </InputAdornment>
                     )
                 }}

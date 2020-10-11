@@ -14,7 +14,7 @@ const App = () => {
 
     let content = <Welcome onLogin={_ => setStage('logged')}></Welcome>;
     if (is_in_dev !== undefined) {
-        content = <Home></Home>;
+        //content = <Home></Home>;
     }
 
     if (stage === 'logged') {

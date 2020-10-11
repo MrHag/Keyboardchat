@@ -56,7 +56,7 @@ const CreationRoom = ({onComplete}) => {
                 <p className="creation-room__error">{err}</p>
                 <div className="creation-room__buttons">
                     <Button onClick={onComplete}>Cancel</Button>
-                    <Button onClick={onCreateBtn}>Create</Button>
+                    <Button disabled={name === ''} onClick={onCreateBtn}>Create</Button>
                 </div>
             </div>
         </div>
