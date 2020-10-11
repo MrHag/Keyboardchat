@@ -15,15 +15,17 @@
 
     &__content {
         @include flex-layout(column, center,  center);
-        height: px;
+        width: 100%;
         padding-bottom: 8px;
     }
 
     &__name {
-        @include flex-layout(row, center, center);
         text-align: center;
         font-weight: 600;
         font-size: 18px;
+        overflow: hidden;
+        max-width: 90%;
+        white-space: nowrap;
     }
 
     &:hover {

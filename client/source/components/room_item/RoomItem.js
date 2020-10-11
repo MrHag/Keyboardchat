@@ -79,7 +79,7 @@ const RoomItem = ({active, roomData, onRoomJoin}) => {
         <div onClick={onClickHandler} className={classNames("room-item", {"active": active})}>
             <div className="room-item__content">
                 {haspass ? <FontAwesomeIcon icon={FontAwesomeIcons.faLock}></FontAwesomeIcon> : null}
-                <div className="room-item__name">{name}</div>
+                <p className="room-item__name" title={name}>{name}</p>
             </div>
             {form}
         </div>
