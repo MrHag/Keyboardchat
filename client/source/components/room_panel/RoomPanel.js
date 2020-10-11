@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import './RoomPanel.scss';
@@ -15,8 +15,10 @@ try {
 } catch (err) { }
 
 const RoomList = ({ inRoom, rooms, joinRoom }) => {
+    const listRef = useRef();
+
     return (
-        <div className="room-panel__list">
+        <div ref={listRef} className="room-panel__list">
             {
                 rooms.map((room, index) => {
                     const isActive = room.name === inRoom;

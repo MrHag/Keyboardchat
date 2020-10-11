@@ -57,7 +57,9 @@ const RoomItem = ({active, roomData, onRoomJoin}) => {
     const onClickHandler = (e) => {
         if (!active) {
             if (haspass) {
-                if (stage !== 'joining') setStage('joining');
+                if (stage !== 'joining') {
+                    setStage('joining');
+                }
             } else {
                 onRoomJoin(name, null);
             }
@@ -78,7 +80,7 @@ const RoomItem = ({active, roomData, onRoomJoin}) => {
     return (
         <div onClick={onClickHandler} className={classNames("room-item", {"active": active})}>
             <div className="room-item__content">
-                {haspass ? <FontAwesomeIcon icon={FontAwesomeIcons.faLock}></FontAwesomeIcon> : null}
+                {haspass ? <FontAwesomeIcon className="room-item__lock-icon" icon={FontAwesomeIcons.faLock}></FontAwesomeIcon> : null}
                 <p className="room-item__name" title={name}>{name}</p>
             </div>
             {form}
