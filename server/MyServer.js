@@ -48,7 +48,7 @@ function validateDefaultText(text, minlength = 0, maxlength = -1) {
     if (text.length < minlength)
         return false;
 
-    if (maxlength != -1 || text.length > maxlength)
+    if (maxlength != -1 && text.length > maxlength)
         return false;
 
     if (text.match(/[\S]+/g) == null)
@@ -268,7 +268,7 @@ function WebSocket(io) {
                 return;
             }
 
-            if (!validateDefaultText(req.name), 0, 64) {
+            if (!validateDefaultText(req.name, 0, 64)) {
                 service_message(ws, header, "badName", false);
                 return;
             }
@@ -299,25 +299,36 @@ function WebSocket(io) {
             let rooms = Array.from(room_list, (room) => { let obj = { name: room.name, password: room.password, qual: 0 }; return obj; });
 
             if (req != null && req.room != null) {
-                for (let key in rooms) {
+                for (let key = 0; key < rooms.length; key++) {
                     let room = rooms[key];
 
-                    for (let i = req.room.length; i >= 0; i--) {
-                        let str = req.room.substring(0, i);
+                    let str = "";
+                    let minQual = Math.ceil(req.room.length * (50 / 100));;
 
-                        if (room.name.includes(str)) {
+                    for (let i = req.room.length; i > 0; i--) {
+                        str = req.room.substring(0, i);
+
+                        let regex = new RegExp(`(${str})+`, "i");
+
+                        console.log(room.name + " include " + str + "     result " + regex.test(room.name));
+
+                        if (regex.test(room.name)) {
                             room.qual = str.length;
                             break;
                         }
 
                     }
 
-                    if (room.qual === 0) {
+                    console.log("Qual = " + room.qual);
+                    console.log("minQual = " + minQual);
+
+                    if (room.qual < minQual) {
                         rooms.splice(key, 1);
+                        key--;
                     }
 
                 }
-                rooms.sort((a, b) => { b.qual - a.qual });
+                rooms.sort((a, b) => { return b.qual - a.qual });
             }
 
             let outrooms = Array.from(rooms, (room) => {
@@ -334,9 +345,9 @@ function WebSocket(io) {
                 return { room: room.name, haspass: haspass };
             });
 
-            //console.log(room_list);
-            //console.log(rooms);
-            //console.log(outrooms);
+            console.log(room_list);
+            console.log(rooms);
+            console.log(outrooms);
 
             service_message(ws, header, outrooms, true);
 
