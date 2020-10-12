@@ -44,7 +44,7 @@ const RoomItemForm = ({roomName, onCancel, onJoin}) => {
             <p className="ri-form__error">{err}</p>
             <div className="ri_form__buttons">
                 <Button onClick={onCancel}>Cancel</Button>
-                <Button onClick={onJoinBtn}>Join</Button>
+                <Button disabled={password === ''} onClick={onJoinBtn}>Join</Button>
             </div>
         </div>
     )
@@ -57,7 +57,9 @@ const RoomItem = ({active, roomData, onRoomJoin}) => {
     const onClickHandler = (e) => {
         if (!active) {
             if (haspass) {
-                if (stage !== 'joining') setStage('joining');
+                if (stage !== 'joining') {
+                    setStage('joining');
+                }
             } else {
                 onRoomJoin(name, null);
             }
@@ -78,8 +80,8 @@ const RoomItem = ({active, roomData, onRoomJoin}) => {
     return (
         <div onClick={onClickHandler} className={classNames("room-item", {"active": active})}>
             <div className="room-item__content">
-                {haspass ? <FontAwesomeIcon icon={FontAwesomeIcons.faLock}></FontAwesomeIcon> : null}
-                <div className="room-item__name">{name}</div>
+                {haspass ? <FontAwesomeIcon className="room-item__lock-icon" icon={FontAwesomeIcons.faLock}></FontAwesomeIcon> : null}
+                <p className="room-item__name" title={name}>{name}</p>
             </div>
             {form}
         </div>

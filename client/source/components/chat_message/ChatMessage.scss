@@ -8,16 +8,18 @@ $msg-content-border-radius: 16px;
     margin: 16px 0px 16px 0px;
     max-width: 100%;
 
-    &__user {
+    &__info {
         margin-bottom: 8px;
         display: flex;
-        align-items: center;
+        align-items: flex-end;
     }
 
     &__name {
         font-size: 20px;
         font-style: italic;
         font-weight: 500;
+        position: relative;
+        top: 2px;
         display: inline-block;
         z-index: 1;
     }
@@ -26,7 +28,12 @@ $msg-content-border-radius: 16px;
         border-radius: 50%;
         width: 40px;
         height: 40px;
-        margin-right: 16px;
+        margin-right: 8px;
+    }
+
+    &__date {
+        margin-left: 8px;
+        font-size: 10px;
     }
 
     &__text {

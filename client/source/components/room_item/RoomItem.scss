@@ -4,9 +4,9 @@
     @include flex-layout(column, center, center);
     position: relative;
     width: 100%;
-    min-height: 76px;
-    margin: 2px 0 2px 0;
-    padding: 8px 0 8px 0;
+    //min-height: 32px;
+    height: fit-content;
+    margin: 8px 0 8px 0;
     background-color: #f0f0f0;
 
     &.active {
@@ -14,16 +14,24 @@
     }
 
     &__content {
-        @include flex-layout(column, center,  center);
-        height: px;
+        @include flex-layout(row, center,  center);
+        padding: 8px 0 8px 0;
+        width: 100%;
         padding-bottom: 8px;
     }
 
+    &__lock-icon {
+        margin: 0 8px;
+    }
+
     &__name {
-        @include flex-layout(row, center, center);
+        margin: 0;
         text-align: center;
         font-weight: 600;
         font-size: 18px;
+        overflow: hidden;
+        max-width: 90%;
+        white-space: nowrap;
     }
 
     &:hover {
@@ -35,7 +43,7 @@
     @include flex-layout(column, flex-start, center);
     background-color: #f0f0f0;
     top: 0;
-    position: absolute;
+    //position: absolute;
     width: 100%;
     z-index: 20;
 
