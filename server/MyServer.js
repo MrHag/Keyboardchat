@@ -45,18 +45,19 @@ fakeRooms.forEach((room) => {
 });
 
 function validateDefaultText(text, minlength = 0, maxlength = -1) {
+
+     if (text.length < minlength)
+         return false;
+
+
+    if (maxlength != -1 && text.length > maxlength)
+        return false;
+
+
+    if (text.match(/[\S]+/g) == null)
+         return false;
+
     return true;
-    //Мешает кодить фронт.
-    // if (text.length < minlength)
-    //     return false;
-
-    // if (maxlength != -1 || text.length > maxlength)
-    //     return false;
-
-    // if (text.match(/[\S]+/g) == null)
-    //     return false;
-
-    // return true;
 }
 
 function GetUser(ws)
@@ -192,7 +193,9 @@ function WebSocket(io) {
 
             data.name = data.name.trim();
 
-            if (!validateDefaultText(data.name, 4, 64)) {
+            //if (!validateDefaultText(data.name, 4, 64)) {
+            //Чтобы легче было кодить фронт
+            if (!validateDefaultText(data.name)) {
                 service_message(ws, header, "badName", false);
                 return;
             }
@@ -223,7 +226,9 @@ function WebSocket(io) {
 
             data.message = data.message.trim();
 
-            if (!validateDefaultText(data.message, 1, 2000))
+            //if (!validateDefaultText(data.message, 1, 2000))
+            //Чтобы легче было кодить фронт
+            if(!validateDefaultText(data.message))
                 return;
 
             console.log("Message = ", data);
@@ -270,7 +275,9 @@ function WebSocket(io) {
                 return;
             }
 
-            if (!validateDefaultText(req.name), 0, 64) {
+            //if (!validateDefaultText(req.name, 0, 64)) {
+            //Чтобы легче было кодить фронт
+            if (!validateDefaultText(req.name)) {
                 service_message(ws, header, "badName", false);
                 return;
             }
@@ -301,25 +308,36 @@ function WebSocket(io) {
             let rooms = Array.from(room_list, (room) => { let obj = { name: room.name, password: room.password, qual: 0 }; return obj; });
 
             if (req != null && req.room != null) {
-                for (let key in rooms) {
+                for (let key = 0; key < rooms.length; key++) {
                     let room = rooms[key];
 
-                    for (let i = req.room.length; i >= 0; i--) {
-                        let str = req.room.substring(0, i);
+                    let str = "";
+                    let minQual = Math.ceil(req.room.length * (50 / 100));;
 
-                        if (room.name.includes(str)) {
+                    for (let i = req.room.length; i > 0; i--) {
+                        str = req.room.substring(0, i);
+
+                        let regex = new RegExp(`(${str})+`, "i");
+
+                        console.log(room.name + " include " + str + "     result " + regex.test(room.name));
+
+                        if (regex.test(room.name)) {
                             room.qual = str.length;
                             break;
                         }
 
                     }
 
-                    if (room.qual === 0) {
+                    console.log("Qual = " + room.qual);
+                    console.log("minQual = " + minQual);
+
+                    if (room.qual < minQual) {
                         rooms.splice(key, 1);
+                        key--;
                     }
 
                 }
-                rooms.sort((a, b) => { b.qual - a.qual });
+                rooms.sort((a, b) => { return b.qual - a.qual });
             }
 
             let outrooms = Array.from(rooms, (room) => {
@@ -336,9 +354,9 @@ function WebSocket(io) {
                 return { room: room.name, haspass: haspass };
             });
 
-            //console.log(room_list);
-            //console.log(rooms);
-            //console.log(outrooms);
+            console.log(room_list);
+            console.log(rooms);
+            console.log(outrooms);
 
             service_message(ws, header, outrooms, true);
 
