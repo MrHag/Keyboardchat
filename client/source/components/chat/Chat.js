@@ -24,17 +24,21 @@ RoomHeader.propTypes = {
 };
 
 const Chat = () => {
-    //Stores messages in JSON format
-    const s = {
+    if (fake_messages) {
+        for (let msg of fake_messages) {
+            msg.date = new Date();
+            msg.date.setSeconds(Math.random() * 1000);
+        }
+    } 
+
+    const [state, setState] = useState( {
         messages: (fake_messages) ? fake_messages : [],
         room_name: 'Палата №1'
-    };
-
-    const [state, setState] = useState(s);
+    } );
     const historyRef = React.useRef();
 
     const onNewMessage = data => {
-        console.log("Message data = ", data);
+        data.date = new Date();
         setState({room_name: state.room_name, messages: [...state.messages, data]});
         historyRef.current.scrollTop = historyRef.current.scrollHeight;
     }
