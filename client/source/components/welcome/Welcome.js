@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Input, Button } from '@material-ui/core';
+import { Input} from '@material-ui/core';
 
 import './Welcome.scss';
 import Socket from '../../Socket';
-import { keys } from '@material-ui/core/styles/createBreakpoints';
-
+import { Button } from '../index';
 
 const Login = ({onLogin}) => {
     const [login, setLogin] = useState('');
-    
+    const [err, setErr] = useState('');
+
     const onLoginHandler = () => {
         let request = {
             name: login
@@ -17,27 +17,33 @@ const Login = ({onLogin}) => {
         Socket.emit('auth', request);
     }
 
-    useEffect(() => {
-        Socket.on('response', data => {
-            console.log("Auth data = ", data);
-            if (data.type === 'authSucc') {
-                console.log("Authorization success!");
-                onLogin();
-            } else {
-                console.error("Authorization failed!");
+    const socketAuth = (data) => {
+        console.log("Auth response!");
+        if (data.successful) {
+            onLogin();
+        } else {
+            switch (data.data) {
+                case 'badName':
+                    setErr('Bad name!');
+                    break;
             }
-        });
-        return () => Socket.off('response');
-    })
+        }
+    }
+
+    useEffect(() => {
+        Socket.on('auth', socketAuth);
+        return () => Socket.removeEventListener('response', socketAuth);
+    }, [])
 
     return (
         <div className="login">
-            <Input placeholder="Enter name" onChange={e => setLogin(e.target.value)} 
+            <Input className="login__login" placeholder="Enter name" onChange={e => setLogin(e.target.value)} 
                 onKeyDown={e => {
                     if (e.key == 'Enter')
                         onLoginHandler(e)
                 }} autoFocus={true}></Input>
-            <Button className="login__btn" variant="contained" color="primary" onClick={onLoginHandler}>Login</Button>
+            <p className="login__error">{err}</p>
+            <Button className="button" variant="contained" color="secondary" onClick={onLoginHandler} disabled={login.length === 0}>Login</Button>
         </div>
     )
 }

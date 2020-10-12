@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 
 import Socket from '../../Socket';
-import { TextareaAutosize, IconButton } from '@material-ui/core/';
+import { TextareaAutosize } from '@material-ui/core/';
+import { IconButton } from '../index';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
@@ -13,8 +14,10 @@ const ChatInput = () => {
 
     const onChatKeydown = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
-            sendMessage();
             e.preventDefault();
+            if (text.length) {
+                sendMessage();
+            }
         }
     }
 
@@ -24,13 +27,15 @@ const ChatInput = () => {
             message: text
         });
     }
-    
+
     return (
         <div className="chat-input">
-            <TextareaAutosize className="chat-input__area" variant="outlined" rowsMax={4} rowsMin={4} value={text} autoFocus={true} placeholder="Your message"
+            <TextareaAutosize className="chat-input__area" variant="outlined" rowsMax={3} rowsMin={3} value={text} autoFocus={true} placeholder="Your message"
                     onChange={e => setText(e.target.value)} onKeyDown={e => onChatKeydown(e)}></TextareaAutosize>
             <div className="chat-input__controls">
-                <IconButton className="chat-input__send" onClick={sendMessage}><FontAwesomeIcon icon={FontAwesomeIcons.faPaperPlane}></FontAwesomeIcon></IconButton>
+                <IconButton disabled={text === ''} onClick={sendMessage}>
+                    <FontAwesomeIcon icon={FontAwesomeIcons.faPaperPlane}></FontAwesomeIcon>
+                </IconButton>
             </div>
         </div>
     )

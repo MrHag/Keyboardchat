@@ -1,6 +1,7 @@
 @import '../../styles/globals.scss';
 
 .room-panel {
+    @include flex-layout(column, flex-start, center);
     background-color: white;
     width: 256px;
     height: 100%;
@@ -12,33 +13,16 @@
     }
 
     &__list {
+        @include flex-layout(column, flex-start, flex-start);
         overflow: scroll;
         max-height: 95%;
-
+        width: 100%;
         overflow-y: scroll;
         overflow-x: hidden;
-        &::-webkit-scrollbar {
-            display: none;
-        }
-    }
-}
-
-.room-item {
-    @include flex-layout(column, center, center);
-    height: 32px;
-    width: 100%;
-    margin: 16px 0;
-    border-radius: 16px;
-    padding: 8px 0;
-    background-color: #f0f0f0;
-
-    &__name {
-        @include flex-layout(row, center, center);
-        font-weight: 600;
-        font-size: 18px;
     }
 
-    &:hover {
-        cursor: pointer;
+    .button {
+        width: 100%;
+        margin-top: 8px;
     }
 }

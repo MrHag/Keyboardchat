@@ -1,25 +1,20 @@
-var express = require('express');
-var socket = require('socket.io');
-var path = require('path');
-const { func } = require('prop-types');
-const { getuid } = require('process');
-var cors = require('cors');
+const express = require('express');
+const socket = require('socket.io');
 
 const Room = require("./room.js");
 const User = require("./user.js");
 
 const messageBody = require("./messageBody.js");
-const responceBody = require("./responceBody.js");
-
-
-var corsOptions = {
-    origin: 'http://127.0.0.1:4000',
-    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}
+const responceBody = require("./responseBody.js");
 
 const Path = '../public/';
 
-var app = express();
+const API = require("../API");
+
+const Calls = API.Calls;
+const SCalls = API.ServerCalls;
+
+const app = express();
 app.get('/', (req, res) => {
     console.log("Required files / = ", req.url);
     res.sendFile("index.html", {root: Path});
@@ -30,32 +25,52 @@ app.get('/*', (req, res) => {
     res.sendFile(req.url, {root: Path});
 });
 
-var server = app.listen(4000);
+const server = app.listen(4000);
 
-var io = socket(server);
+const io = socket(server);
 io.origins('*:*');
 
-var globalRoom = new Room("global");
+const globalRoom = new Room("global");
 
-var user_list = [];
-var room_list = [];
+const user_list = [];
+const room_list = [];
+
+
+const fakeRooms = require("./fake.js").rooms;
 
 fakeRooms.forEach((room) => {
-    room_list.push(new Room(room.name, null));
+    if (room.password == null)
+        room.password = null;
+    room_list.push(new Room(room.name, room.password));
 });
+
+function validateDefaultText(text, minlength = 0, maxlength = -1) {
+
+     if (text.length < minlength)
+         return false;
+
+
+    if (maxlength != -1 && text.length > maxlength)
+        return false;
+
+
+    if (text.match(/[\S]+/g) == null)
+         return false;
+
+    return true;
+}
 
 function GetUser(ws)
 {
-    for (var key in user_list) {
+    for (let user of user_list) {
 
-        user = user_list[key];
         if (user.client == ws)
             return user;
     }
 }
 
 function DeleteUser(ws) {
-    for (var key in user_list) {
+    for (let key in user_list) {
 
         user = user_list[key];
         if (user.client == ws)
@@ -66,46 +81,51 @@ function DeleteUser(ws) {
 function AuthCheckReport(user)
 {
     if (!user.Auth)
-        access_error(user.client, 'You are not Authorizate');
+        error_message(user.client, SCalls.Access.header, "notAuth");
 
     return user.Auth;
 }
 
 function SendMessage(to, message, name, ava)
 {
-    if (ava == undefined)
+    if (ava == null)
         ava = "images/unknown.png";
 
     console.log(to + " " + message + " " + name + " " + ava);
-    body = new messageBody(name, message, ava);
-    io.to(to).emit('chat', body);
+    let body = new messageBody(name, message, ava);
+    io.to(to).emit(Calls.Chat.header, body);
 }
 
-function service_message(ws, type, data) {
+function message(ws, header, data, succ, error) {
 
-    console.log(type + ": " + data);
-    resp = new responceBody(type, data, false);
-    console.log("This is our responce = ", resp);
-    io.to(ws.id).emit('response', resp);
+    console.log(header + ": " + data);
+    let resp = new responceBody(data, succ, error);
+    console.log("This is our response = ", resp);
+    io.to(ws.id).emit(header, resp);
 }
 
-function access_error(ws, data) {
+function service_message(ws, header, data, succ) {
 
-    console.log("access error: " + data);
-    resp = new responceBody("accessError", data, true);
-    io.to(ws.id).emit('response', resp);
+    message(ws, header, data, succ, false);
 }
 
-function error_message(ws, data, type) {
+function BroadCast(header, data, succ, error) {
+
+    for (let user of user_list) {
+        message(user.client, header, data, succ, error);
+    }
+
+}
+
+function error_message(ws, header, data) {
 
     console.log("error: " + data);
-    resp = new responceBody(type, data, true);
-    io.to(ws.id).emit('response', resp);
+    message(ws, header, data, false, true);
 }
 
 function joinroom(ws, room) {
 
-    var user = GetUser(ws);
+    let user = GetUser(ws);
 
     if (!AuthCheckReport(user))
         return false;
@@ -121,13 +141,15 @@ function joinroom(ws, room) {
         SendMessage(room.name, user.name + " connected", "Server", "images/server.jpg");
         room.AddUser(user);
         user.room = room;
+
+        service_message(ws, Calls.JoinRoom.header, { message: "Join room", room: room.name }, true);
         return true;
     });
 }
 
 function leaveroom(ws, room) {
 
-    var user = GetUser(ws);
+    let user = GetUser(ws);
 
     if (!AuthCheckReport(user))
         return false;
@@ -138,11 +160,12 @@ function leaveroom(ws, room) {
         ws.leave(room.name);
 
         if (room.users.length == 0) {
-            for (var key in room_list) {
+            for (let key in room_list) {
                 let froom = room_list[key];
                 if (froom == room) {
                     room_list.splice(key, 1);
                     console.log("delete room: ", froom.name);
+                    BroadCast(SCalls.RoomChange.header, "Deleted room", true, false);
                     break;
                 }
             }
@@ -159,30 +182,41 @@ function WebSocket(io) {
 
         user_list.push(new User(ws));
 
-        ws.on("auth", data => {
+        ws.on(Calls.Authorization.header, data => {
+
+            let header = Calls.Authorization.header;
 
             if (data == null || data.name == null) {
-                service_message(ws, "authFail", "incorrect nickname");
+                error_message(ws, header, "invalidData");
                 return;
             }
 
-            var user = GetUser(ws);
+            data.name = data.name.trim();
+
+            //if (!validateDefaultText(data.name, 4, 64)) {
+            //Чтобы легче было кодить фронт
+            if (!validateDefaultText(data.name)) {
+                service_message(ws, header, "badName", false);
+                return;
+            }
+
+            let user = GetUser(ws);
 
             user.name = data.name;
             user.Auth = true;
 
             joinroom(ws, globalRoom);
 
-            service_message(ws, "authSucc", "Aunthentication successful");
+            service_message(ws, header, "Aunthentication successful", true);
 
         });
 
-        ws.on('chat', (data) => {
+        ws.on(Calls.Chat.header, (data) => {
 
-            var user = GetUser(ws);
-
-            if (user.client != ws)
+            if (data == null || data.message == null)
                 return;
+
+            let user = GetUser(ws);
 
             if (!AuthCheckReport(user))
                 return;
@@ -190,34 +224,70 @@ function WebSocket(io) {
             if (user.room == null)
                 return;         
 
+            data.message = data.message.trim();
+
+            //if (!validateDefaultText(data.message, 1, 2000))
+            //Чтобы легче было кодить фронт
+            if(!validateDefaultText(data.message))
+                return;
+
             console.log("Message = ", data);
             console.log("from = ", user.room.name);
             SendMessage(user.room.name, data.message, user.name);
             
         });
 
-        ws.on('JoinRoom', req => {
+        ws.on(Calls.JoinRoom.header, req => {
+
+            let header = Calls.JoinRoom.header;
 
             if (req == null || req.name == null) {
-                error_message(ws, "Cant join room", "roomError");
+                error_message(ws, header, "invalidData");
                 return;
             }
 
             if (req.password == null)
                 req.password = "";
+
+            console.log("try to join:" + req.name + " " + req.password);
             
-            for (var key in room_list) {
-                let room = room_list[key];
+            for (let room of room_list) {
                 if (room.name === req.name) {
-                    console.log(room.password);
-                    console.log(req.password);
-                    if (room.password !== "") {
+                    console.log("roompass: "+room.password);
+                    if (room.password == "" || room.password == null || room.password === req.password) {
                         joinroom(ws, room);
                     }
-                    else
-                    if (room.password === req.password) {
-                        joinroom(ws, room);
-                    }
+                    service_message(ws, header, "invalidPass", false);
+                    return;
+                }
+            }
+
+            service_message(ws, header, "roomNotFound", false);
+        });
+
+
+        ws.on(Calls.CreateRoom.header, req => {
+
+            let header = Calls.CreateRoom.header;
+
+            if (req == null || req.name == null) {
+                error_message(ws, header, "invalidData");
+                return;
+            }
+
+            //if (!validateDefaultText(req.name, 0, 64)) {
+            //Чтобы легче было кодить фронт
+            if (!validateDefaultText(req.name)) {
+                service_message(ws, header, "badName", false);
+                return;
+            }
+
+            if (req.password == null)
+                req.password = "";
+
+            for (let room of room_list) {
+                if (room.name === req.name) {
+                    service_message(ws, header, "roomExists", false);
                     return;
                 }
             }
@@ -225,42 +295,70 @@ function WebSocket(io) {
             let room = new Room(req.name, req.password);
             room_list.push(room);
             console.log("create room: ", room.name);
+            service_message(ws, header, "Created room", true);
+            BroadCast(SCalls.RoomChange.header, "Created room", true, false);
             joinroom(ws, room);
 
         });
 
-        ws.on('getRooms', req => {
-            var rooms = Array.from(room_list, (room) => { var obj = { name: room.name, qual: 0 }; return obj; });
+        ws.on(Calls.GetRooms.header, req => {
+
+            let header = Calls.GetRooms.header;
+
+            let rooms = Array.from(room_list, (room) => { let obj = { name: room.name, password: room.password, qual: 0 }; return obj; });
 
             if (req != null && req.room != null) {
-                for (var key in rooms) {
+                for (let key = 0; key < rooms.length; key++) {
                     let room = rooms[key];
 
-                    for (var i = req.room.length; i >= 0; i--) {
-                        var str = req.room.substring(0, i);
+                    let str = "";
+                    let minQual = Math.ceil(req.room.length * (50 / 100));;
 
-                        if (room.name.includes(str)) {
+                    for (let i = req.room.length; i > 0; i--) {
+                        str = req.room.substring(0, i);
+
+                        let regex = new RegExp(`(${str})+`, "i");
+
+                        console.log(room.name + " include " + str + "     result " + regex.test(room.name));
+
+                        if (regex.test(room.name)) {
                             room.qual = str.length;
                             break;
                         }
 
                     }
 
-                    if (room.qual === 0) {
+                    console.log("Qual = " + room.qual);
+                    console.log("minQual = " + minQual);
+
+                    if (room.qual < minQual) {
                         rooms.splice(key, 1);
+                        key--;
                     }
 
                 }
-                rooms.sort((a, b) => { b.qual - a.qual });
+                rooms.sort((a, b) => { return b.qual - a.qual });
             }
 
-            var outrooms = Array.from(rooms, (room) => room.name);
+            let outrooms = Array.from(rooms, (room) => {
 
-            //console.log(room_list);
-            //console.log(rooms);
-            //console.log(outrooms);
+                let pass = room.password;
 
-            service_message(ws, "rooms", outrooms);
+                console.log(room);
+
+                let haspass = true;
+
+                if (pass == null || pass == "")
+                    haspass = false;
+
+                return { room: room.name, haspass: haspass };
+            });
+
+            console.log(room_list);
+            console.log(rooms);
+            console.log(outrooms);
+
+            service_message(ws, header, outrooms, true);
 
         });
 
@@ -270,7 +368,7 @@ function WebSocket(io) {
 
         ws.on('disconnect', () => {
 
-            var user = GetUser(ws);
+            let user = GetUser(ws);
 
             if (!user.Auth)
                 return;
