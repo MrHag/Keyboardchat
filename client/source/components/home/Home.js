@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Chat, RoomPanel, CreationRoom } from '../index';
+import { Chat, RoomPanel, CreationRoom, Sidebar } from '../index';
 
 import './Home.scss';
 
@@ -17,7 +17,9 @@ const Home = () => {
 
     return (
         <div className="home">
-            <RoomPanel onCreateRoom={onCreateRoom}></RoomPanel>
+            <Sidebar>
+                <RoomPanel onCreateRoom={onCreateRoom}></RoomPanel>
+            </Sidebar>
             <Chat></Chat>
             {content}
         </div>

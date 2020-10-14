@@ -1,7 +1,9 @@
 import React from 'react';
 
-import { IconButton as BaseIconButton, createMuiTheme, ThemeProvider } from '@material-ui/core';
+import { IconButton as BaseIconButton, createMuiTheme, withStyles, ThemeProvider } from '@material-ui/core';
 import * as Colors from '@material-ui/core/colors';
+
+import classNames from 'classnames';
 
 import './IconButton.scss';
 
@@ -12,10 +14,10 @@ const customTheme = createMuiTheme({
     }
 });
 
-const IconButton = (props) => {
+const IconButton = ({className, ...props}) => {
     return (
         <ThemeProvider theme={customTheme}>
-            <BaseIconButton color="secondary" className="chat-input__send" {...props}>
+            <BaseIconButton color="secondary" className={classNames("icon-btn", className)} {...props}>
             </BaseIconButton>
         </ThemeProvider>
     )

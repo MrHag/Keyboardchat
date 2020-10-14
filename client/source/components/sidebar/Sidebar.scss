@@ -1,0 +1,19 @@
+@import '../../styles/globals.scss';
+
+.sidebar {
+    @include flex-layout(column, flex-start, center);
+    height: 100%;
+    position: relative;
+
+    & &__arrow-btn {
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateX(100%);
+        z-index: 5;
+    }
+
+    &.hidden {
+        width: 0px;
+    }
+}

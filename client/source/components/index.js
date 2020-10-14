@@ -8,3 +8,4 @@ export { default as RoomItem }  from './room_item/RoomItem';
 export { default as Button } from './button/Button';
 export { default as CreationRoom } from './creation_room/CreationRoom';
 export { default as IconButton } from './icon_button/IconButton';
+export { default as Sidebar } from './sidebar/Sidebar';
