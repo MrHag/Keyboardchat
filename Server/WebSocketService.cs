@@ -127,19 +127,24 @@ namespace Keyboardchat
         public void JoinRoom(User user, Room room)
         {
 
-            var Interface = _users.EnterInQueue();
-
             if (!AuthCheckReport(user))
                 return;
+
+            var Interface = _users.EnterInQueue();
 
             if (user.Room != null)
             {
                 Interface.ExitFromQueue();
 
+                if (user.Room == room)
+                    return;
+
                 LeaveRoom(user, user.Room);
 
                 Interface = _users.EnterInQueue();
             }
+
+            
 
             room.AddUser(user);
             user.Room = room;
@@ -147,6 +152,7 @@ namespace Keyboardchat
             Interface.ExitFromQueue();
 
             SendChatMessage(room, user.Name + " connected", "Server", "images/server.jpg");
+            ServiceResponseMessage(user.Client, Calls["JoinRoom"]["header"].ToString(), new JoinedRoom(room.Name, "Join room"), true);
         }
 
         public void LeaveRoom(User user, Room room)

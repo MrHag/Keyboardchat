@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "7cLAX3FnZeiOB6M8dNzZFl85PNGVnoyFQIZwAf1dL2NS4sfI17YmM/ie486u0mmBHSmcPxxzZ+N+I/7Dfvn4Jg==",
+  "dgSpecHash": "OnYRr/GrzOU+1akxloapPYe14QZB+CALjofwGIjWBTXArFxk5LJVWYhvtOaDNSkGj0R9l9gDAw7rB3LvqpsKAg==",
   "success": true,
-  "projectFilePath": "D:\\chat\\Server\\Keyboardchat.csproj",
+  "projectFilePath": "D:\\Projects\\Keyboardchat\\Server\\Keyboardchat.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\MrHag\\.nuget\\packages\\emittersharp\\1.1.1.1\\emittersharp.1.1.1.1.nupkg.sha512",
     "C:\\Users\\MrHag\\.nuget\\packages\\engineiosharp\\1.0.2\\engineiosharp.1.0.2.nupkg.sha512",

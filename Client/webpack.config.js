@@ -75,7 +75,7 @@ function generateConfig(output_path) {
 
         devtool: 'eval-source-map',
         devServer: {
-            open: true,
+            open: !isDevelopment,
             contentBase: output_path,
             port: 3000,
             proxy: {

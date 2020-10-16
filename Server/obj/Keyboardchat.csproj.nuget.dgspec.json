@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\chat\\Server\\Keyboardchat.csproj": {}
+    "D:\\Projects\\Keyboardchat\\Server\\Keyboardchat.csproj": {}
   },
   "projects": {
-    "D:\\chat\\Server\\Keyboardchat.csproj": {
+    "D:\\Projects\\Keyboardchat\\Server\\Keyboardchat.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\chat\\Server\\Keyboardchat.csproj",
+        "projectUniqueName": "D:\\Projects\\Keyboardchat\\Server\\Keyboardchat.csproj",
         "projectName": "Keyboardchat",
-        "projectPath": "D:\\chat\\Server\\Keyboardchat.csproj",
+        "projectPath": "D:\\Projects\\Keyboardchat\\Server\\Keyboardchat.csproj",
         "packagesPath": "C:\\Users\\MrHag\\.nuget\\packages\\",
-        "outputPath": "D:\\chat\\Server\\obj\\",
+        "outputPath": "D:\\Projects\\Keyboardchat\\Server\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\MrHag\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -21,7 +21,7 @@
           "netcoreapp3.1"
         ],
         "sources": {
-          "D:\\chat\\Server\\Keyboardchat.csproj": {}
+          "D:\\Projects\\Keyboardchat\\Server\\Keyboardchat.csproj": {}
         },
         "frameworks": {
           "netcoreapp3.1": {
