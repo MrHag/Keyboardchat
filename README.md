@@ -1,5 +1,5 @@
 ## Keyboardchat
-This is chat that build in react + nodejs.
+This is chat that build in react + nodejs (C# in develop).
 
 ## Install
 * Download repository
@@ -10,4 +10,4 @@ This is chat that build in react + nodejs.
 * ``` npm start ```
 
 ## Use
-* Enter in browser http://localhost:4000
+* Enter in browser http://localhost:4000 or http://localhost:5000
