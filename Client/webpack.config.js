@@ -79,7 +79,7 @@ function generateConfig(output_path) {
             contentBase: output_path,
             port: 3000,
             proxy: {
-                '/': 'http://localhost:4000' //Allows to make request from React.app to server on 4000
+                '/': 'http://localhost:5000' //Allows to make request from React.app to server on 4000
             }
         },
 

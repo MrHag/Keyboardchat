@@ -1,4 +1,5 @@
 /Client/node_modules/
+/Server/node_modules/
 
 /public/bundle.css
 /public/bundle.js
