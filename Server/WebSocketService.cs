@@ -263,11 +263,13 @@ namespace Keyboardchat
 
                         var RoomInterface = _globalRooms.EnterInQueue();
 
+                        Room globalRoom = RoomInterface[0];
+
                         RoomInterface.ExitFromQueue();
 
                         Interface.ExitFromQueue();
 
-                        JoinRoom(user, RoomInterface[0]);
+                        JoinRoom(user, globalRoom);
 
                         ServiceResponseMessage(socket, header, "Aunthentication successful", true);
                     });
@@ -406,9 +408,11 @@ namespace Keyboardchat
 
                         Room room = GetRoom(RoomName, RoomInterface);
 
+                        Room globalRoom = RoomInterface[0];
+
                         RoomInterface.ExitFromQueue();
 
-                        if (room == null || user.Room == room)
+                        if (room == null || user.Room != room)
                         {
                             ServiceResponseMessage(socket, header, "roomNotFound", false);
                             return;
@@ -417,6 +421,8 @@ namespace Keyboardchat
                         LeaveRoom(user, room);
 
                         ServiceResponseMessage(socket, header, new LeftJoinedRoom(RoomName, "Leaved from room"), true);
+
+                        JoinRoom(user, globalRoom);
 
                     });
                 });
