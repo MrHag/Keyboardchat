@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { TextField } from '@material-ui/core';
-import { Button } from '../index';
+import { Button, IconButton } from '../index';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
 
@@ -50,9 +50,11 @@ const RoomItemForm = ({roomName, onCancel, onJoin}) => {
     )
 }
 
-const RoomItem = ({active, roomData, onRoomJoin}) => {
+const RoomItem = ({active, roomData, onRoomJoin, onRoomLeave}) => {
     const { name, haspass } = roomData;
     const [ stage, setStage ] = useState('');
+
+    console.log("roomData = ", roomData);
 
     const onClickHandler = (e) => {
         if (!active) {
@@ -70,18 +72,30 @@ const RoomItem = ({active, roomData, onRoomJoin}) => {
         setStage('');
     }
 
-    /*Сделать кнопки тонкими!*/
-
     let form = null;
     if (stage === 'joining') {
         form = <RoomItemForm roomName={name} onCancel={() => {setStage('')}} onJoin={onJoin}></RoomItemForm>
     }
 
+    const roomLeaveButton = active && (
+        <IconButton 
+            className="room-item__leave-btn"
+            color="dark"
+            onClick={onRoomLeave}
+        >
+            <FontAwesomeIcon
+                className="room-item__lock-icon" 
+                icon={FontAwesomeIcons.faDoorOpen}
+            />
+        </IconButton>
+    )
+        
     return (
         <div onClick={onClickHandler} className={classNames("room-item", {"active": active})}>
             <div className="room-item__content">
-                {haspass ? <FontAwesomeIcon className="room-item__lock-icon" icon={FontAwesomeIcons.faLock}></FontAwesomeIcon> : null}
+                {haspass && <FontAwesomeIcon className="room-item__lock-icon" icon={FontAwesomeIcons.faLock}></FontAwesomeIcon>}
                 <p className="room-item__name" title={name}>{name}</p>
+                {roomLeaveButton}
             </div>
             {form}
         </div>
@@ -91,7 +105,8 @@ const RoomItem = ({active, roomData, onRoomJoin}) => {
 RoomItem.propType = {
     roomData: PropTypes.object.isRequired,
     active: PropTypes.bool.isRequired,
-    onRoomJoin: PropTypes.func.isRequired
+    onRoomJoin: PropTypes.func.isRequired,
+    onRoomLeave: PropTypes.func.isRequired,
 }
 
 export default RoomItem;

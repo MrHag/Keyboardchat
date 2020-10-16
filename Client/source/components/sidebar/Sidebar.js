@@ -18,11 +18,13 @@ const Sidebar = ({children, ...props}) => {
     const icon = (isHidden) ? FontAwesomeIcons.faArrowRight : FontAwesomeIcons.faArrowLeft;
 
     return (
-        <div className={classNames("sidebar", {"hidden": isHidden})} {...props}>
+        <div className="sidebar" {...props}>
             <IconButton onClick={onArrowBtnHandler} className="sidebar__arrow-btn">
                 <FontAwesomeIcon icon={icon}></FontAwesomeIcon>
             </IconButton>
-            {(isHidden) ? null : children}
+            <div className={classNames("sidebar__content", {"hidden": isHidden})}>
+                {children}
+            </div>
         </div>
     )
 }

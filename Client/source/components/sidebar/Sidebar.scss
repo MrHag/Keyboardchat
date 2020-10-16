@@ -13,7 +13,8 @@
         z-index: 3;
     }
 
-    &.hidden {
+    &__content.hidden {
+        visibility: hidden;
         width: 0px;
     }
 }

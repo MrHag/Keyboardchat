@@ -32,10 +32,16 @@
         overflow: hidden;
         max-width: 90%;
         white-space: nowrap;
+        margin: 0 8px;
     }
 
     &:hover {
         cursor: pointer;
+    }
+
+    & &__leave-btn {
+        padding: 0;
+        margin: 0;
     }
 }
 

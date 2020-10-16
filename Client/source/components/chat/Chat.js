@@ -2,7 +2,7 @@ import React, { useEffect, useReducer, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import Socket from '../../Socket';
-import { ChatMessage, ChatInput } from '../index';
+import { ChatMessage, ChatInput, IconButton } from '../index';
 
 import './Chat.scss';
 
@@ -14,7 +14,9 @@ const RoomHeader = ({name}) => {
     const room = (name === 'global') ? 'Палата №1' : name;
     return (
         <div className="room-header">
-            <h3 className="room-header__name">{room}</h3>
+            <div className="room-header__wrapper">
+                <h3 className="room-header__name">{room}</h3>
+            </div>
         </div>
     )
 };
@@ -34,7 +36,7 @@ const Chat = () => {
     const [state, setState] = useState( {
         messages: (fake_messages) ? fake_messages : [],
         room_name: 'Палата №1'
-    } );
+    });
     const historyRef = React.useRef();
 
     const onNewMessage = data => {
@@ -52,16 +54,25 @@ const Chat = () => {
                     room_name: data.data.room
                 });
             }
-    } 
+    };
+
+    const socketLeaveroom = () => {
+        setState({
+            messages: [],
+            room_name: 'Палата №1'
+        });
+    };
 
     const initSockets = () => {
         Socket.on('chat', onNewMessage);
         Socket.on('joinroom', socketJoinroom);
+        Socket.on('leaveroom', socketLeaveroom);
     }
 
     const cleanSockets = () => {
         Socket.removeEventListener('chat', onNewMessage);
         Socket.removeEventListener('joinroom', socketJoinroom);
+        Socket.removeEventListener('leaveroom', socketLeaveroom);
     }
 
     useEffect(() => {

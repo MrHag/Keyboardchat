@@ -17,6 +17,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 
+
 namespace Keyboardchat
 {
     public class WebSocketService
@@ -411,6 +412,7 @@ namespace Keyboardchat
                         Room globalRoom = RoomInterface[0];
 
                         RoomInterface.ExitFromQueue();
+
 
                         if (room == null || user.Room != room)
                         {
