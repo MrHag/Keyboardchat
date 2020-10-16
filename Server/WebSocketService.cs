@@ -157,7 +157,6 @@ namespace Keyboardchat
                 Interface = _users.EnterInQueue();
             }
 
-            
 
             room.AddUser(user);
             user.Room = room;
@@ -408,6 +407,10 @@ namespace Keyboardchat
                         var RoomInterface = _rooms.EnterInQueue();
 
                         Room room = GetRoom(RoomName, RoomInterface);
+
+                        RoomInterface.ExitFromQueue();
+
+                        RoomInterface = _globalRooms.EnterInQueue();
 
                         Room globalRoom = RoomInterface[0];
 
