@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 
 namespace Keyboardchat.Models.Network
 {
-    public struct JoinedRoom
+    public struct LeftJoinedRoom
     {
         public string room;
         public string message;
 
-        public JoinedRoom(string room, string message)
+        public LeftJoinedRoom(string room, string message)
         {
             this.room = room;
             this.message = message;

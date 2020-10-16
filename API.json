@@ -1,172 +1,204 @@
 {
-  Calls: {
+  "Calls": {
 
-    Authorization: {
+    "Authorization": {
 
-      header: "auth",
-      request: {
-        body: {
-          name: ":string:"
+      "header": "auth",
+      "request": {
+        "body": {
+          "name": ":string:"
         }
       },
 
-      response: {
-        body: {
-          data: {
-            successful: ":string:",
-            unsuccessful: [
+      "response": {
+        "body": {
+          "data": {
+            "successful": ":string:",
+            "unsuccessful": [
               "badName"
             ],
-            error: [
+            "error": [
               "invalidData"
             ]
           },
-          successful: true,
-          error: true
+          "successful": true,
+          "error": true
         }
       }
     },
 
-    GetRooms: {
+    "GetRooms": {
 
-      header: "getrooms",
+      "header": "getrooms",
 
-      request: {
-        body: {
-          room: [
+      "request": {
+        "body": {
+          "room": [
             ":string:",
             null
           ]
         },
-        desctiption: "Send string to get rooms by name. Send null to get all rooms."
+        "desctiption": "Send string to get rooms by name. Send null to get all rooms."
       },
 
-      response: {
-        body: {
-          data: [
+      "response": {
+        "body": {
+          "data": [
             {
-              room: ":string:",
-              haspass: true
+              "room": ":string:",
+              "haspass": true
             }
           ],
-          successful: true,
-          error: true
+          "successful": true,
+          "error": true
         },
-        desctiption: "Returns array sorted by input string like."
+        "desctiption": "Returns array sorted by input string like."
       }
 
     },
 
-    Chat: {
+    "Chat": {
 
-      header: "chat",
-      request: {
-        body: {
-          message: ":string:"
+      "header": "chat",
+      "request": {
+        "body": {
+          "message": ":string:"
         }
       },
 
-      response: {
-        body: {
-          data: ":string:",
-          successful: true,
-          error: true
+      "response": {
+        "body": {
+          "data": ":string:",
+          "successful": true,
+          "error": true
         }
       }
     },
 
-    JoinRoom: {
+    "JoinRoom": {
 
-      header: "joinroom",
-      request: {
-        body: {
-          name: ":string:",
-          password: [
+      "header": "joinroom",
+      "request": {
+        "body": {
+          "name": ":string:",
+          "password": [
             ":string:",
             null
           ]
         }
       },
 
-      response: {
-        body: {
-          data: {
-            successful: {
-              message: ":string:",
-              room: ":string:"
+      "response": {
+        "body": {
+          "data": {
+            "successful": {
+              "message": ":string:",
+              "room": ":string:"
             },
-            unsuccessful: [
+            "unsuccessful": [
               "invalidPass",
               "roomNotFound"
             ],
-            error: [
+            "error": [
               "invalidData"
             ]
           },
-          successful: true,
-          error: true
+          "successful": true,
+          "error": true
         }
       }
     },
 
-    CreateRoom: {
 
-      header: "createroom",
-      request: {
-        body: {
-          name: ":string:",
-          password: [
+    "LeaveRoom": {
+
+      "header": "leaveroom",
+      "request": {
+        "body": {
+          "name": ":string:"
+        }
+      },
+
+      "response": {
+        "body": {
+          "data": {
+            "successful": {
+              "message": ":string:",
+              "room": ":string:"
+            },
+            "unsuccessful": [
+              "roomNotFound",
+              "notInRoom"
+            ],
+            "error": [
+              "invalidData"
+            ]
+          },
+          "successful": true,
+          "error": true
+        }
+      }
+    },
+
+
+    "CreateRoom": {
+
+      "header": "createroom",
+      "request": {
+        "body": {
+          "name": ":string:",
+          "password": [
             ":string:",
             null
           ]
         }
       },
 
-      response: {
-        body: {
-          data: {
-            successful: ":string:",
-            unsuccessful: [
+      "response": {
+        "body": {
+          "data": {
+            "successful": ":string:",
+            "unsuccessful": [
               "roomExists",
               "badName"
             ],
-            error: [
+            "error": [
               "invalidData"
             ]
           },
-          successful: true,
-          error: true
+          "successful": true,
+          "error": true
         }
       }
-    },
+    }
 
   },
 
-  ServerCalls: {
+  "ServerCalls": {
 
-    Access: {
-      header: "access",
-      response: {
-        body: {
-          data: {
-            successful: ":string:",
-            error: [
+    "Access": {
+      "header": "access",
+      "response": {
+        "body": {
+          "data": {
+            "successful": ":string:",
+            "error": [
               "notAuth"
             ]
           },
-          successful: true,
-          error: true
+          "successful": true,
+          "error": true
         }
       }
     },
 
-    RoomChange: {
-      header: "roomchange",
-      response: {
-        body: {
-          data: ":string:",
-          successful: true,
-          error: true
+    "RoomChange": {
+      "header": "roomchange",
+      "response": {
+        "body": {
+          "data": ":string:",
+          "successful": true,
+          "error": true
         }
       }
 

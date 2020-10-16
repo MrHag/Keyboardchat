@@ -108,6 +108,18 @@ namespace Keyboardchat
             return null;
         }
 
+        public Room GetRoom(string RoomName, SaveList<Room>.SaveListInterface Interface)
+        {
+
+            foreach (var room in Interface)
+            {
+                if (room.Name == RoomName)
+                    return room;
+            }
+
+            return null;
+        }
+
         public void Broadcast(string header, object data, bool successful, bool error)
         {
             var Interface = _users.EnterInQueue();
@@ -152,7 +164,7 @@ namespace Keyboardchat
             Interface.ExitFromQueue();
 
             SendChatMessage(room, user.Name + " connected", "Server", "images/server.jpg");
-            ServiceResponseMessage(user.Client, Calls["JoinRoom"]["header"].ToString(), new JoinedRoom(room.Name, "Join room"), true);
+            ServiceResponseMessage(user.Client, Calls["JoinRoom"]["header"].ToString(), new LeftJoinedRoom(room.Name, "Join room"), true);
         }
 
         public void LeaveRoom(User user, Room room)
@@ -362,6 +374,51 @@ namespace Keyboardchat
 
                     });
 
+                });
+
+                socket.On(Calls["LeftRoom"]["header"], (JToken[] data) =>
+                {
+                    string header = Calls["LeftRoom"]["header"].ToString();
+
+                    Task.Run(() =>
+                    {
+
+                        var Interface = _users.EnterInQueue();
+
+                        User user = GetUser(socket, Interface);
+
+                        Interface.ExitFromQueue();
+
+                        if (!AuthCheckReport(user) || user.Room == null)
+                        {
+                            ServiceResponseMessage(socket, header, "notInRoom", false);
+                            return;
+                        }
+
+                        string RoomName;
+                        if (data == null || data.GetValues(0, out List<JToken> values) == null || values[0].GetValue(out RoomName, "name") == null)
+                        {
+                            ErrorResponseMessage(socket, header, "invalidData");
+                            return;
+                        }
+
+                        var RoomInterface = _rooms.EnterInQueue();
+
+                        Room room = GetRoom(RoomName, RoomInterface);
+
+                        RoomInterface.ExitFromQueue();
+
+                        if (room == null || user.Room == room)
+                        {
+                            ServiceResponseMessage(socket, header, "roomNotFound", false);
+                            return;
+                        }
+
+                        LeaveRoom(user, room);
+
+                        ServiceResponseMessage(socket, header, new LeftJoinedRoom(RoomName, "Leaved from room"), true);
+
+                    });
                 });
 
                 socket.On(Calls["GetRooms"]["header"], (JToken[] data) =>

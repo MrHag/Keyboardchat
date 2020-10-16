@@ -5,8 +5,11 @@
 /public/index.html
 
 /Server/Build/
-/Server/obj/Debug/
-/Server/obj/Release/
+/Client/obj/
+/Server/obj/
 
 Keyboardchat.code-workspace
 /.vscode/
+
+/.vs/Keyboardchat/DesignTimeBuild/
+/.vs/Keyboardchat/v16/
