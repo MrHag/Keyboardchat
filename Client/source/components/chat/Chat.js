@@ -2,7 +2,10 @@ import React, { useEffect, useReducer, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import Socket from '../../Socket';
-import { ChatMessage, ChatInput } from '../index';
+import { ChatMessage, ChatInput, IconButton } from '../index';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
 
 import './Chat.scss';
 
@@ -14,7 +17,9 @@ const RoomHeader = ({name}) => {
     const room = (name === 'global') ? 'Палата №1' : name;
     return (
         <div className="room-header">
-            <h3 className="room-header__name">{room}</h3>
+            <div className="room-header__wrapper">
+                <h3 className="room-header__name">{room}</h3>
+            </div>
         </div>
     )
 };

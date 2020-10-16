@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { TextField } from '@material-ui/core';
-import { Button } from '../index';
+import { Button, IconButton } from '../index';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
 
@@ -70,18 +70,32 @@ const RoomItem = ({active, roomData, onRoomJoin}) => {
         setStage('');
     }
 
-    /*Сделать кнопки тонкими!*/
+    const onLeaveHandler = () => {
+
+    }
 
     let form = null;
     if (stage === 'joining') {
         form = <RoomItemForm roomName={name} onCancel={() => {setStage('')}} onJoin={onJoin}></RoomItemForm>
     }
 
+    const roomLeaveButton = haspass && (
+        <IconButton className="room-header__leave-btn" color="dark">
+            <FontAwesomeIcon
+                className="room-item__lock-icon" 
+                icon={FontAwesomeIcons.faLock}
+                onClick
+            />
+        </IconButton>
+    )
+        
+
     return (
         <div onClick={onClickHandler} className={classNames("room-item", {"active": active})}>
             <div className="room-item__content">
-                {haspass ? <FontAwesomeIcon className="room-item__lock-icon" icon={FontAwesomeIcons.faLock}></FontAwesomeIcon> : null}
                 <p className="room-item__name" title={name}>{name}</p>
+                {roomLeaveButton}
+                {active && <FontAwesomeIcon icon={FontAwesomeIcons.faDoorOpen}></FontAwesomeIcon>}
             </div>
             {form}
         </div>
