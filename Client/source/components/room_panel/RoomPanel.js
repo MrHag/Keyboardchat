@@ -15,7 +15,7 @@ try {
     var fake_rooms = require('../../../fake_data/fake.json').rooms;
 } catch (err) { }
 
-const RoomList = ({ inRoom, rooms, joinRoom }) => {
+const RoomList = ({ inRoom, rooms, joinRoom, leaveRoom }) => {
     const listRef = useRef();
 
     return (
@@ -23,7 +23,14 @@ const RoomList = ({ inRoom, rooms, joinRoom }) => {
             {
                 rooms.map((room, index) => {
                     const isActive = room.name === inRoom;
-                    return <RoomItem key={room.name + index} roomData={room} active={isActive} onRoomJoin={joinRoom}></RoomItem>
+                    return (
+                        <RoomItem
+                            key={room.name + index}
+                            roomData={room} active={isActive}
+                            onRoomJoin={joinRoom}
+                            onRoomLeave={() => leaveRoom(room.name)}
+                        />
+                    )
                 })
             }
         </div>
@@ -40,7 +47,14 @@ const RoomPanel = ({ onCreateRoom }) => {
             name: name,
             password: password
         });
-    }
+    };
+
+    const leaveRoom = (name) => {
+        console.log("Leaving room... Name = ", name);
+        Socket.emit('leaveroom', {
+            name: name
+        });
+    };
 
     const socketGetrooms = (data) => {
         const rooms = data.data.map(room => {
@@ -59,10 +73,16 @@ const RoomPanel = ({ onCreateRoom }) => {
         }
     }
 
+    const socketLeaveroom = (data) => {
+        console.log("socketLeaveroom data = ", data);
+        setInRoom('global');
+    }
+
     const initSocketsListeners = () => {
         Socket.on('getrooms', socketGetrooms);
         Socket.on('roomchange', socketRoomchange);
         Socket.on('joinroom', socketJoinroom);
+        Socket.on('leaveroom', socketLeaveroom)
         Socket.emit('getrooms', {room: null});
     }
 
@@ -70,6 +90,7 @@ const RoomPanel = ({ onCreateRoom }) => {
         Socket.removeEventListener("getrooms", socketGetrooms);
         Socket.removeEventListener('joinroom', socketJoinroom);
         Socket.removeEventListener('roomchange', socketRoomchange);
+        Socket.removeEventListener('leaveroom', socketLeaveroom);
     }
 
     useEffect(() => {
@@ -101,7 +122,7 @@ const RoomPanel = ({ onCreateRoom }) => {
                     )
                 }}
             />
-            <RoomList inRoom={inRoom} rooms={rooms} joinRoom={joinRoom}></RoomList>
+            <RoomList inRoom={inRoom} rooms={rooms} joinRoom={joinRoom} leaveRoom={leaveRoom}></RoomList>
             <Button onClick={onCreateRoom}>Create room</Button>
         </div>
     )

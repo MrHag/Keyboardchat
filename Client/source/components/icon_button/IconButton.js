@@ -12,7 +12,6 @@ const customTheme = createMuiTheme({
         primary: Colors.amber,
         secondary: { main: '#c5cae9' },
         dark: {
-            //backgroundColor: '#',
             color: '#000',
         },
     }

@@ -50,9 +50,11 @@ const RoomItemForm = ({roomName, onCancel, onJoin}) => {
     )
 }
 
-const RoomItem = ({active, roomData, onRoomJoin}) => {
+const RoomItem = ({active, roomData, onRoomJoin, onRoomLeave}) => {
     const { name, haspass } = roomData;
     const [ stage, setStage ] = useState('');
+
+    console.log("roomData = ", roomData);
 
     const onClickHandler = (e) => {
         if (!active) {
@@ -70,32 +72,30 @@ const RoomItem = ({active, roomData, onRoomJoin}) => {
         setStage('');
     }
 
-    const onLeaveHandler = () => {
-
-    }
-
     let form = null;
     if (stage === 'joining') {
         form = <RoomItemForm roomName={name} onCancel={() => {setStage('')}} onJoin={onJoin}></RoomItemForm>
     }
 
-    const roomLeaveButton = haspass && (
-        <IconButton className="room-header__leave-btn" color="dark">
+    const roomLeaveButton = active && (
+        <IconButton 
+            className="room-item__leave-btn"
+            color="dark"
+            onClick={onRoomLeave}
+        >
             <FontAwesomeIcon
                 className="room-item__lock-icon" 
-                icon={FontAwesomeIcons.faLock}
-                onClick
+                icon={FontAwesomeIcons.faDoorOpen}
             />
         </IconButton>
     )
         
-
     return (
         <div onClick={onClickHandler} className={classNames("room-item", {"active": active})}>
             <div className="room-item__content">
+                {haspass && <FontAwesomeIcon className="room-item__lock-icon" icon={FontAwesomeIcons.faLock}></FontAwesomeIcon>}
                 <p className="room-item__name" title={name}>{name}</p>
                 {roomLeaveButton}
-                {active && <FontAwesomeIcon icon={FontAwesomeIcons.faDoorOpen}></FontAwesomeIcon>}
             </div>
             {form}
         </div>
@@ -105,7 +105,8 @@ const RoomItem = ({active, roomData, onRoomJoin}) => {
 RoomItem.propType = {
     roomData: PropTypes.object.isRequired,
     active: PropTypes.bool.isRequired,
-    onRoomJoin: PropTypes.func.isRequired
+    onRoomJoin: PropTypes.func.isRequired,
+    onRoomLeave: PropTypes.func.isRequired,
 }
 
 export default RoomItem;
