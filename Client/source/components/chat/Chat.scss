@@ -1,0 +1,41 @@
+@import '../../styles/globals.scss';
+
+.chat {
+    @include flex-layout(column, flex-end, center);
+    position: relative;
+    width: 100%;
+    height: 100%;
+
+    &__history-wrapper {
+        width: 90%;
+        overflow: hidden;
+    }
+
+    &__history {
+        @include flex-layout(column, flex-start, flex-start);
+        box-sizing: border-box;
+        margin-top: 32px;
+        padding-bottom: 32px;
+        height: 100%;
+        width: 100%;
+        overflow-y: scroll;
+        overflow-x: hidden;
+    }
+}
+
+.room-header {
+    @include flex-layout(column, center, center);
+    position: absolute;
+    top: 8px;
+    width: 90%;
+    min-height: 40px;
+    border-radius: 8px;
+    background-color: #f0f0f0;
+    z-index: 2;
+
+    &__name {
+        font-weight: 600;
+        font-size: 24px;
+        margin: 0 0 0 16px;
+    }
+}

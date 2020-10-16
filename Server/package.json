@@ -1,0 +1,17 @@
+{
+  "name": "keyboardchat",
+  "version": "1.0.0",
+  "description": "chat",
+  "main": "MyServer.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "start": "cd Build/netcoreapp3.1/ && Keyboardchat.exe"
+  },
+  "repository": {
+    "type": "git",
+    "url": "\u0016https://github.com/MrHag/Keyboardchat"
+  },
+  "author": "MrHag",
+  "license": "ISC"
+}

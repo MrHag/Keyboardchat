@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30523.141
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Keyboardchat", "Server\Keyboardchat.csproj", "{36D61543-E909-4144-BB72-87A0079D4FBE}"
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "KeyboardchatClient", "Client\KeyboardchatClient.njsproj", "{14940BAF-2209-4365-AEDB-73BBCBB81481}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{36D61543-E909-4144-BB72-87A0079D4FBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36D61543-E909-4144-BB72-87A0079D4FBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36D61543-E909-4144-BB72-87A0079D4FBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36D61543-E909-4144-BB72-87A0079D4FBE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14940BAF-2209-4365-AEDB-73BBCBB81481}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14940BAF-2209-4365-AEDB-73BBCBB81481}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14940BAF-2209-4365-AEDB-73BBCBB81481}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14940BAF-2209-4365-AEDB-73BBCBB81481}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7B1E3315-C4E0-4616-86CB-6E1A2E7BD4E4}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,63 @@
+@import '../../styles/globals.scss';
+
+$msg-content-bg-color: #f0f0f0;
+$msg-content-border-radius: 16px;
+
+.chat-msg {
+    @include flex-layout(column, center, flex-start);
+    margin: 16px 0px 16px 0px;
+    max-width: 100%;
+
+    &__info {
+        margin-bottom: 8px;
+        display: flex;
+        align-items: flex-end;
+    }
+
+    &__name {
+        font-size: 20px;
+        font-style: italic;
+        font-weight: 500;
+        position: relative;
+        top: 2px;
+        display: inline-block;
+        z-index: 1;
+    }
+
+    &__av {
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        margin-right: 8px;
+    }
+
+    &__date {
+        margin-left: 8px;
+        font-size: 10px;
+    }
+
+    &__text {
+        max-width: 100%;
+    }
+
+    &__content {
+        @include flex-layout(column, flex-start, flex-start);
+        background-color: $msg-content-bg-color;
+        position: relative;
+        padding: 16px;
+        border-radius: $msg-content-border-radius;
+        max-width: 100%;
+        margin-left: calc(32px + 16px);
+        word-break: break-word;
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: $msg-content-border-radius;
+            height: $msg-content-border-radius;
+            background-color: $msg-content-bg-color;
+        }
+    }
+}

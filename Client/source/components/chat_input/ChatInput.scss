@@ -1,0 +1,36 @@
+@import '../../styles/globals.scss';
+
+.chat-input {
+    @include flex-layout(column, flex-end);
+    box-sizing: border-box;
+    position: relative;
+    font-size: 16px;
+    margin-bottom: 8px;
+    width: 90%;
+    border-radius: 8px;
+    box-shadow: 0px 0px 8px gray;
+    padding: 8px;
+
+    &__area {
+        min-width: 100%;
+        max-width: 100%;
+        border: none;
+        font-size: 18px;
+        resize: none;
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    &__controls {
+        position: absolute;
+        top: 50%;
+        right: 16px;
+        transform: translateY(-50%);
+    }
+
+    &__send {
+        padding: 0;
+    }
+}

@@ -1,0 +1,12 @@
+/Client/node_modules/
+
+/public/bundle.css
+/public/bundle.js
+/public/index.html
+
+/Server/Build/
+/Server/obj/Debug/
+/Server/obj/Release/
+
+Keyboardchat.code-workspace
+/.vscode/

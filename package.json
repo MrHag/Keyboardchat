@@ -1,0 +1,20 @@
+{
+  "name": "keyboardchat",
+  "version": "1.0.0",
+  "description": "chat",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "start": "npm --prefix ./Client/ run build-pro && cd Server/ && dotnet build --source Keyboardchat.csproj --configuration Release --output Build/netcoreapp3.1/ && npm start",
+    "start-dev": "npm --prefix ./Client/ run build-dev && cd Server/ && dotnet build --source Keyboardchat.csproj --configuration Debug --output Build/netcoreapp3.1/ && npm start",
+    "build-client": "npm --prefix ./Client/ run build-dev",
+    "build-server": "cd Server/ && dotnet build --source Keyboardchat.csproj --configuration Debug --output Build/netcoreapp3.1/",
+    "install": "cd Server/ && npm install && cd ../Client/ && npm install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "\u0016https://github.com/MrHag/Keyboardchat"
+  },
+  "author": "MrHag",
+  "license": "ISC"
+}
