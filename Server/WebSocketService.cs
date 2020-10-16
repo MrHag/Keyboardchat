@@ -376,9 +376,9 @@ namespace Keyboardchat
 
                 });
 
-                socket.On(Calls["LeftRoom"]["header"], (JToken[] data) =>
+                socket.On(Calls["LeaveRoom"]["header"], (JToken[] data) =>
                 {
-                    string header = Calls["LeftRoom"]["header"].ToString();
+                    string header = Calls["LeaveRoom"]["header"].ToString();
 
                     Task.Run(() =>
                     {
