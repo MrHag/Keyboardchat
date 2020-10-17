@@ -32,8 +32,7 @@ function includePlugins() {
         }),
         new MiniCssExtractPlugin({
             filename: "bundle.css"
-        }),
-        new webpack.HotModuleReplacementPlugin()
+        })
     ];
     //Don't include fake data if you're building production version
     if (!isDevelopment) {
@@ -50,7 +49,14 @@ function includePlugins() {
 
 function generateConfig(output_path) {
     return {
-        entry: [path.resolve(__dirname, "./source/App.js")],
+        entry: [path.resolve(__dirname, "./source/index.js")],
+
+        resolve: {
+            extensions: ['.js', '.jsx'],
+            alias: {
+                'react-dom': '@hot-loader/react-dom'
+            },
+        },
 
         module: {
             rules: [
@@ -59,7 +65,8 @@ function generateConfig(output_path) {
                     exclude: /node_modules/,
                     loader: 'babel-loader',
                     options: {
-                        presets: ["@babel/preset-env", "@babel/preset-react"]
+                        presets: ["@babel/preset-react"],
+                        plugins: ["react-hot-loader/babel"],
                     }
                 },
                 {
@@ -74,10 +81,11 @@ function generateConfig(output_path) {
         },
 
         devtool: 'eval-source-map',
+        
         devServer: {
-            open: !isDevelopment,
             contentBase: output_path,
             port: 3000,
+            hot: true,
             proxy: {
                 '/': 'http://localhost:5000' //Allows to make request from React.app to server on 4000
             }

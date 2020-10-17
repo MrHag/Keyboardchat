@@ -1,9 +1,8 @@
+import { hot } from 'react-hot-loader/root';
 import React, { useState } from "react";
-import ReactDOM from 'react-dom';
-
-import './App.scss';
 
 import { Welcome, Home } from './components/';
+import './App.scss';
 
 try {
     var is_in_dev = require('../fake_data/fake.json');
@@ -30,4 +29,4 @@ const App = () => {
     )
 }
 
-ReactDOM.render(<App />, document.getElementById('root'));
+export default hot(App);
