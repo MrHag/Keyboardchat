@@ -1,34 +1,114 @@
-const webpack = require('webpack');
+const Webpack = require('webpack');
+const path = require('path');
+const HTMLWebpackPlugin = require('html-webpack-plugin');
+const MiniSCCExtrractPlugin = require('mini-css-extract-plugin');
+
+const isDev = (/development/).test(process.env.NODE_ENV);
+const outputPath = `../public/`;
+
+function generateModule() {
+  return {
+    rules: [
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              presets: ['@babel/preset-react'],
+              plugins: ["react-hot-loader/babel"]
+            },
+          },
+        ],
+      },
+      {
+        test: /\.s[ac]ss$/i,
+        use: [
+          MiniSCCExtrractPlugin.loader,
+          'css-loader',
+          'sass-loader',
+        ],
+      },
+    ],
+  };
+}
+
+function generatePlugins() {
+  let plugins = [
+    new HTMLWebpackPlugin({
+      template: './source/index.html',
+      favicon: './favicon.ico',
+
+    }),
+    new MiniSCCExtrractPlugin({
+      filename: 'bundle.css',
+    }),
+  ];
+
+  if (!isDev) {
+    console.log("Ignore fake.json!");
+    plugins.push(
+        new Webpack.IgnorePlugin({
+            resourceRegExp: /fake\.json$/,
+        })
+    )
+  }
+
+  return plugins;
+}
+
+function generateConfig() {
+  return {
+    resolve: {
+      extensions: ['.js', '.jsx'],
+      alias: {
+        components: path.resolve(__dirname, './source/components/'),
+        layouts: path.resolve(__dirname, './source/layouts/'),
+      },
+    },
+
+    mode: isDev ? 'development' : 'production',
+
+    entry: path.resolve(__dirname, './source/index.js'),
+
+    module: generateModule(),
+
+    plugins: generatePlugins(),
+
+    devtool: isDev ? 'eval-source-map' : false,
+    devServer: {
+      // open: s,
+      hot: true,
+      contentBase: outputPath,
+      port: 3000,
+      proxy: {
+        '/': 'http://localhost:5000',
+      },
+    },
+
+    output: {
+      path: path.resolve(__dirname, outputPath),
+      filename: 'bundle.js',
+    },
+  };
+}
+
+module.exports = generateConfig();
+
+/*const webpack = require('webpack');
 const path = require('path');
 const htmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-const isDevelopment = /development/.test(process.env.NODE_ENV);
-
-function CreateTemplateHTML(app_name)
-{
-    return (
-`<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta content="ie=edge" http-equiv="x-ua-compatible">
-        <meta name="viewport" content="width=device-width, height=device-height initial-scale=1.0">
-        <title>${app_name}</title>
-    </head>
-    <body>
-        <div id="root"></div>
-    </body>
-</html>`
-    )
-}
+/*const isDevelopment = /development/.test(process.env.NODE_ENV);
 
 const APP_NAME = 'Keyboardchat';
 
 function includePlugins() {
     let plugins = [
         new htmlWebpackPlugin({
-            templateContent: CreateTemplateHTML(APP_NAME)
+            template: './source/index.html',
         }),
         new MiniCssExtractPlugin({
             filename: "bundle.css"
@@ -104,4 +184,4 @@ function makeOutputPath() {
     return path.resolve(__dirname, `../public/`);
 }
 
-module.exports = generateConfig(makeOutputPath());
+module.exports = generateConfig(makeOutputPath());*/
