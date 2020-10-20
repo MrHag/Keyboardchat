@@ -6,7 +6,8 @@
       "header": "auth",
       "request": {
         "body": {
-          "name": ":string:"
+          "name": ":string:",
+          "password": ":string:"
         }
       },
 
@@ -15,10 +16,43 @@
           "data": {
             "successful": ":string:",
             "unsuccessful": [
-              "badName"
+              "badName",
+              "badPassword",
+              "wrongNamePass",
+              "alreadyInSess"
             ],
             "error": [
               "invalidData"
+            ]
+          },
+          "successful": true,
+          "error": true
+        }
+      }
+    },
+
+    "Registration": {
+
+      "header": "registration",
+      "request": {
+        "body": {
+          "name": ":string:",
+          "password": ":string:"
+        }
+      },
+
+      "response": {
+        "body": {
+          "data": {
+            "successful": ":string:",
+            "unsuccessful": [
+              "badName",
+              "badPassword",
+              "nameExists"
+            ],
+            "error": [
+              "invalidData",
+              "uknownError"
             ]
           },
           "successful": true,

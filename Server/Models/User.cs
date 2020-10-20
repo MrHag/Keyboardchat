@@ -5,17 +5,16 @@ namespace Keyboardchat.Models
 {
     public class User
     {
+        public uint UID { get; protected set; }
         public SocketIOSocket Client { get; protected set; }
         public string Name { get; set; }
         public Room Room { get; set; }
-        public bool Authorizated { get; set; }
 
-        public User(SocketIOSocket Client, string Name, Room Room, bool Authorizated)
+        public User(SocketIOSocket Client, string Name, Room Room)
         {
             this.Client = Client;
             this.Name = Name;
             this.Room = Room;
-            this.Authorizated = Authorizated;
         }
 
         public User(SocketIOSocket Client)
@@ -23,12 +22,11 @@ namespace Keyboardchat.Models
             this.Client = Client;
             Name = null;
             Room = null;
-            Authorizated = false;
         }
 
         public User Copy()
         {
-            return new User(Client, new string(Name), Room, Authorizated);
+            return new User(Client, new string(Name), Room);
         }
 
     }

@@ -1,24 +1,25 @@
-﻿using Keyboardchat.Extensions;
+﻿using Keyboardchat.DataBase;
+using Keyboardchat.Extensions;
 using Keyboardchat.Models;
 using Keyboardchat.Models.Network;
 using Keyboardchat.ModifiedObjects;
 using Keyboardchat.SaveCollections;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using SocketIOSharp.Common;
 using SocketIOSharp.Server.Client;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
 
 
-namespace Keyboardchat
+namespace Keyboardchat.Web
 {
     public class WebSocketService
     {
@@ -89,14 +90,25 @@ namespace Keyboardchat
             return true;
         }
 
-        private bool AuthCheckReport(User user)
+        private bool AuthCheckReport(SocketIOSocket client)
         {
-            bool userAuth = user.Authorizated;
+            var Interface = _users.EnterInQueue();
+            try
+            {
+                User user = GetUser(client, Interface);
 
-            if (!userAuth)
-                ErrorResponseMessage(user.Client, SCalls["Access"]["header"].ToString(), "notAuth");
+                if (user == null)
+                {
+                    ErrorResponseMessage(user.Client, SCalls["Access"]["header"].ToString(), "notAuth");
+                    return false;
+                }
 
-            return userAuth;
+                return true;
+            }
+            finally
+            {
+                Interface.ExitFromQueue();
+            }
         }
 
         public User GetUser(SocketIOSocket client, SaveList<User>.SaveListInterface Interface)
@@ -126,7 +138,6 @@ namespace Keyboardchat
             var Interface = _users.EnterInQueue();
             foreach (var user in Interface)
             {
-                if(user.Authorizated)
                 ResponseMessage(user.Client, header, data, successful, error);
             }
             Interface.ExitFromQueue();
@@ -140,7 +151,7 @@ namespace Keyboardchat
         public void JoinRoom(User user, Room room)
         {
 
-            if (!AuthCheckReport(user))
+            if (!AuthCheckReport(user.Client))
                 return;
 
             var Interface = _users.EnterInQueue();
@@ -170,7 +181,7 @@ namespace Keyboardchat
         public void LeaveRoom(User user, Room room)
         {
 
-            if (!AuthCheckReport(user))
+            if (!AuthCheckReport(user.Client))
                 return;
 
             if (room != null)
@@ -211,7 +222,6 @@ namespace Keyboardchat
 
         public void Start()
         {
-
             var Interface = _globalRooms.EnterInQueue();
 
             Interface.Add(new Room("global", ""));
@@ -222,27 +232,19 @@ namespace Keyboardchat
 
             server.OnConnection((socket) =>
             {
-                
                 Program.LogService.Log("Connection");
 
-                var Interface = _users.EnterInQueue();
-
-                Interface.Add(new User(socket));
-
-                Program.LogService.Log("Users:"+Interface.Count);
-
-                Interface.ExitFromQueue();
-                
-
-                socket.On(Calls["Authorization"]["header"], (JToken[] data) =>
+                socket.On(Calls["Registration"]["header"], (JToken[] data) =>
                 {
-                    string header = Calls["Authorization"]["header"].ToString();
-                    Task.Run(() => {
+                    string header = Calls["Registration"]["header"].ToString();
 
+                    Task.Run(() => 
+                    {
                         List<JToken> values;
                         string name;
+                        string pass;
 
-                        if (data == null || data.GetValues(0, out values) == null || values[0].GetValue(out name, "name") == null)
+                        if (data == null || data.GetValues(0, out values) == null || values[0].GetValue(out name, "name") == null || values[0].GetValue(out pass, "password") == null)
                         {
                             ErrorResponseMessage(socket, header, "invalidData");
                             return;
@@ -254,12 +256,104 @@ namespace Keyboardchat
                             return;
                         }
 
+                        if (!ValidateDefaultText(pass))
+                        {
+                            ServiceResponseMessage(socket, header, "badPass", false);
+                            return;
+                        }
+
+                        using (var dbcontext = new DatabaseContext())
+                        {
+                            try
+                            {
+                                dbcontext.Users.Single(user => user.Name == name);
+
+                                ServiceResponseMessage(socket, header, "nameExists", false);
+                                return;
+                            }
+                            catch (InvalidOperationException)
+                            {
+
+                                SHA256 SHA256 = SHA256.Create();
+
+                                var passwordHash = SHA256.ComputeHash(Encoding.UTF8.GetBytes(pass));
+
+                                var dbUser = new DataBase.Models.User() { Name = name,  PasswordHash = passwordHash};
+                                dbcontext.Add(dbUser);
+                                if (dbcontext.SaveChanges() > 0)
+                                {
+                                    ServiceResponseMessage(socket, header, "Registration successful", true);
+                                }
+                                else
+                                {
+                                    ErrorResponseMessage(socket, header, "uknownError");                             
+                                }
+                            }
+                        }
+
+                    });
+                });
+
+                socket.On(Calls["Authorization"]["header"], (JToken[] data) =>
+                {
+                    string header = Calls["Authorization"]["header"].ToString();
+                    Task.Run(() => {
+
+                        List<JToken> values;
+                        string name;
+                        string pass;
+
+                        if (data == null || data.GetValues(0, out values) == null || values[0].GetValue(out name, "name") == null || values[0].GetValue(out pass, "password") == null)
+                        {
+                            ErrorResponseMessage(socket, header, "invalidData");
+                            return;
+                        }
+
+                        if (!ValidateDefaultText(name, maxlength: 32))
+                        {
+                            ServiceResponseMessage(socket, header, "badName", false);
+                            return;
+                        }
+
+                        if (!ValidateDefaultText(pass, maxlength: 64))
+                        {
+                            ServiceResponseMessage(socket, header, "badPass", false);
+                            return;
+                        }
+
+                        using (var dbcontext = new DatabaseContext())
+                        {
+                            try
+                            {
+                                SHA256 SHA256 = SHA256.Create();
+                                var passwordHash = SHA256.ComputeHash(Encoding.UTF8.GetBytes(pass));
+
+                                var dbUser = dbcontext.Users.Single(user => user.Name == name);
+
+                                if (!dbUser.PasswordHash.SequenceEqual(passwordHash))
+                                    throw new InvalidOperationException();
+                            }
+                            catch (InvalidOperationException)
+                            {
+                                ServiceResponseMessage(socket, header, "wrongNamePass", false);
+                                return;
+                            }
+                        }
+
+
                         var Interface = _users.EnterInQueue();
 
                         User user = GetUser(socket, Interface);
 
-                        user.Name = name;
-                        user.Authorizated = true;
+                        if(user != null)
+                        {
+                            Interface.ExitFromQueue();
+                            ServiceResponseMessage(socket, header, "alreadyInSess", false);
+                            return;
+                        }
+
+                        user = new User(socket, name, null);
+                        Interface.Add(user);
 
                         var RoomInterface = _globalRooms.EnterInQueue();
 
@@ -292,7 +386,7 @@ namespace Keyboardchat
 
                         Interface.ExitFromQueue();
 
-                        if (!AuthCheckReport(user))
+                        if (!AuthCheckReport(user.Client))
                             return;
 
                         string message;
@@ -330,7 +424,7 @@ namespace Keyboardchat
 
                         UserInterface.ExitFromQueue();
 
-                        if (!AuthCheckReport(user))
+                        if (!AuthCheckReport(user.Client))
                             return;
 
                         string RoomName;
@@ -391,7 +485,7 @@ namespace Keyboardchat
 
                         Interface.ExitFromQueue();
 
-                        if (!AuthCheckReport(user) || user.Room == null)
+                        if (!AuthCheckReport(user.Client) || user.Room == null)
                         {
                             ServiceResponseMessage(socket, header, "notInRoom", false);
                             return;
@@ -445,7 +539,7 @@ namespace Keyboardchat
 
                         UserInterface.ExitFromQueue();
 
-                        if (!AuthCheckReport(user))
+                        if (!AuthCheckReport(user.Client))
                             return;
 
                         var Interface = _rooms.EnterInQueue();
@@ -524,7 +618,7 @@ namespace Keyboardchat
 
                         UserInterface.ExitFromQueue();
 
-                        if (!AuthCheckReport(user))
+                        if (!AuthCheckReport(user.Client))
                             return;
 
                         string RoomName;
@@ -584,12 +678,9 @@ namespace Keyboardchat
 
                         User user = GetUser(socket, Interface);
 
-                        Room userroom = user.Room;
-
-                        bool auth = user.Authorizated;
-
-                        if (auth)
+                        if (user != null)
                         {
+                            Room userroom = user.Room;
                             Interface.ExitFromQueue();
 
                             LeaveRoom(user, userroom);

@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Keyboardchat.UseClasses;
 using System.Threading;
 
-namespace Semafored
+namespace Keyboardchat.SaveObjects
 {
     class SemaphoreUIDmanager : UIDmanager
     {

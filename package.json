@@ -9,7 +9,9 @@
     "start-dev": "npm --prefix ./Client/ run build-dev && cd Server/ && dotnet build --source Keyboardchat.csproj --configuration Debug --output Build/netcoreapp3.1/ && npm start",
     "build-client": "npm --prefix ./Client/ run build-dev",
     "build-server": "cd Server/ && dotnet build --source Keyboardchat.csproj --configuration Debug --output Build/netcoreapp3.1/",
-    "install": "cd Server/ && npm install && cd ../Client/ && npm install"
+    "install": "cd Server/ && npm install && cd ../Client/ && npm install",
+    "startdb": "cd Server/UniServerZ/ && UniController.exe start_mysql && UniController.exe start_apache",
+    "stopdb": "cd Server/UniServerZ/ && UniController.exe stop_mysql && UniController.exe stop_apache"
   },
   "repository": {
     "type": "git",
