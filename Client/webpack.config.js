@@ -63,6 +63,7 @@ function generateConfig() {
     resolve: {
       extensions: ['.js', '.jsx'],
       alias: {
+        logic: path.resolve(__dirname, './source/logic/'),
         components: path.resolve(__dirname, './source/components/'),
         layouts: path.resolve(__dirname, './source/layouts/'),
       },

@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Input} from '@material-ui/core';
 
-import './Welcome.scss';
-import Socket from '../../Socket';
+import { Socket } from 'logic';
 import { Button } from 'components';
+
+import './Welcome.scss';
 
 const Login = ({onLogin}) => {
     const [password, setPassword] = useState('');

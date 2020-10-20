@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 
-import Socket from '../../Socket';
 import { TextareaAutosize } from '@material-ui/core/';
-import { IconButton } from '../index';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
+
+import { IconButton } from 'components';
+import { Socket } from 'logic';
 
 import './ChatInput.scss';
 

@@ -1,8 +1,8 @@
 import React, { useEffect, useReducer, useState } from 'react';
 import PropTypes from 'prop-types';
 
-import Socket from '../../Socket';
-import { ChatMessage, ChatInput, IconButton } from '../index';
+import { ChatMessage, ChatInput, IconButton } from 'components';
+import { Socket } from 'logic';
 
 import './Chat.scss';
 

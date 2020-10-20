@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
-import { Button } from '../index';
 import { TextField } from '@material-ui/core';
 
-import Socket from '../../Socket';
+import { Socket } from 'logic';
+import { Button } from 'components';
 
 import './CreationRoom.scss';
-import { keys } from '@material-ui/core/styles/createBreakpoints';
 
 const CreationRoom = ({onComplete}) => {
     const [name, setName] = useState('');

@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import { TextField } from '@material-ui/core';
-import { Button, IconButton } from '../index';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
 
+import { Button, IconButton } from 'components';
+import { Socket } from 'logic';
+
 import './RoomItem.scss';
-import Socket from '../../Socket';
 
 const RoomItemForm = ({roomName, onCancel, onJoin}) => {
     const [password, setPassword] = useState('');

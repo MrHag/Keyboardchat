@@ -1,15 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 
-import './RoomPanel.scss';
 import { InputAdornment, TextField} from '@material-ui/core';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
 
-import { RoomItem, Button, IconButton } from '../../components';
+import { RoomItem, Button, IconButton } from 'components';
+import { Socket } from 'logic';
 
-import Socket from '../../Socket';
+import './RoomPanel.scss';
 
 try {
     var fake_rooms = require('../../../fake_data/fake.json').rooms;
