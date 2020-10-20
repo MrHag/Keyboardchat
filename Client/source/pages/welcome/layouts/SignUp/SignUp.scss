@@ -1,0 +1,34 @@
+@import 'styles/globals.scss';
+
+.sign-up {
+  @include flex-layout(column, flex-start, center);
+  max-width: 250px;
+  max-height: 512px;
+
+  .button {
+      width: 100%;
+  }
+
+  .input, .input-password {
+      width: 100%;
+      margin: 8px 0;
+  }
+
+  & &__pass-input {
+    margin-top: 32px;
+    margin-bottom: 8px;
+  }
+
+  &__error {
+      color: red;
+      text-align: center;
+  }
+
+  &__register {
+    margin-top: 16px;
+    color: rgb(84, 149, 170);
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+  }
+}

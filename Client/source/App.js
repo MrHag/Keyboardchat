@@ -1,6 +1,6 @@
 import { hot } from 'react-hot-loader/root';
 import React, { useState } from "react";
-import { BrowserRouter, Route } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 
 import { Welcome, Home } from './pages';
 
@@ -14,12 +14,15 @@ const App = () => (
     <BrowserRouter>
         <div className="app">
             <div className="app__content">
-            <Route path="/">
-                <Welcome></Welcome>
-            </Route>
-            <Route path="/home">
-                <Home></Home>
-            </Route>
+                <Route exact path="/">
+                    <Welcome></Welcome>
+                </Route>
+                <Route path="/signup">
+                    <Welcome></Welcome>
+                </Route>
+                <Route path="/chat">
+                    <Home></Home>
+                </Route>
             </div>
         </div>
     </BrowserRouter>

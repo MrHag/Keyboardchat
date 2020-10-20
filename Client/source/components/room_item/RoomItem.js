@@ -55,8 +55,6 @@ const RoomItem = ({active, roomData, onRoomJoin, onRoomLeave}) => {
     const { name, haspass } = roomData;
     const [ stage, setStage ] = useState('');
 
-    console.log("roomData = ", roomData);
-
     const onClickHandler = (e) => {
         if (!active) {
             if (haspass) {
