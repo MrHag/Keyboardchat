@@ -1,24 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Input} from '@material-ui/core';
 
 import './Welcome.scss';
 import Socket from '../../Socket';
-import { Button } from '../index';
+import { Button } from 'components';
 
 const Login = ({onLogin}) => {
+    const [password, setPassword] = useState('');
     const [login, setLogin] = useState('');
     const [err, setErr] = useState('');
 
+    const passwordRef = useRef();
+
     const onLoginHandler = () => {
         let request = {
-            name: login
+            name: login,
+            password: password,
         };
         Socket.emit('auth', request);
     }
 
     const socketAuth = (data) => {
         console.log("Auth response!");
+        console.log("Response data = ", data);
         if (data.successful) {
             onLogin();
         } else {
@@ -35,15 +40,44 @@ const Login = ({onLogin}) => {
         return () => Socket.removeEventListener('response', socketAuth);
     }, [])
 
+    const onLoginKeyupHandler = (e) => {
+        if (e.key === "Enter") {
+            console.log("Login enter up...");
+            passwordRef.current.focus();
+        }
+    }
+
+    const onPasswordKeyupHandler = (e) => {
+        if (e.key === 'Enter') {
+            onLoginHandler(e);
+        }
+    }
+
     return (
         <div className="login">
-            <Input className="login__login" placeholder="Enter name" onChange={e => setLogin(e.target.value)} 
-                onKeyDown={e => {
-                    if (e.key == 'Enter')
-                        onLoginHandler(e)
-                }} autoFocus={true}></Input>
+            <Input
+                className="login__input"
+                placeholder="Enter name"
+                onChange={e => setLogin(e.target.value)}
+                onKeyDown={onLoginKeyupHandler} 
+                autoFocus={true} 
+            />
+            <Input inputRef={passwordRef}
+                className="login__input"
+                placeholder="Enter password"
+                onChange={e => setPassword(e.target.value)}
+                onKeyDown={onPasswordKeyupHandler} 
+            />
             <p className="login__error">{err}</p>
-            <Button className="button" variant="contained" color="secondary" onClick={onLoginHandler} disabled={login.length === 0}>Login</Button>
+            <Button
+                className="button"
+                variant="contained"
+                color="secondary"
+                onClick={onLoginHandler}
+                disabled={login.length === 0 || password.length === 0}
+            >
+                Login
+            </Button>
         </div>
     )
 }
