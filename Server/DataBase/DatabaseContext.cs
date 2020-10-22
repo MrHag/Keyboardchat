@@ -8,8 +8,7 @@ namespace Keyboardchat.DataBase
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseMySql(
-                @"server=localhost;database=chat;uid=Chat;pwd=pass");
+            optionsBuilder.UseMySql(@"server=localhost;database=chat;uid=Chat;pwd=pass");
         }
 
     }

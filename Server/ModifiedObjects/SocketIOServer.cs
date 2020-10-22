@@ -49,14 +49,13 @@ namespace Keyboardchat.ModifiedObjects
 
         private static void To(this SocketIOServer server, Room room, string header, object body)
         {
-            var Interface = room.Users.EnterInQueue();
-
-            foreach (var user in Interface)
-            {
-                server.To(user, header, body);
-            }
-
-            room.Users.ExitFromQueue(Interface);
+            room.Users.Open((Interface)=> 
+            { 
+                foreach (var user in Interface)
+                {
+                    server.To(user, header, body);
+                }
+            });
         }
 
     }

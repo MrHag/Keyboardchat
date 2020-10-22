@@ -31,6 +31,64 @@
       }
     },
 
+    "DeAuthorization": {
+
+      "header": "deauth",
+      "request": {
+        "body": {
+        }
+      },
+
+      "response": {
+        "body": {
+          "data": {
+            "successful": ":string:",
+            "unsuccessful": [
+              "notAuth"
+            ],
+            "error": []
+          },
+          "successful": true,
+          "error": true
+        }
+      }
+    },
+
+    "GetUsers": {
+
+      "header": "getusers",
+      "request": {
+        "body": [
+            [
+               ":int:"           
+            ],  
+          null
+        ]
+      },
+
+      "response": {
+        "body": {
+          "data": {
+            "successful": {
+              "data": [
+                {
+                  "id": ":int:",
+                  "name": ":string:",
+                  "avatar": ":base64string:"
+                }
+              ]
+            },
+            "unsuccessful": [
+              "notAuth"
+            ],
+            "error": []
+          },
+          "successful": true,
+          "error": true
+        }
+      }
+    },
+
     "Registration": {
 
       "header": "registration",

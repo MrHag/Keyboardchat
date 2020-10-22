@@ -1,38 +1,17 @@
-﻿using Keyboardchat.SaveCollections;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Keyboardchat.SaveCollections
 {
-    public class SaveList<T>
+    public class SaveList<T> : ISaveCollection
     {
-        private SaveListInterface _currentInterface;
-
         private List<T> _list;
 
         private Semaphore _semaphore;
 
-        public SaveListInterface EnterInQueue()
-        {
-            _semaphore.WaitOne();
-            var Interface = new SaveListInterface(this);
-            _currentInterface = Interface;
-            return Interface;
-        }
-
-        public void ExitFromQueue(SaveListInterface Interface)
-        {
-            if (_currentInterface == Interface)
-            {
-                _semaphore.Release();
-            }
-            else
-                throw new Exception("Cant exit from queue");
-        }
+        private int _currentThread;
 
         private int Count
         {
@@ -43,6 +22,19 @@ namespace Keyboardchat.SaveCollections
         }
 
         private bool IsReadOnly => false;
+
+        int ISaveCollection.CurrentThread { get => _currentThread; set => _currentThread = value; }
+        Semaphore ISaveCollection.Semaphore { get => _semaphore; set => _semaphore = value; }
+
+        public T2 Open<T2>(Func<SaveListInterface, T2> func)
+        {
+            return (this as ISaveCollection).Open<T2,SaveListInterface, SaveList<T>>(func);
+        }
+
+        public void Open(Action<SaveListInterface> action)
+        {
+           (this as ISaveCollection).Open<SaveListInterface, SaveList<T>>(action);
+        }
 
         private T this[int index]
         {
@@ -59,18 +51,13 @@ namespace Keyboardchat.SaveCollections
         public SaveList(IEnumerable<T> Collection)
         {
             _list = new List<T>(Collection);
-            Init();
+            (this as ISaveCollection).Init();
         }
 
         public SaveList()
         {
             _list = new List<T>();
-            Init();
-        }
-
-        private void Init()
-        {
-            _semaphore = new Semaphore(1, 1);
+            (this as ISaveCollection).Init();
         }
 
         private void Add(T obj)
@@ -118,18 +105,17 @@ namespace Keyboardchat.SaveCollections
             return new List<T>(_list).GetEnumerator();
         }
 
+        ISaveInterface<T4> ISaveCollection.CreateInterface<T4>()
+        {
+            return (ISaveInterface<T4>) new SaveListInterface(this);
+        }
 
-        public class SaveListInterface : IEnumerable<T>
+        public class SaveListInterface : ISaveInterface<SaveList<T>>, IEnumerable<T>
         {
             private SaveList<T> _saveList;
             internal SaveListInterface(SaveList<T> saveList)
             {
                 _saveList = saveList;
-            }
-
-            public void ExitFromQueue()
-            {
-                _saveList.ExitFromQueue(this);
             }
 
             public int Count
@@ -141,6 +127,7 @@ namespace Keyboardchat.SaveCollections
             }
 
             public bool IsReadOnly => _saveList.IsReadOnly;
+            SaveList<T> ISaveInterface<SaveList<T>>.SaveCollection { get => _saveList; set => _saveList = value; }
 
             public T this[int index]
             {
@@ -202,11 +189,9 @@ namespace Keyboardchat.SaveCollections
             {
                 return GetEnumerator();
             }
-
         }
 
     }
 
-   
-}
 
+}

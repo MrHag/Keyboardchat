@@ -5,28 +5,28 @@ namespace Keyboardchat.Models
 {
     public class User
     {
+        public SocketIOSocket Client { get; private set; }
         public uint UID { get; protected set; }
-        public SocketIOSocket Client { get; protected set; }
         public string Name { get; set; }
         public Room Room { get; set; }
 
-        public User(SocketIOSocket Client, string Name, Room Room)
+        public User(string Name, Room Room, SocketIOSocket Client)
         {
-            this.Client = Client;
             this.Name = Name;
             this.Room = Room;
+            this.Client = Client;
         }
 
         public User(SocketIOSocket Client)
         {
-            this.Client = Client;
             Name = null;
             Room = null;
+            this.Client = Client;
         }
 
         public User Copy()
         {
-            return new User(Client, new string(Name), Room);
+            return new User(new string(Name), Room, Client);
         }
 
     }

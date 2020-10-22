@@ -5,8 +5,8 @@ using Keyboardchat.Models.Network;
 using Keyboardchat.ModifiedObjects;
 using Keyboardchat.SaveCollections;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SocketIOSharp.Common;
 using SocketIOSharp.Server.Client;
@@ -28,6 +28,8 @@ namespace Keyboardchat.Web
         private JToken SCalls;
         private SocketIOServer server;
 
+        private SaveDictionary<SocketIOSocket, User> _connectionUsers;
+
         private SaveList<User> _users;
 
         private SaveList<Room> _rooms;
@@ -39,6 +41,7 @@ namespace Keyboardchat.Web
             SCalls = Program.API.SelectToken("ServerCalls");
             server = new SocketIOServer(new SocketIOSharp.Server.SocketIOServerOption(4001));
             _users = new SaveList<User>();
+            _connectionUsers = new SaveDictionary<SocketIOSocket, User>();
             _rooms = new SaveList<Room>();
             _globalRooms = new SaveList<Room>();
         }
@@ -92,90 +95,91 @@ namespace Keyboardchat.Web
 
         private bool AuthCheckReport(SocketIOSocket client)
         {
-            var Interface = _users.EnterInQueue();
-            try
-            {
-                User user = GetUser(client, Interface);
+            return _users.Open((Interface) => {
+
+                User user = GetUser(client);
 
                 if (user == null)
                 {
-                    ErrorResponseMessage(user.Client, SCalls["Access"]["header"].ToString(), "notAuth");
+                    ErrorResponseMessage(client, SCalls["Access"]["header"].ToString(), "notAuth");
                     return false;
                 }
 
                 return true;
-            }
-            finally
-            {
-                Interface.ExitFromQueue();
-            }
+            });
+                
         }
 
-        public User GetUser(SocketIOSocket client, SaveList<User>.SaveListInterface Interface)
+        public User GetUser(SocketIOSocket client)
         {
-            foreach (var user in Interface)
+            return _connectionUsers.Open((DInterface) => 
             {
-                if (user.Client == client)
+                User user;
+                if (DInterface.TryGetValue(client, out user))
                     return user;
-            }
-            return null;
+                return null;
+            });           
         }
 
-        public Room GetRoom(string RoomName, SaveList<Room>.SaveListInterface Interface)
+        public Room GetRoom(string RoomName)
         {
-
-            foreach (var room in Interface)
+            return _rooms.Open((Interface) => 
             {
-                if (room.Name == RoomName)
-                    return room;
-            }
+                foreach (var room in Interface)
+                {
+                    if (room.Name == RoomName)
+                        return room;
+                }
 
-            return null;
+                return null;
+
+            });        
         }
 
         public void Broadcast(string header, object data, bool successful, bool error)
         {
-            var Interface = _users.EnterInQueue();
-            foreach (var user in Interface)
+            _connectionUsers.Open((DInterface) =>
             {
-                ResponseMessage(user.Client, header, data, successful, error);
-            }
-            Interface.ExitFromQueue();
+                foreach (var connection in DInterface.Keys)
+                {
+                    ResponseMessage(connection, header, data, successful, error);
+                }
+            });       
         }
 
-        public void DeleteUser(User user, SaveList<User>.SaveListInterface Interface)
+        public bool DeleteUser(User user)
         {
-            Interface.Remove(user);
+            return _users.Open((Interface) =>
+            {
+                return Interface.Remove(user);
+            });
         }
 
         public void JoinRoom(User user, Room room)
         {
-
-            if (!AuthCheckReport(user.Client))
-                return;
-
-            var Interface = _users.EnterInQueue();
-
-            if (user.Room != null)
+            try
             {
-                Interface.ExitFromQueue();
+                _users.Open((Interface) =>
+                {
 
-                if (user.Room == room)
-                    return;
+                    if (user.Room != null)
+                    {
 
-                LeaveRoom(user, user.Room);
+                        if (user.Room == room)
+                            throw new QueueExitException();
 
-                Interface = _users.EnterInQueue();
+                        LeaveRoom(user, user.Room);
+                    } 
+
+                    room.AddUser(user);
+                    user.Room = room;
+                });
+
+                SendChatMessage(room, user.Name + " connected", "Server", "images/server.jpg");
+                ServiceResponseMessage(user.Client, Calls["JoinRoom"]["header"].ToString(), new LeftJoinedRoom(room.Name, "Join room"), true);
             }
-
-
-            room.AddUser(user);
-            user.Room = room;
-
-            Interface.ExitFromQueue();
-
-            SendChatMessage(room, user.Name + " connected", "Server", "images/server.jpg");
-            ServiceResponseMessage(user.Client, Calls["JoinRoom"]["header"].ToString(), new LeftJoinedRoom(room.Name, "Join room"), true);
+            catch (QueueExitException)
+            { }
         }
 
         public void LeaveRoom(User user, Room room)
@@ -184,49 +188,58 @@ namespace Keyboardchat.Web
             if (!AuthCheckReport(user.Client))
                 return;
 
-            if (room != null)
+            try
             {
-                SendChatMessage(room, user.Name + " disconnected", "Server", "images/server.jpg");
-                room.DeleteUser(user);
 
-                var UserInterface = room.Users.EnterInQueue();
-
-                var UserCount = UserInterface.Count;
-
-                UserInterface.ExitFromQueue();
-
-                if (UserCount == 0)
+                if (room != null)
                 {
-                    var RoomInterface = _rooms.EnterInQueue();
+                    SendChatMessage(room, user.Name + " disconnected", "Server", "images/server.jpg");
+                    room.DeleteUser(user);
 
-                    for (int key = 0; key < RoomInterface.Count; key++)
+                    int UserCount = 0;
+                    room.Users.Open((UserInterface) => 
                     {
-                        var froom = RoomInterface[key];
-                        if (froom == room)
-                        {
-                            RoomInterface.RemoveAt(key);
-                            Program.LogService.Log("delete room: " + froom.Name);
-                            Broadcast(SCalls["RoomChange"]["header"].ToString(), "Deleted room", true, false);
-                            break;
-                        }
-                    }
+                        UserCount = UserInterface.Count;
+                    });
 
-                    RoomInterface.ExitFromQueue();
+                    if (UserCount == 0)
+                    {
+
+                        _rooms.Open((RoomInterface) =>
+                        {
+                            for (int key = 0; key < RoomInterface.Count; key++)
+                            {
+                                var froom = RoomInterface[key];
+                                if (froom == room)
+                                {
+                                    RoomInterface.RemoveAt(key);
+                                    Program.LogService.Log("delete room: " + froom.Name);
+                                    Broadcast(SCalls["RoomChange"]["header"].ToString(), "Deleted room", true, false);
+                                    break;
+                                }
+                            }
+
+                        });
+                    }
+                    _rooms.Open((RoomInterface) =>
+                    {
+                        user.Room = null;
+                    });
                 }
-                var ForRoomInterface = _users.EnterInQueue();
-                user.Room = null;
-                ForRoomInterface.ExitFromQueue();
+
+            }
+            catch (QueueExitException)
+            { 
             }
 
         }
 
         public void Start()
         {
-            var Interface = _globalRooms.EnterInQueue();
-
-            Interface.Add(new Room("global", ""));
-
-            Interface.ExitFromQueue();
+            _globalRooms.Open((Interface) =>
+            {
+                Interface.Add(new Room("global", ""));
+            });
 
             server.Start();
 
@@ -340,32 +353,57 @@ namespace Keyboardchat.Web
                             }
                         }
 
+                        User user = GetUser(socket);
 
-                        var Interface = _users.EnterInQueue();
-
-                        User user = GetUser(socket, Interface);
-
-                        if(user != null)
+                        if (user != null)
                         {
-                            Interface.ExitFromQueue();
                             ServiceResponseMessage(socket, header, "alreadyInSess", false);
                             return;
                         }
 
-                        user = new User(socket, name, null);
-                        Interface.Add(user);
+                        _users.Open((Interface) =>
+                        {
+                            user = new User(name, null, socket);
+                            Interface.Add(user);
+                        });
 
-                        var RoomInterface = _globalRooms.EnterInQueue();
+                        _connectionUsers.Open((Interface) =>
+                        {
+                            Interface.Add(socket, user);
+                        });
 
-                        Room globalRoom = RoomInterface[0];
-
-                        RoomInterface.ExitFromQueue();
-
-                        Interface.ExitFromQueue();
-
-                        JoinRoom(user, globalRoom);
-
+                        _globalRooms.Open((RoomInterface) =>
+                        {
+                            Room globalRoom = RoomInterface[0];
+                            JoinRoom(user, globalRoom);
+                        });
+                        
                         ServiceResponseMessage(socket, header, "Aunthentication successful", true);
+                    });
+
+                });
+
+                socket.On(Calls["DeAuthorization"]["header"], (JToken[] data) =>
+                {
+                    string header = Calls["DeAuthorization"]["header"].ToString();
+
+                    Task.Run(() =>
+                    {
+                        User user = GetUser(socket);
+                        if (user == null)
+                        {
+                            ServiceResponseMessage(socket, header, "notAuth", false);
+                            return;
+                        }
+
+                        DeleteUser(user);
+
+                        _connectionUsers.Open((Interface) =>
+                        {
+                            Interface.Remove(socket);
+                        });
+
+                        ServiceResponseMessage(socket, header, "Deaunthentication successful", true);
                     });
 
                 });
@@ -378,16 +416,17 @@ namespace Keyboardchat.Web
                     Task.Run(() =>
                     {
 
-                        var Interface = _users.EnterInQueue();
-
-                        var user = GetUser(socket, Interface);
-
-                        var room = user.Room;
-
-                        Interface.ExitFromQueue();
-
-                        if (!AuthCheckReport(user.Client))
+                        if (!AuthCheckReport(socket))
                             return;
+
+                        User user = null;
+                        Room room = null;
+
+                        _users.Open((Interface) =>
+                        {
+                            user = GetUser(socket);
+                            room = user.Room;
+                        });
 
                         string message;
 
@@ -395,7 +434,6 @@ namespace Keyboardchat.Web
                         {
                             return;
                         }
-
 
                         if (room == null)
                             return;
@@ -418,14 +456,15 @@ namespace Keyboardchat.Web
                     Task.Run(() =>
                     {
 
-                        var UserInterface = _users.EnterInQueue();
-
-                        User user = GetUser(socket, UserInterface);
-
-                        UserInterface.ExitFromQueue();
-
-                        if (!AuthCheckReport(user.Client))
+                        if (!AuthCheckReport(socket))
                             return;
+
+                        User user = null;
+
+                        _users.Open((Interface) =>
+                        {
+                            user = GetUser(socket);
+                        });
 
                         string RoomName;
                         string Password;
@@ -439,37 +478,38 @@ namespace Keyboardchat.Web
                         if (values[0].GetValue(out Password, "password") == null)
                             Password = "";
 
-                        var Interface = _rooms.EnterInQueue();
 
-                        for (int key = 0; key < Interface.Count; key++)
+                        try
                         {
-                            var room = Interface[key];
-
-                            if (room.Name == RoomName)
+                            _rooms.Open((Interface) =>
                             {
-                                if (room.Password == "" || room.Password == Password)
-                                {
-                                    Interface.ExitFromQueue();
 
-                                    JoinRoom(user, room);
-
-                                    return;
-                                }
-                                else
+                                for (int key = 0; key < Interface.Count; key++)
                                 {
-                                    ServiceResponseMessage(socket, header, "invalidPass", false);
-                                    Interface.ExitFromQueue();
-                                    return;
+                                    var room = Interface[key];
+
+                                    if (room.Name == RoomName)
+                                    {
+                                        if (room.Password == "" || room.Password == Password)
+                                        {
+                                            JoinRoom(user, room);
+
+                                            throw new QueueExitException();
+                                        }
+                                        else
+                                        {
+                                            ServiceResponseMessage(socket, header, "invalidPass", false);
+                                            throw new QueueExitException();
+                                        }
+                                    }
                                 }
-                            }
+                            });
                         }
-
-                        Interface.ExitFromQueue();
+                        catch (QueueExitException)
+                        { }
 
                         ServiceResponseMessage(socket, header, "roomNotFound", false);
-
                     });
-
                 });
 
                 socket.On(Calls["LeaveRoom"]["header"], (JToken[] data) =>
@@ -478,52 +518,61 @@ namespace Keyboardchat.Web
 
                     Task.Run(() =>
                     {
-
-                        var Interface = _users.EnterInQueue();
-
-                        User user = GetUser(socket, Interface);
-
-                        Interface.ExitFromQueue();
-
-                        if (!AuthCheckReport(user.Client) || user.Room == null)
+                        try
                         {
-                            ServiceResponseMessage(socket, header, "notInRoom", false);
-                            return;
+                            User user = null;
+
+                            _users.Open((RoomInterface) =>
+                            {
+                                user = GetUser(socket);
+                                if (!AuthCheckReport(user.Client) || user.Room == null)
+                                {
+                                    ServiceResponseMessage(socket, header, "notInRoom", false);
+                                    throw new QueueExitException();
+                                }
+                            });
+
+
+                            string RoomName;
+                            if (data == null || data.GetValues(0, out List<JToken> values) == null || values[0].GetValue(out RoomName, "name") == null)
+                            {
+                                ErrorResponseMessage(socket, header, "invalidData");
+                                return;
+                            }
+
+                            Room room = null;
+                            Room globalRoom = null;
+
+                            _rooms.Open((RoomInterface) =>
+                            {
+                                room = GetRoom(RoomName);
+                            });
+
+                            _globalRooms.Open((RoomInterface) =>
+                            {
+                                globalRoom = RoomInterface[0];
+                            });
+
+                            _users.Open((RoomInterface) =>
+                            {
+                                if (room == null || user.Room != room)
+                                {
+                                    ServiceResponseMessage(socket, header, "roomNotFound", false);
+                                    throw new QueueExitException();
+                                }
+
+                                LeaveRoom(user, room);
+
+                                ServiceResponseMessage(socket, header, new LeftJoinedRoom(RoomName, "Leaved from room"), true);
+
+                                JoinRoom(user, globalRoom);
+                            });
+
                         }
-
-                        string RoomName;
-                        if (data == null || data.GetValues(0, out List<JToken> values) == null || values[0].GetValue(out RoomName, "name") == null)
-                        {
-                            ErrorResponseMessage(socket, header, "invalidData");
-                            return;
-                        }
-
-                        var RoomInterface = _rooms.EnterInQueue();
-
-                        Room room = GetRoom(RoomName, RoomInterface);
-
-                        RoomInterface.ExitFromQueue();
-
-                        RoomInterface = _globalRooms.EnterInQueue();
-
-                        Room globalRoom = RoomInterface[0];
-
-                        RoomInterface.ExitFromQueue();
-
-
-                        if (room == null || user.Room != room)
-                        {
-                            ServiceResponseMessage(socket, header, "roomNotFound", false);
-                            return;
-                        }
-
-                        LeaveRoom(user, room);
-
-                        ServiceResponseMessage(socket, header, new LeftJoinedRoom(RoomName, "Leaved from room"), true);
-
-                        JoinRoom(user, globalRoom);
-
+                        catch (QueueExitException)
+                        { }
                     });
+                
                 });
 
                 socket.On(Calls["GetRooms"]["header"], (JToken[] data) =>
@@ -533,23 +582,22 @@ namespace Keyboardchat.Web
                     Task.Run(() =>
                     {
 
-                        var UserInterface = _users.EnterInQueue();
-
-                        User user = GetUser(socket, UserInterface);
-
-                        UserInterface.ExitFromQueue();
-
-                        if (!AuthCheckReport(user.Client))
+                        if (!AuthCheckReport(socket))
                             return;
 
-                        var Interface = _rooms.EnterInQueue();
+                        User user = null;
+                        _users.Open((UserInterface) =>
+                        {
+                            user = GetUser(socket);
+                        });
 
                         List<(Room room, int qual)> rooms = new List<(Room room, int qual)>();
 
-                        foreach (var room in Interface)
-                            rooms.Add((room, 0));
-
-                        Interface.ExitFromQueue();
+                        _rooms.Open((Interface) =>
+                        {                     
+                            foreach (var room in Interface)
+                                rooms.Add((room, 0));
+                        });
 
                         string roomname;
 
@@ -601,6 +649,73 @@ namespace Keyboardchat.Web
                         ServiceResponseMessage(socket, header, outrooms, true);
 
                     });
+                }); 
+
+                socket.On(Calls["GetUsers"]["header"], (JToken[] data) =>
+                {
+                    string header = Calls["GetUsers"]["header"].ToString();
+
+                    Task.Run(() =>
+                    {
+                        if (!AuthCheckReport(socket))
+                            return;
+
+                        List<uint> userids = null;
+
+                        List<UserInfo> userInfos = new List<UserInfo>();
+
+
+                        if (data != null && data.GetValues(0, out List<JToken> values) != null)
+                        {
+                            try
+                            {
+                                userids = (List<uint>)JsonConvert.DeserializeObject(values[0].ToString(), typeof(List<uint>));
+                            }
+                            catch (Exception)
+                            {
+                            }
+                        }
+
+                        List<DataBase.Models.User> dbusers = new List<DataBase.Models.User>();
+
+                        using (var dbcontext = new DatabaseContext())
+                        {
+                            if (userids != null)
+                            {
+                                foreach (var id in userids)
+                                {
+                                    try
+                                    {
+                                        var dbuser = dbcontext.Users.Single((user) => user.UserId == id);
+                                        dbusers.Add(dbuser);
+                                    }
+                                    catch (InvalidOperationException)
+                                    { }
+                                }
+                            }
+                            else
+                            {
+                                dbusers = new List<DataBase.Models.User>(dbcontext.Users);
+                            }
+
+                            foreach (var dbuser in dbusers)
+                            {
+                                byte[] dbavatar = dbuser.Avatar;
+                                string avatar = "";
+
+                                if (dbavatar != null)
+                                {
+                                    avatar = Convert.ToBase64String(dbavatar);
+                                }
+
+                                var userinfo = new UserInfo(dbuser.UserId, dbuser.Name, avatar);
+                                userInfos.Add(userinfo);
+                            }
+                        }
+
+                        ServiceResponseMessage(socket, header, userInfos, true);
+                    });
+
                 });
 
                 socket.On(Calls["CreateRoom"]["header"], (JToken[] data) =>
@@ -611,59 +726,63 @@ namespace Keyboardchat.Web
 
                     Task.Run(() => 
                     {
-
-                        var UserInterface = _users.EnterInQueue();
-
-                        User user = GetUser(socket, UserInterface);
-
-                        UserInterface.ExitFromQueue();
-
-                        if (!AuthCheckReport(user.Client))
-                            return;
-
-                        string RoomName;
-                        string Password;
-                        if (data == null || data.GetValues(0, out List<JToken> values) == null || values[0].GetValue(out RoomName, "name") == null)
-                        {
-                            ErrorResponseMessage(socket, header, "invalidData");
-                            return;
-                        }
-
-                        RoomName = RoomName.Trim();
-
-                        if (!ValidateDefaultText(RoomName))
-                        {
-                            ServiceResponseMessage(socket, header, "badName", false);
-                            return;
-                        }
-
-                        if (values[0].GetValue(out Password, "password") == null)
-                            Password = "";
-
-                        var Interface = _rooms.EnterInQueue();
-
-                        foreach (var room in Interface)
+                        try
                         {
 
-                            if (room.Name == RoomName)
+                            if (!AuthCheckReport(socket))
+                                return;
+                            User user = null;
+                            _users.Open((UserInterface) =>
                             {
-                                ServiceResponseMessage(socket, header, "roomExists", false);
-                                Interface.ExitFromQueue();
+                                user = GetUser(socket);
+                            });
+
+                            string RoomName;
+                            string Password;
+                            if (data == null || data.GetValues(0, out List<JToken> values) == null || values[0].GetValue(out RoomName, "name") == null)
+                            {
+                                ErrorResponseMessage(socket, header, "invalidData");
                                 return;
                             }
 
+                            RoomName = RoomName.Trim();
+
+                            if (!ValidateDefaultText(RoomName))
+                            {
+                                ServiceResponseMessage(socket, header, "badName", false);
+                                return;
+                            }
+
+                            if (values[0].GetValue(out Password, "password") == null)
+                                Password = "";
+
+                            Room NewRoom = null;
+
+                            _rooms.Open((Interface) =>
+                            {
+
+                                foreach (var room in Interface)
+                                {
+                                    if (room.Name == RoomName)
+                                    {
+                                        ServiceResponseMessage(socket, header, "roomExists", false);
+                                        throw new QueueExitException();
+                                    }
+                                }
+
+                                NewRoom = new Room(RoomName, Password);
+
+                                Interface.Add(NewRoom);
+
+                            });
+
+                            ServiceResponseMessage(socket, header, "Created room", true);
+                            Broadcast(SCalls["RoomChange"]["header"].ToString(), "Created room", true, false);
+
+                            JoinRoom(user, NewRoom);
                         }
-
-                        Room NewRoom = new Room(RoomName, Password);
-
-                        Interface.Add(NewRoom);
-
-                        Interface.ExitFromQueue();
-
-                        ServiceResponseMessage(socket, header, "Created room", true);
-                        Broadcast(SCalls["RoomChange"]["header"].ToString(), "Created room", true, false);
-
-                        JoinRoom(user, NewRoom);
+                        catch (QueueExitException)
+                        { }
 
                     });
                     
@@ -673,32 +792,28 @@ namespace Keyboardchat.Web
                 {
                     Task.Run(() =>
                     {
-
-                        var Interface = _users.EnterInQueue();
-
-                        User user = GetUser(socket, Interface);
-
-                        if (user != null)
+                        _users.Open((UserInterface) =>
                         {
-                            Room userroom = user.Room;
-                            Interface.ExitFromQueue();
+                            User user = GetUser(socket);
+                        
 
-                            LeaveRoom(user, userroom);
+                            if (user != null)
+                            {
+                                Room userroom = user.Room;
 
-                            Interface = _users.EnterInQueue();
+                                LeaveRoom(user, userroom);
 
-                            DeleteUser(user, Interface);
-                            
-                        }
-                        else
-                        {
-                            DeleteUser(user, Interface);
-                        }
+                                DeleteUser(user); 
+                            }
+                            else
+                            {
+                                DeleteUser(user);
+                            }
 #if DEBUG
-                        Program.LogService.Log("Users:" + Interface.Count);
+                            Program.LogService.Log("Users:" + UserInterface.Count);
 #endif
 
-                        Interface.ExitFromQueue();
+                        });
 
                     });
 

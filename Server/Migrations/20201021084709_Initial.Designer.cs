@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Keyboardchat.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20201020115948_Initial")]
+    [Migration("20201021084709_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

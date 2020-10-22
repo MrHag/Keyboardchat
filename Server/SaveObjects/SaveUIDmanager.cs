@@ -3,10 +3,10 @@ using System.Threading;
 
 namespace Keyboardchat.SaveObjects
 {
-    class SemaphoreUIDmanager : UIDmanager
+    class SaveUIDmanager : UIDmanager
     {
         protected Semaphore _semaphore;
-        public SemaphoreUIDmanager() : base()
+        public SaveUIDmanager() : base()
         {
             _semaphore = new Semaphore(1, 1);     
         }

@@ -23,20 +23,18 @@ namespace Keyboardchat.Models
 
         public void AddUser(User user)
         {
-            var Interface = Users.EnterInQueue();
-
-            Interface.Add(user);
-
-            Users.ExitFromQueue(Interface);
+            Users.Open((Interface) =>
+            { 
+                Interface.Add(user);
+            });
         }
 
         public void DeleteUser(User user)
         {
-            var Interface = Users.EnterInQueue();
-
-            Interface.Remove(user);
-
-            Interface.ExitFromQueue();
+            Users.Open((Interface) =>
+            {
+                Interface.Remove(user);
+            });
         }
 
         public Room Copy()
