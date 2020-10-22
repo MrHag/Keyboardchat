@@ -1,4 +1,4 @@
-@import '../../styles/globals.scss';
+@import 'styles/globals.scss';
 
 .chat {
     @include flex-layout(column, space-between, center);

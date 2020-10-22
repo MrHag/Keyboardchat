@@ -11,7 +11,7 @@ import { Socket } from 'logic';
 import './RoomPanel.scss';
 
 try {
-    var fake_rooms = require('../../../fake_data/fake.json').rooms;
+    var fake_rooms = require('fake_data/fake.json').rooms;
 } catch (err) { }
 
 const RoomList = ({ inRoom, rooms, joinRoom, leaveRoom }) => {
@@ -33,7 +33,7 @@ const RoomList = ({ inRoom, rooms, joinRoom, leaveRoom }) => {
                 })
             }
         </div>
-    )
+    );
 }
 
 const RoomPanel = ({ onCreateRoom }) => {
@@ -82,7 +82,7 @@ const RoomPanel = ({ onCreateRoom }) => {
         Socket.on('roomchange', socketRoomchange);
         Socket.on('joinroom', socketJoinroom);
         Socket.on('leaveroom', socketLeaveroom)
-        Socket.emit('getrooms', {room: null});
+        //Socket.emit('getrooms', {room: null});
     }
 
     const removeSocketListeners = () => {

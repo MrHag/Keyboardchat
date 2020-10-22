@@ -13,20 +13,25 @@ const Sidebar = ({children, ...props}) => {
 
     const onArrowBtnHandler = (e) => {
         setHidden(!isHidden);
-    }
+    };
 
-    const icon = (isHidden) ? FontAwesomeIcons.faArrowRight : FontAwesomeIcons.faArrowLeft;
+    const icon = (isHidden) ? FontAwesomeIcons.faAngleRight : FontAwesomeIcons.faAngleLeft;
 
     return (
-        <div className="sidebar" {...props}>
-            <IconButton onClick={onArrowBtnHandler} className="sidebar__arrow-btn">
+        <div className={classNames("sidebar")} {...props}>
+            <IconButton
+                className={classNames("sidebar__arrow-btn", {"hidden": isHidden})}
+                onClick={onArrowBtnHandler}
+            >
                 <FontAwesomeIcon icon={icon}></FontAwesomeIcon>
             </IconButton>
-            <div className={classNames("sidebar__content", {"hidden": isHidden})}>
+            <div
+                className={classNames("sidebar__content", {"hidden": isHidden})}
+            >
                 {children}
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default Sidebar;

@@ -29,8 +29,8 @@ const SignUp = () => {
   }
 
   const socketRegistration = (data) => {
-      console.log("Auth response!");
-      console.log("Response data = ", data);
+      console.log('Auth response!');
+      console.log('Response data = ', data);
       if (data.successful) {
           routeHistory.push('/');
       } else {

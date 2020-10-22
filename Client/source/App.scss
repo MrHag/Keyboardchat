@@ -30,6 +30,7 @@ body {
 
     &__content {
         padding: 4px 0 4px 0;
+        padding: 4px;
         @include flex-layout(row, center, center);
         height: 100%;
         box-shadow: 0px 0px 16px lightgray;

@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
-import { TextField } from '@material-ui/core';
-
+import { Input, InputPassword, Button } from 'components';
 import { Socket } from 'logic';
-import { Button } from 'components';
 
 import './CreationRoom.scss';
 
@@ -50,8 +48,18 @@ const CreationRoom = ({onComplete}) => {
             <div className="creation-room__bg"></div>
             <div className="creation-room__content">
                 <h2 className="creation-room__header">Create room</h2>
-                <TextField onChange={e => setName(e.target.value)} className="creation-room__input" placeholder="Room name" onKeyDown={onInputKeydown} autoFocus></TextField>
-                <TextField onChange={e => setPassword(e.target.value)} className="creation-room__input" placeholder="Room password" onKeyDown={onInputKeydown}></TextField>
+                <Input
+                    onChange={e => setName(e.target.value)}
+                    className="creation-room__input"
+                    placeholder="Room name"
+                    onKeyDown={onInputKeydown} autoFocus
+                />
+                <InputPassword
+                    onChange={e => setPassword(e.target.value)}
+                    className="creation-room__input"
+                    placeholder="Room password"
+                    onKeyDown={onInputKeydown}
+                />
                 <p className="creation-room__error">{err}</p>
                 <div className="creation-room__buttons">
                     <Button onClick={onComplete}>Cancel</Button>

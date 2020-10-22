@@ -7,7 +7,7 @@ import { Socket } from 'logic';
 import './Chat.scss';
 
 try {
-    var fake_messages = require('../../../fake_data/fake.json').chat_messages;
+    var fake_messages = require('fake_data/fake.json').chat_messages;
 } catch (err) { }
 
 const RoomHeader = ({name}) => {

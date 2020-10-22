@@ -1,8 +1,7 @@
-@import '../../styles/globals.scss';
+@import 'styles/globals.scss';
 
 .room-panel {
     @include flex-layout(column, flex-start, center);
-    background-color: white;
     width: 256px;
     height: 100%;
     padding: 8px;
@@ -20,10 +19,11 @@
         width: 100%;
         overflow-y: scroll;
         overflow-x: hidden;
+        margin: 8px;
     }
 
     .button {
         width: 100%;
-        margin-top: 8px;
+        //margin-top: 8px;
     }
 }

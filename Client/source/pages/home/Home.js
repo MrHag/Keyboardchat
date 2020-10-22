@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Chat, RoomPanel, CreationRoom, Sidebar } from 'components';
+
+import { Sidebar } from 'components';
+import { Chat, RoomPanel, CreationRoom } from './layouts';
 
 import './Home.scss';
 

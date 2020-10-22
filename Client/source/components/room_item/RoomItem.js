@@ -38,12 +38,18 @@ const RoomItemForm = ({roomName, onCancel, onJoin}) => {
 
     return (
         <div className="ri-form">
-            <TextField className="ri-form__password" onChange={e => setPassword(e.target.value)} placeholder="Password" autoFocus
-             onKeyDown={e => {
-                 if (e.key === 'Enter') onJoinBtn();
-             }}></TextField>
+            <TextField 
+                className="ri-form__password"
+                placeholder="Password"
+                onChange={e => setPassword(e.target.value)} 
+                onKeyDown={e => {
+                    if (e.key === 'Enter') onJoinBtn();
+                }}
+                autoFocus
+            />
             <p className="ri-form__error">{err}</p>
-            <div className="ri-form__buttons">
+            <div 
+                className="ri-form__buttons">
                 <Button onClick={onCancel}>Cancel</Button>
                 <Button disabled={password === ''} onClick={onJoinBtn}>Join</Button>
             </div>
@@ -73,7 +79,13 @@ const RoomItem = ({active, roomData, onRoomJoin, onRoomLeave}) => {
 
     let form = null;
     if (stage === 'joining') {
-        form = <RoomItemForm roomName={name} onCancel={() => {setStage('')}} onJoin={onJoin}></RoomItemForm>
+        form = (
+            <RoomItemForm
+                roomName={name}
+                onCancel={() => {setStage('')}}
+                onJoin={onJoin}
+            />
+        );
     }
 
     const roomLeaveButton = active && (
