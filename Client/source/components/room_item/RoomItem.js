@@ -93,10 +93,11 @@ const RoomItem = ({active, roomData, onRoomJoin, onRoomLeave}) => {
             className="room-item__leave-btn"
             color="dark"
             onClick={onRoomLeave}
+            title="Leave room"
         >
             <FontAwesomeIcon
                 className="room-item__lock-icon" 
-                icon={FontAwesomeIcons.faDoorOpen}
+                icon={FontAwesomeIcons.faTimesCircle}
             />
         </IconButton>
     )

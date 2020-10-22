@@ -20,10 +20,6 @@
         padding-bottom: 8px;
     }
 
-    &__lock-icon {
-        margin: 0 8px;
-    }
-
     &__name {
         margin: 0;
         text-align: center;
@@ -40,8 +36,13 @@
     }
 
     & &__leave-btn {
-        padding: 0;
-        margin: 0;
+        position: absolute;
+        top: 50%;
+        right: 0;
+        font-size: 20px;
+        padding: 4px;
+        transform: translateY(-50%);
+        background-color: #b3b3b3;
     }
 }
 
