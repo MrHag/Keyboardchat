@@ -20,6 +20,10 @@ const Home = () => {
     return (
         <div className="home">
             <Sidebar>
+                <div className="user-widget">
+                    <div className="user-widget__av" />
+                    <div className="user-widget__name">User Login</div>
+                </div>
                 <RoomPanel onCreateRoom={onCreateRoom}></RoomPanel>
             </Sidebar>
             <Chat></Chat>

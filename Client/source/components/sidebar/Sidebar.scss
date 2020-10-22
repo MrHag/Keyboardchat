@@ -5,10 +5,11 @@
     height: 100%;
     position: relative;
 
-    background-color: rgb(233, 233, 233);
+    background-color: $main-bg-color;
 
     &__content {
-        max-height: 100%;
+        @include flex-layout(column, flex-start, center);
+        height: 100%;
     }
 
     & &__arrow-btn {
@@ -18,7 +19,6 @@
         top: 50%;
         transform: scaleY(1.0) translate(100%, -50%);
         z-index: 3;
-        color: red;
     }
 
     &__content.hidden {
