@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import classNames from 'class-names';
@@ -18,8 +18,17 @@ const UserWidget = () => {
 
   const onLogoutButton = () => {
     Socket.emit('deauth', {});
+  }
+
+  const onSocketDeauth = (response) => {
+    console.log('Deauth response = ', response);
     routerHistory.push('/');
   }
+
+  useEffect(() => {
+    Socket.addEventListener('deauth', onSocketDeauth);
+    return () => Socket.removeEventListener('deauth', onSocketDeauth());
+  }, []);
 
   const toggle = toggled ? (
     <div className={classNames("user-widget__toggle", { "toggled": toggled })}>
