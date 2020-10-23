@@ -7,16 +7,13 @@ namespace Keyboardchat.Models.Network
 {
     public class MessageBody
     {
-        public string name { get; private set; }
+        public uint userid { get; private set; }
 
         public string message { get; private set; }
-
-        public string avatar { get; private set; }
-        public MessageBody(string name, string message, string avatar)
+        public MessageBody(uint userid, string message)
         {
-            this.name = name;
+            this.userid = userid;
             this.message = message;
-            this.avatar = avatar;
         }
 
     }

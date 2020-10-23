@@ -11,12 +11,12 @@ using SocketIOSharp.Common;
 using SocketIOSharp.Server.Client;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-
 
 namespace Keyboardchat.Web
 {
@@ -55,15 +55,13 @@ namespace Keyboardchat.Web
 #endif
         }
 
-        private void SendChatMessage(Room room, string message, string userName, string avatar = null)
+        private void SendChatMessage(Room room, string message, uint userId)
         {
-            if (avatar == null)
-                avatar = "images/unknown.png";
 
-            var MessageBody = new MessageBody(userName, message, avatar);
+            var MessageBody = new MessageBody(userId, message);
             server.EmitTo(room, Calls["Chat"]["header"].ToString(), MessageBody);
 #if DEBUG
-            Program.LogService.Log($"Message to\n{room.Name}, {message}, from {userName}");
+            Program.LogService.Log($"Message to\n{room.Name}, {message}, from {userId}");
 #endif
         }
 
@@ -175,7 +173,7 @@ namespace Keyboardchat.Web
                     user.Room = room;
                 });
 
-                SendChatMessage(room, user.Name + " connected", "Server", "images/server.jpg");
+                SendChatMessage(room, user.Name + " connected", 0);
                 ServiceResponseMessage(user.Client, Calls["JoinRoom"]["header"].ToString(), new LeftJoinedRoom(room.Name, "Join room"), true);
             }
             catch (QueueExitException)
@@ -193,7 +191,7 @@ namespace Keyboardchat.Web
 
                 if (room != null)
                 {
-                    SendChatMessage(room, user.Name + " disconnected", "Server", "images/server.jpg");
+                    SendChatMessage(room, user.Name + " disconnected", 0);
                     room.DeleteUser(user);
 
                     int UserCount = 0;
@@ -487,7 +485,7 @@ namespace Keyboardchat.Web
                         if (!ValidateDefaultText(message))
                             return;
 
-                        SendChatMessage(room, message, user.Name);
+                        SendChatMessage(room, message, user.UID);
 
                     });
 
@@ -683,7 +681,109 @@ namespace Keyboardchat.Web
                         ServiceResponseMessage(socket, header, outrooms, true);
 
                     });
-                }); 
+                });
+
+                socket.On(Calls["ChangeProfile"]["header"], (JToken[] data) =>
+                {
+                    string header = Calls["ChangeProfile"]["header"].ToString();
+
+                    Task.Run(() =>
+                    {
+                        User user = GetUser(socket);
+
+                        if (!AuthCheckReport(user))
+                            return;
+
+                        string name = null;
+                        string avatar = null;
+
+                        bool reqname = true;
+                        bool reqavatar = true;
+
+                        if (data != null && data.GetValues(0, out List<JToken> values) != null)
+                        {
+                            try
+                            {
+                                reqname = values[0].GetValue(out name, "name") != null;
+                                reqavatar = values[0].GetValue(out avatar, "avatar") != null;
+                            }
+                            catch (Exception)
+                            {
+                            }
+                        }
+                        else
+                        {
+                            ErrorResponseMessage(socket, header, "invalidData");
+                            return;
+                        }
+                       
+
+                        using (var dbcontext = new DatabaseContext())
+                        {
+                            try
+                            {
+                                dbcontext.Users.Single(user => user.Name == name);
+
+                                ServiceResponseMessage(socket, header, "nameExists", false);
+                                return;
+                            }
+                            catch (InvalidOperationException)
+                            {
+                                var dbuser = dbcontext.Users.Single(dbuser => dbuser.UserId == user.UID);
+
+                                if (reqname)
+                                {
+                                    if (!ValidateDefaultText(name, maxlength: 32))
+                                    {
+                                        ServiceResponseMessage(socket, header, "badName", false);
+                                        return;
+                                    }
+                                    dbuser.Name = name;
+                                }
+
+                                if (reqavatar)
+                                {
+                                    byte[] bytes;
+                                    try
+                                    {
+                                        bytes = Convert.FromBase64String(avatar);
+                                    }
+                                    catch (FormatException)
+                                    {
+                                        ServiceResponseMessage(socket, header, "invalidData", false);
+                                        return;
+                                    }
+
+                                    using (MemoryStream ms = new MemoryStream(bytes))
+                                    {
+                                        System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(ms);
+                                        if (bitmap.Width > 128 || bitmap.Height > 128)
+                                        {
+                                            ServiceResponseMessage(socket, header, "badImage", false);
+                                            return;
+                                        }
+
+                                        dbuser.Avatar = bytes;
+
+                                        var sha256 = SHA256.Create();
+                                        var avatarHash = sha256.ComputeHash(dbuser.Avatar);
+
+                                        dbuser.AvatarHash = avatarHash;
+                                    }
+
+                                }
+
+                                dbcontext.SaveChanges();
+
+                                ServiceResponseMessage(socket, header, "Data changed", true);
+
+                            }
+                        }
+
+                    });
+
+                });
+
 
                 socket.On(Calls["GetUsers"]["header"], (JToken[] data) =>
                 {
@@ -697,15 +797,16 @@ namespace Keyboardchat.Web
                             return;
 
                         List<uint> userids = null;
-
-                        List<UserInfo> userInfos = new List<UserInfo>();
+                        List<string> select = null;
 
 
                         if (data != null && data.GetValues(0, out List<JToken> values) != null)
                         {
                             try
                             {
-                                userids = (List<uint>)JsonConvert.DeserializeObject(values[0].ToString(), typeof(List<uint>));
+                                JToken iterateToken = values[0].First;
+                                userids = (List<uint>)JsonConvert.DeserializeObject(iterateToken.First.ToString(), typeof(List<uint>));
+                                select = (List<string>)JsonConvert.DeserializeObject(iterateToken.Next.First.ToString(), typeof(List<string>));
                             }
                             catch (Exception)
                             {
@@ -731,25 +832,79 @@ namespace Keyboardchat.Web
                             }
                             else
                             {
-                                dbusers = new List<DataBase.Models.User>(dbcontext.Users);
-                            }
-
-                            foreach (var dbuser in dbusers)
-                            {
-                                byte[] dbavatar = dbuser.Avatar;
-                                string avatar = "";
-
-                                if (dbavatar != null)
-                                {
-                                    avatar = Convert.ToBase64String(dbavatar);
-                                }
-
-                                var userinfo = new UserInfo(dbuser.UserId, dbuser.Name, avatar);
-                                userInfos.Add(userinfo);
+                                dbusers.Add(dbcontext.Users.Single((user) => user.UserId == user.UserId));
                             }
                         }
+                        using (MemoryStream memoryStream = new MemoryStream())
+                        {
+                            using (StreamWriter streamWriter = new StreamWriter(memoryStream))
+                            using (JsonTextWriter jsonTextWriter = new JsonTextWriter(streamWriter))
+                            {
 
-                        ServiceResponseMessage(socket, header, userInfos, true);
+                                bool reqavatar = true; 
+                                bool reqavatarHash = true; 
+                                bool reqname = true;
+
+                                if (select != null && select.Count > 0)
+                                {
+                                    reqavatar = select.Contains("avatar");
+                                    reqavatarHash = select.Contains("avatarHash");
+                                    reqname = select.Contains("name");
+                                }
+
+                                jsonTextWriter.WriteStartObject();
+
+                                foreach (var dbuser in dbusers)
+                                {
+
+                                    jsonTextWriter.WritePropertyName("id");
+                                    jsonTextWriter.WriteValue(dbuser.UserId);
+
+                                    if (reqname)
+                                    {
+                                        jsonTextWriter.WritePropertyName("name");
+                                        jsonTextWriter.WriteValue(dbuser.Name);
+                                    }
+                                    if (reqavatar)
+                                    {
+                                        byte[] dbavatar = dbuser.Avatar;
+                                        string avatar = "";
+
+
+                                        if (dbavatar != null)
+                                        {
+                                            avatar = Convert.ToBase64String(dbavatar);
+                                        }
+                                        jsonTextWriter.WritePropertyName("avatar");
+                                        jsonTextWriter.WriteValue(avatar);
+                                    }
+                                    if (reqavatarHash)
+                                    {
+                                        byte[] dbavatarHash = dbuser.Avatar;
+                                        string avatarHash = "";
+
+
+                                        if (dbavatarHash != null)
+                                        {
+                                            avatarHash = Convert.ToBase64String(dbavatarHash);
+                                        }
+
+                                        jsonTextWriter.WritePropertyName("avatarHash");
+                                        jsonTextWriter.WriteValue(avatarHash);
+                                    }
+                                }
+
+                                jsonTextWriter.WriteEndObject();
+                            }
+
+                            string json = Encoding.UTF8.GetString(memoryStream.ToArray());
+
+                            var jObject = JObject.Parse(json);
+
+                            ServiceResponseMessage(socket, header, jObject, true);
+                        }
+
+                        
                     });
 
                 });

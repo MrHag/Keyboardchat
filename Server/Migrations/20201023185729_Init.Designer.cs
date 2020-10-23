@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Keyboardchat.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20201021084709_Initial")]
-    partial class Initial
+    [Migration("20201023185729_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -26,6 +26,9 @@ namespace Keyboardchat.Migrations
                         .HasColumnType("int unsigned");
 
                     b.Property<byte[]>("Avatar")
+                        .HasColumnType("longblob");
+
+                    b.Property<byte[]>("AvatarHash")
                         .HasColumnType("longblob");
 
                     b.Property<string>("Name")
