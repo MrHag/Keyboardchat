@@ -20,6 +20,7 @@ const SignIn = () => {
           name: login,
           password: password,
       };
+      console.log('Socket.emit("auth", ...)');
       Socket.emit('auth', request);
   }
 

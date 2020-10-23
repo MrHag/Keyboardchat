@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import { Sidebar } from 'components';
-import { Chat, RoomPanel, CreationRoom } from './layouts';
+import { Chat, RoomPanel, CreationRoom, UserWidget } from './layouts';
 
 import './Home.scss';
 
@@ -20,10 +20,7 @@ const Home = () => {
     return (
         <div className="home">
             <Sidebar>
-                <div className="user-widget">
-                    <div className="user-widget__av" />
-                    <div className="user-widget__name">User Login</div>
-                </div>
+                <UserWidget />
                 <RoomPanel onCreateRoom={onCreateRoom}></RoomPanel>
             </Sidebar>
             <Chat></Chat>

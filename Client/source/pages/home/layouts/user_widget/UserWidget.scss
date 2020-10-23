@@ -1,0 +1,50 @@
+@import 'styles/globals.scss';
+
+.user-widget {
+  @include flex-layout(column, flex-start, center);
+  min-height: 56px;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: rgb(189, 185, 185);
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &__info {
+    box-sizing: border-box;
+    @include flex-layout(row, flex-start, center);
+    width: 100%;
+    min-height: 100%;
+    padding: 4px;
+  }
+
+  &__av {
+      min-width: 40px;
+      min-height: 40px;
+      border-radius: 50%;
+      background-color: lightgray;
+  }
+
+  &__name {
+    margin: 0 16px;
+    text-align: center;
+  }
+
+  &__toggle {
+    height: 0;
+    visibility: hidden;
+
+    &.toggled {
+      z-index: 3;
+      visibility: visible;
+      //min-height: 256px;
+      width: 100%;
+      background-color: #f0f0f0;
+    }
+  }
+
+  .button {
+    width: 100%;
+  }
+}

@@ -1,12 +1,12 @@
 import React from 'react';
 
-import './Sidebar.scss';
-
 import { IconButton } from '../index';
 import classNames from 'classnames';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
+
+import './Sidebar.scss';
 
 const Sidebar = ({children, ...props}) => {
     const [isHidden, setHidden] = React.useState(false);

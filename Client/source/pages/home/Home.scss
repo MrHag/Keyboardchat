@@ -7,23 +7,3 @@
     height: 100%;
     background-color: white;
 }
-
-.user-widget {
-    @include flex-layout(row, flex-start, center);
-    min-height: 56px;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 4px;
-    background-color: rgb(189, 185, 185);
-
-    &__av {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background-color: lightgray;
-    }
-
-    &__name {
-        margin-left: 16px;
-    }
-}
