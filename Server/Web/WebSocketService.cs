@@ -4,7 +4,6 @@ using Keyboardchat.Models;
 using Keyboardchat.Models.Network;
 using Keyboardchat.ModifiedObjects;
 using Keyboardchat.SaveCollections;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -30,7 +29,7 @@ namespace Keyboardchat.Web
 
         private SaveDictionary<SocketIOSocket, User> _connectionUsers;
 
-        private SaveList<User> _users;
+        private SaveDictionary<uint, User> _authUsers;
 
         private SaveList<Room> _rooms;
         private SaveList<Room> _globalRooms;
@@ -40,7 +39,7 @@ namespace Keyboardchat.Web
             Calls = Program.API.SelectToken("Calls");
             SCalls = Program.API.SelectToken("ServerCalls");
             server = new SocketIOServer(new SocketIOSharp.Server.SocketIOServerOption(4001));
-            _users = new SaveList<User>();
+            _authUsers = new SaveDictionary<uint, User>();
             _connectionUsers = new SaveDictionary<SocketIOSocket, User>();
             _rooms = new SaveList<Room>();
             _globalRooms = new SaveList<Room>();
@@ -52,7 +51,7 @@ namespace Keyboardchat.Web
             client.Emit(header, responseBody);
 
 #if DEBUG
-            Program.LogService.Log($"Responsebody to\n{responseBody.Json()}");
+            Program.LogService.Log($"{header} Responsebody to {GetUser(client).Name}\n{responseBody.Json()}");
 #endif
         }
 
@@ -93,21 +92,20 @@ namespace Keyboardchat.Web
             return true;
         }
 
-        private bool AuthCheckReport(SocketIOSocket client)
+        private bool AuthCheckReport(User user)
         {
-            return _users.Open((Interface) => {
+            if (user == null)
+                return false;
 
-                User user = GetUser(client);
-
-                if (user == null)
+            return _authUsers.Open((Interface) =>
+            {
+                if (!user.Auth)
                 {
-                    ErrorResponseMessage(client, SCalls["Access"]["header"].ToString(), "notAuth");
+                    ErrorResponseMessage(user.Client, SCalls["Access"]["header"].ToString(), "notAuth");
                     return false;
                 }
-
                 return true;
             });
-                
         }
 
         public User GetUser(SocketIOSocket client)
@@ -138,20 +136,22 @@ namespace Keyboardchat.Web
 
         public void Broadcast(string header, object data, bool successful, bool error)
         {
-            _connectionUsers.Open((DInterface) =>
+            _authUsers.Open((Interface) =>
             {
-                foreach (var connection in DInterface.Keys)
+                foreach (var user in Interface.Values)
                 {
-                    ResponseMessage(connection, header, data, successful, error);
+                    ResponseMessage(user.Client, header, data, successful, error);
                 }
             });       
         }
 
         public bool DeleteUser(User user)
         {
-            return _users.Open((Interface) =>
+            if (user == null)
+                return false;
+            return _connectionUsers.Open((Interface) =>
             {
-                return Interface.Remove(user);
+                return Interface.Remove(user.Client);
             });
         }
 
@@ -159,7 +159,7 @@ namespace Keyboardchat.Web
         {
             try
             {
-                _users.Open((Interface) =>
+                _connectionUsers.Open((Interface) =>
                 {
 
                     if (user.Room != null)
@@ -185,7 +185,7 @@ namespace Keyboardchat.Web
         public void LeaveRoom(User user, Room room)
         {
 
-            if (!AuthCheckReport(user.Client))
+            if (!AuthCheckReport(user))
                 return;
 
             try
@@ -247,6 +247,46 @@ namespace Keyboardchat.Web
             {
                 Program.LogService.Log("Connection");
 
+                _connectionUsers.Open((Interface) =>
+                {
+                    Interface.Add(socket, new User(socket));
+                });
+
+                Action<bool> DisconnectAction = (disconnected) =>
+                {
+                    Task.Run(() =>
+                    {
+                        _connectionUsers.Open((UserInterface) =>
+                        {
+                            User user = GetUser(socket);
+
+                            if (user != null)
+                            {
+                                Room userroom = user.Room;
+
+                                LeaveRoom(user, userroom);
+                            }
+
+                            user.Auth = false;
+
+                            if(disconnected)
+                            DeleteUser(user);
+
+                            _authUsers.Open((Interface) =>
+                            {
+                                Interface.Remove(user.UID);
+                            });
+                            
+#if DEBUG
+                            Program.LogService.Log("Users:" + UserInterface.Count);
+#endif
+
+                        });
+
+                    });
+
+                };
+
                 socket.On(Calls["Registration"]["header"], (JToken[] data) =>
                 {
                     string header = Calls["Registration"]["header"].ToString();
@@ -263,13 +303,13 @@ namespace Keyboardchat.Web
                             return;
                         }
 
-                        if (!ValidateDefaultText(name))
+                        if (!ValidateDefaultText(name, maxlength: 32))
                         {
                             ServiceResponseMessage(socket, header, "badName", false);
                             return;
                         }
 
-                        if (!ValidateDefaultText(pass))
+                        if (!ValidateDefaultText(pass, maxlength: 64))
                         {
                             ServiceResponseMessage(socket, header, "badPass", false);
                             return;
@@ -334,6 +374,8 @@ namespace Keyboardchat.Web
                             return;
                         }
 
+                        uint UserId;
+
                         using (var dbcontext = new DatabaseContext())
                         {
                             try
@@ -345,6 +387,8 @@ namespace Keyboardchat.Web
 
                                 if (!dbUser.PasswordHash.SequenceEqual(passwordHash))
                                     throw new InvalidOperationException();
+                                else
+                                    UserId = dbUser.UserId;
                             }
                             catch (InvalidOperationException)
                             {
@@ -355,21 +399,27 @@ namespace Keyboardchat.Web
 
                         User user = GetUser(socket);
 
-                        if (user != null)
+                        if (user.Auth)
                         {
                             ServiceResponseMessage(socket, header, "alreadyInSess", false);
                             return;
                         }
 
-                        _users.Open((Interface) =>
-                        {
-                            user = new User(name, null, socket);
-                            Interface.Add(user);
-                        });
-
                         _connectionUsers.Open((Interface) =>
                         {
-                            Interface.Add(socket, user);
+                            user.Name = name;
+                            user.UID = UserId;
+                            user.Auth = true;
+                        });
+                        
+                        _authUsers.Open((Interface) =>
+                        {
+                            try
+                            {
+                                Interface.Add(user.UID, user);
+                            }
+                            catch (ArgumentException)
+                            { }
                         });
 
                         _globalRooms.Open((RoomInterface) =>
@@ -396,12 +446,8 @@ namespace Keyboardchat.Web
                             return;
                         }
 
-                        DeleteUser(user);
 
-                        _connectionUsers.Open((Interface) =>
-                        {
-                            Interface.Remove(socket);
-                        });
+                        DisconnectAction.Invoke(false);
 
                         ServiceResponseMessage(socket, header, "Deaunthentication successful", true);
                     });
@@ -416,18 +462,16 @@ namespace Keyboardchat.Web
                     Task.Run(() =>
                     {
 
-                        if (!AuthCheckReport(socket))
-                            return;
-
                         User user = null;
                         Room room = null;
 
-                        _users.Open((Interface) =>
-                        {
-                            user = GetUser(socket);
-                            room = user.Room;
-                        });
+                        user = GetUser(socket);
 
+                        if (!AuthCheckReport(user))
+                            return;
+
+                        room = user.Room;
+                        
                         string message;
 
                         if (data == null || data.GetValues(0, out List<JToken> values) == null || values[0].GetValue(out message, "message") == null)
@@ -455,16 +499,10 @@ namespace Keyboardchat.Web
 
                     Task.Run(() =>
                     {
+                        User user = GetUser(socket);
 
-                        if (!AuthCheckReport(socket))
+                        if (!AuthCheckReport(user))
                             return;
-
-                        User user = null;
-
-                        _users.Open((Interface) =>
-                        {
-                            user = GetUser(socket);
-                        });
 
                         string RoomName;
                         string Password;
@@ -522,10 +560,10 @@ namespace Keyboardchat.Web
                         {
                             User user = null;
 
-                            _users.Open((RoomInterface) =>
+                            _connectionUsers.Open((RoomInterface) =>
                             {
                                 user = GetUser(socket);
-                                if (!AuthCheckReport(user.Client) || user.Room == null)
+                                if (!AuthCheckReport(user) || user.Room == null)
                                 {
                                     ServiceResponseMessage(socket, header, "notInRoom", false);
                                     throw new QueueExitException();
@@ -553,7 +591,7 @@ namespace Keyboardchat.Web
                                 globalRoom = RoomInterface[0];
                             });
 
-                            _users.Open((RoomInterface) =>
+                            _connectionUsers.Open((RoomInterface) =>
                             {
                                 if (room == null || user.Room != room)
                                 {
@@ -582,14 +620,10 @@ namespace Keyboardchat.Web
                     Task.Run(() =>
                     {
 
-                        if (!AuthCheckReport(socket))
-                            return;
+                        User user = GetUser(socket);
 
-                        User user = null;
-                        _users.Open((UserInterface) =>
-                        {
-                            user = GetUser(socket);
-                        });
+                        if (!AuthCheckReport(user))
+                            return;
 
                         List<(Room room, int qual)> rooms = new List<(Room room, int qual)>();
 
@@ -657,7 +691,9 @@ namespace Keyboardchat.Web
 
                     Task.Run(() =>
                     {
-                        if (!AuthCheckReport(socket))
+                        User user = GetUser(socket);
+
+                        if (!AuthCheckReport(user))
                             return;
 
                         List<uint> userids = null;
@@ -728,14 +764,11 @@ namespace Keyboardchat.Web
                     {
                         try
                         {
+                            
+                            User user = GetUser(socket);
 
-                            if (!AuthCheckReport(socket))
+                            if (!AuthCheckReport(user))
                                 return;
-                            User user = null;
-                            _users.Open((UserInterface) =>
-                            {
-                                user = GetUser(socket);
-                            });
 
                             string RoomName;
                             string Password;
@@ -788,40 +821,10 @@ namespace Keyboardchat.Web
                     
                 });
 
-                Action DisconnectAction = () =>
-                {
-                    Task.Run(() =>
-                    {
-                        _users.Open((UserInterface) =>
-                        {
-                            User user = GetUser(socket);
-                        
 
-                            if (user != null)
-                            {
-                                Room userroom = user.Room;
+                socket.On(SocketIOEvent.DISCONNECT, () => DisconnectAction(true));
 
-                                LeaveRoom(user, userroom);
-
-                                DeleteUser(user); 
-                            }
-                            else
-                            {
-                                DeleteUser(user);
-                            }
-#if DEBUG
-                            Program.LogService.Log("Users:" + UserInterface.Count);
-#endif
-
-                        });
-
-                    });
-
-                };
-
-                socket.On(SocketIOEvent.DISCONNECT, DisconnectAction);
-
-                socket.On(SocketIOEvent.ERROR, DisconnectAction);
+                socket.On(SocketIOEvent.ERROR, () => DisconnectAction(true));
 
             });
 
