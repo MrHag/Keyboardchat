@@ -1,5 +1,7 @@
 import React from 'react';
-import { Route } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
+
+import { ROUTES } from 'shared';
 
 import SignIn from './layouts/SignIn/SignIn';
 import SignUp from './layouts/SignUp/SignUp';
@@ -8,12 +10,14 @@ import './Welcome.scss';
 
 const Welcome = () => (
     <div className="welcome">
-        <Route exact path="/">
-            <SignIn />
-        </Route>
-        <Route exact path="/signup">
-            <SignUp></SignUp>
-        </Route>
+        <Switch>
+            <Route path={ROUTES.Signup.route}>
+                <SignUp></SignUp>
+            </Route>
+            <Route path={ROUTES.Authorization.route}>
+                <SignIn />
+            </Route>
+        </Switch>
     </div>
 );
 

@@ -46,14 +46,14 @@ const Chat = () => {
     }
 
     const socketJoinroom = data => {
-        console.log("Chat joinroom data = ", data);
-            console.log("room name = ", data.data.room);
-            if (data.successful) {
-                setState({
-                    messages: [],
-                    room_name: data.data.room
-                });
-            }
+        // console.log("Chat joinroom data = ", data);
+        // console.log("room name = ", data.data.room);
+        if (data.successful) {
+            setState({
+                messages: [],
+                room_name: data.data.room
+            });
+        }
     };
 
     const socketLeaveroom = () => {
