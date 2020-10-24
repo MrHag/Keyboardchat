@@ -30,10 +30,13 @@ const SignIn = () => {
       if (data.successful) {
           routeHistory.push('/chat');
       } else {
-          switch (data.data) {
-              case 'badName':
-                  setErr('Bad name!');
-                  break;
+        switch (data.data) {
+            case 'badName':
+                setErr('Bad name!');
+                break;
+            case 'invalidData':
+                setErr('Invalid data!');
+                break;
           }
       }
   }

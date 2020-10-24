@@ -10,7 +10,6 @@
   }
 
   .button {
-    margin-top: 32px;
     width: 100%;
   }
 
@@ -20,8 +19,9 @@
   }
 
   &__error {
-      color: red;
-      text-align: center;
+    margin: 16px 0;
+    color: red;
+    text-align: center;
   }
 
   &__register {
