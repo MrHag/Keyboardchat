@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { history } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
-import { InputAdornment, TextField} from '@material-ui/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
 

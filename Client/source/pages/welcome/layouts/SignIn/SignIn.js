@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useHistory, NavLink } from 'react-router-dom';
 
 import { Socket } from 'logic';
+import { ROUTES } from 'shared';
 import { Button, Input, InputPassword } from 'components';
 
 import './SignIn.scss';
@@ -28,7 +29,7 @@ const SignIn = () => {
       console.log("Auth response!");
       console.log("Response data = ", data);
       if (data.successful) {
-          routeHistory.push('/chat');
+          routeHistory.push(ROUTES.Home.route);
       } else {
         switch (data.data) {
             case 'badName':

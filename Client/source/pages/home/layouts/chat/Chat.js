@@ -1,7 +1,7 @@
-import React, { useEffect, useReducer, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
-import { ChatMessage, ChatInput, IconButton } from 'components';
+import { ChatMessage, ChatInput } from 'components';
 import { Socket } from 'logic';
 
 import ChatHeader from './chat_header/ChatHeader';
@@ -33,8 +33,6 @@ const Chat = () => {
     }
 
     const socketJoinroom = data => {
-        // console.log("Chat joinroom data = ", data);
-        // console.log("room name = ", data.data.room);
         if (data.successful) {
             setState({
                 messages: [],

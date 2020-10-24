@@ -8,10 +8,22 @@
 
   &__item {
     @include flex-layout(row, center, center);
-    font-size: 32px;
     width: 56px;
     height: 56px;
     border-radius: 50%;
+    margin-bottom: 16px;
+
+    .item__content {
+      font-size: 32px;
+    }
+
+    &.user {
+      background-color: red;
+    }
+
+    &.is-active {
+      background-color: lightslategray;
+    }
 
     &:hover {
       cursor: pointer;

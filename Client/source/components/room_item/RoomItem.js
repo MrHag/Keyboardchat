@@ -90,7 +90,6 @@ const RoomItem = ({active, roomData, onRoomJoin, onRoomLeave}) => {
     const roomLeaveButton = active && (
         <IconButton 
             className="room-item__leave-btn"
-            color="dark"
             onClick={onRoomLeave}
             title="Leave room"
         >

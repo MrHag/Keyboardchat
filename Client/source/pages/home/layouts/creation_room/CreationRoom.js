@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import { useHistory, Redirect } from 'react-router-dom';
 
 import { Input, InputPassword, Button } from 'components';
 import { Socket } from 'logic';
+import { ROUTES } from 'shared';
 
 import './CreationRoom.scss';
 
-const CreationRoom = ({onComplete}) => {
+const CreationRoom = () => {
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
     const [err, setErr] = useState('');
-
+    const routeHistory = useHistory();
     /*
         Пока joinroom всегда возвращает success. Если это изменится, то нужно будет хендлить ошибки здесь
     */
@@ -20,12 +21,17 @@ const CreationRoom = ({onComplete}) => {
             name: name,
             password: (password.length === 0) ? null : password
         });
+    };
+
+    const onCancelBtn = () => {
+        routeHistory.goBack();
     }
 
     const socketCreateRoom = (data) => {
         console.log("Socket create room = ", data);
         if (data.successful) {
-            onComplete();
+            routeHistory.push(ROUTES.RoomChat.route);
+            
         } else {
             //Here might be other types of errors
             setErr('Room with this name already exist!');
@@ -62,16 +68,12 @@ const CreationRoom = ({onComplete}) => {
                 />
                 <p className="creation-room__error">{err}</p>
                 <div className="creation-room__buttons">
-                    <Button onClick={onComplete}>Cancel</Button>
+                    <Button onClick={onCancelBtn}>Cancel</Button>
                     <Button disabled={name === ''} onClick={onCreateBtn}>Create</Button>
                 </div>
             </div>
         </div>
     )
-}
-
-CreationRoom.propTypes = {
-    onComplete: PropTypes.func.isRequired,
 }
 
 export default CreationRoom;
