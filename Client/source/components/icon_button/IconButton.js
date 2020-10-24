@@ -31,7 +31,6 @@ const IconButton = ({className, color, ...props}) => {
     return (
         <MuiThemeProvider theme={customTheme}>
             <BaseIconButton
-                color="secondary"
                 style={style}
                 className={classNames("icon-btn", className)}
                 classes={{

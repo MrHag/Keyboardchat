@@ -1,4 +1,4 @@
-@import '../../styles/globals.scss';
+@import 'styles/globals.scss';
 
 .chat-input {
     @include flex-layout(column, flex-end);
@@ -8,15 +8,17 @@
     margin-bottom: 8px;
     width: 90%;
     border-radius: 8px;
-    box-shadow: 0px 0px 8px gray;
+    background-color: $main-dark-bg-color;
+    border: 1px solid #63686d;
     padding: 8px;
 
     &__area {
-        min-width: 100%;
-        max-width: 100%;
+        width: 100%;
         border: none;
         font-size: 18px;
         resize: none;
+        background-color: $main-dark-bg-color;
+        color: white;
 
         &:focus {
             outline: none;

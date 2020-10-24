@@ -15,15 +15,17 @@ try {
 const App = () => (
     <BrowserRouter>
         <div className="app">
-            <div className="app__content">
-                <Switch>
-                    <Route path={ROUTES.Chat.route}>
-                        <Home></Home>
-                    </Route>
-                    <Route path="/">
-                        <Welcome></Welcome>
-                    </Route>
-                </Switch>
+            <div className="app__wrapper">
+                <div className="app__content">
+                    <Switch>
+                        <Route path={ROUTES.Chat.route}>
+                            <Home></Home>
+                        </Route>
+                        <Route path="/">
+                            <Welcome></Welcome>
+                        </Route>
+                    </Switch>
+                </div>
             </div>
         </div>
     </BrowserRouter>

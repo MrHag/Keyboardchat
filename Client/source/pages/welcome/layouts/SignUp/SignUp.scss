@@ -5,8 +5,13 @@
   max-width: 250px;
   max-height: 512px;
 
+  h1 {
+    margin-bottom: 32px;
+  }
+
   .button {
-      width: 100%;
+    margin-top: 32px;
+    width: 100%;
   }
 
   .input, .input-password {

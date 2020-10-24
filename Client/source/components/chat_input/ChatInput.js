@@ -30,8 +30,15 @@ const ChatInput = () => {
 
     return (
         <div className="chat-input">
-            <TextareaAutosize className="chat-input__area" variant="outlined" rowsMax={3} rowsMin={3} value={text} autoFocus={true} placeholder="Your message"
-                    onChange={e => setText(e.target.value)} onKeyDown={e => onChatKeydown(e)}></TextareaAutosize>
+            <TextareaAutosize
+                className="chat-input__area"
+                variant="outlined"
+                rowsMax={3} rowsMin={3} value={text}
+                autoFocus={true}
+                placeholder="Your message"
+                onChange={e => setText(e.target.value)}
+                onKeyDown={e => onChatKeydown(e)}
+            />
             <div className="chat-input__controls">
                 <IconButton disabled={text === ''} onClick={sendMessage}>
                     <FontAwesomeIcon icon={FontAwesomeIcons.faPaperPlane}></FontAwesomeIcon>

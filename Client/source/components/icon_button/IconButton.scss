@@ -1,4 +1,10 @@
+@import 'styles/globals.scss';
+
 .icon-btn {
+    & > * {
+        color: $btn-active-bg-color;
+    }
+
     &:hover {
         cursor: pointer;
     }
