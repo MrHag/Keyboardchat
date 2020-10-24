@@ -9,9 +9,9 @@ namespace Keyboardchat.SaveCollections
     {
         private List<T> _list;
 
-        private Semaphore _semaphore;
+        private Mutex _mutex;
 
-        private int _currentThread;
+        private Thread _currentThread;
 
         private int Count
         {
@@ -23,8 +23,8 @@ namespace Keyboardchat.SaveCollections
 
         private bool IsReadOnly => false;
 
-        int ISaveCollection.CurrentThread { get => _currentThread; set => _currentThread = value; }
-        Semaphore ISaveCollection.Semaphore { get => _semaphore; set => _semaphore = value; }
+        Thread ISaveCollection.CurrentThread { get => _currentThread; set => _currentThread = value; }
+        Mutex ISaveCollection.Mutex { get => _mutex; set => _mutex = value; }
 
         public T2 Open<T2>(Func<SaveListInterface, T2> func)
         {

@@ -6,26 +6,26 @@ namespace Keyboardchat.SaveCollections
 {
     public interface ISaveCollection
     {
-        abstract private protected int CurrentThread { get; set; }
-        abstract private protected Semaphore Semaphore { get; set; }
+        abstract private protected Thread CurrentThread { get; set; }
+        abstract private protected Mutex Mutex { get; set; }
         abstract private protected ISaveInterface<T5> CreateInterface<T5>() where T5 : ISaveCollection;
 
         protected internal void Init()
         {
-            Semaphore = new Semaphore(1, 1);
-            CurrentThread = -1;
+            Mutex = new Mutex();
+            CurrentThread = null;
         }
 
         public T2 Open<T2, T4, T5>(Func<T4, T2> func) where T4 : ISaveInterface<T5> where T5 : ISaveCollection
         {
             T2 result;
 
-            bool threadEqual = CurrentThread == Thread.CurrentThread.ManagedThreadId;
+            bool threadEqual = CurrentThread == Thread.CurrentThread;
 
             if (!threadEqual)
             {
-                Semaphore.WaitOne();
-                CurrentThread = Thread.CurrentThread.ManagedThreadId;
+                Mutex.WaitOne();
+                CurrentThread = Thread.CurrentThread;
             }
 
             try
@@ -37,8 +37,8 @@ namespace Keyboardchat.SaveCollections
             {   
                 if (!threadEqual)
                 {
-                    CurrentThread = -1;
-                    Semaphore.Release();
+                    CurrentThread = null;
+                    Mutex.ReleaseMutex();
                 }
             }         
 
