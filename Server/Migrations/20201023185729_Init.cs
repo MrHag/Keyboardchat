@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Keyboardchat.Migrations
 {
-    public partial class Initial : Migration
+    public partial class Init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -16,7 +16,8 @@ namespace Keyboardchat.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(nullable: true),
                     PasswordHash = table.Column<byte[]>(nullable: true),
-                    Avatar = table.Column<byte[]>(nullable: true)
+                    Avatar = table.Column<byte[]>(nullable: true),
+                    AvatarHash = table.Column<byte[]>(nullable: true)
                 },
                 constraints: table =>
                 {

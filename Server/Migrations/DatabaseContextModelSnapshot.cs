@@ -26,6 +26,9 @@ namespace Keyboardchat.Migrations
                     b.Property<byte[]>("Avatar")
                         .HasColumnType("longblob");
 
+                    b.Property<byte[]>("AvatarHash")
+                        .HasColumnType("longblob");
+
                     b.Property<string>("Name")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
