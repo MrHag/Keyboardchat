@@ -6,7 +6,7 @@
     width: 100%;
     height: 100%;
     z-index: 3;
-    background-color: #F0F0F0;
+    background-color: $main-dark-bg-color;
 
     &__content {
         @include flex-layout(column, center, center);

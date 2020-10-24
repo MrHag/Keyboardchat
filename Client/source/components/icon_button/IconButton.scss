@@ -1,8 +1,18 @@
 @import 'styles/globals.scss';
 
 .icon-btn {
-    & > * {
-        color: $btn-active-bg-color;
+    &.MuiIconButton-root {
+        padding: 0;
+
+        svg {
+            color: $btn-active-bg-color;
+        }
+    }
+
+    &.MuiIconButton-root.disabled {
+        svg {
+            color: $btn-disabled-bg-color;
+        }
     }
 
     &:hover {

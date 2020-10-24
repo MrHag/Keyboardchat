@@ -1,17 +1,17 @@
-@import '../../styles/globals.scss';
+@import 'styles/globals.scss';
 
-$msg-content-bg-color: #f0f0f0;
-$msg-content-border-radius: 16px;
+$msg-content-bg-color: transparent;
+$msg-content-border-radius: 0px;
 
 .chat-msg {
     @include flex-layout(column, center, flex-start);
     margin: 16px 0px 16px 0px;
-    max-width: 100%;
+    width: 100%;
+    border-bottom: 2px solid #2f3136;
 
     &__info {
-        margin-bottom: 8px;
         display: flex;
-        align-items: flex-end;
+        align-items: flex-start;
     }
 
     &__name {
@@ -32,8 +32,9 @@ $msg-content-border-radius: 16px;
     }
 
     &__date {
-        margin-left: 8px;
-        font-size: 10px;
+        margin-left: 16px;
+        font-size: 12px;
+        color: $third-text-color;
     }
 
     &__text {
@@ -44,7 +45,7 @@ $msg-content-border-radius: 16px;
         @include flex-layout(column, flex-start, flex-start);
         background-color: $msg-content-bg-color;
         position: relative;
-        padding: 16px;
+        padding-bottom: 16px;
         border-radius: $msg-content-border-radius;
         max-width: 100%;
         margin-left: calc(32px + 16px);

@@ -50,8 +50,6 @@ body {
     &__content {
         @include flex-layout(row, center, center);
         background-color: $main-dark-bg-color;
-        
-        padding: 4px;
         height: 100%;
     }
 }
@@ -66,7 +64,7 @@ body {
     }
 
     &::-webkit-scrollbar-thumb {
-        background-color: darkgray;
+        background-color: $main-border-color;
         border-radius: 20px;
     }
 }

@@ -9,7 +9,7 @@
 
     background-color: #222429;
     
-    border-left: 1px solid $main-border-color;
+    border-left: 2px solid $main-border-color;
 
     &__history-wrapper {
         @include flex-layout(column);
@@ -24,7 +24,15 @@
         box-sizing: border-box;
         height: 100%;
         width: 100%;
+        
         overflow-y: scroll;
         overflow-x: hidden;
+
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+
+        &::-webkit-scrollbar {
+            width: 0px;
+        }
     }
 }

@@ -70,7 +70,7 @@ const Chat = () => {
 
     return (
         <div className="chat">
-            <RoomHeader name={state.room_name}></RoomHeader>``
+            <ChatHeader name={state.room_name}></ChatHeader>
             <div className="chat__history-wrapper">
                 <div ref={historyRef} className="chat__history">
                     { state.messages.map((msg, index) => <ChatMessage key={index} msg={msg}></ChatMessage>) }

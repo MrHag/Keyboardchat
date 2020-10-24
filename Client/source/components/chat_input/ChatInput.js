@@ -40,7 +40,10 @@ const ChatInput = () => {
                 onKeyDown={e => onChatKeydown(e)}
             />
             <div className="chat-input__controls">
-                <IconButton disabled={text === ''} onClick={sendMessage}>
+                <IconButton
+                    disabled={text === ''}
+                    onClick={sendMessage}
+                >
                     <FontAwesomeIcon icon={FontAwesomeIcons.faPaperPlane}></FontAwesomeIcon>
                 </IconButton>
             </div>
