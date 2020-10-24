@@ -363,11 +363,29 @@ namespace Keyboardchat.Web
                         {
                             var iterator = data[0].First;
 
-                            if(iterator is JProperty property && property.Name == "name" && property.Value.Value<string>() != null)
-                            name = (string)property.Value;
+                            bool fun()
+                            {
+                                if (iterator != null && iterator is JProperty nameproperty && nameproperty.Name == "name" && nameproperty.Value.Value<string>() != null)
+                                {
+                                    name = (string)nameproperty.Value;
+                                }
+                                else
+                                    return false;
 
-                            ErrorResponseMessage(socket, header, "invalidData");
-                            return;
+                                iterator = iterator.Next;
+                                if (iterator != null && iterator is JProperty passproperty && passproperty.Name == "password" && passproperty.Value.Value<string>() != null)
+                                {
+                                    pass = (string)passproperty.Value;
+                                }
+                                else
+                                    return false;
+                                return true;
+                            }
+                            if (!fun())
+                            {
+                                ErrorResponseMessage(socket, header, "invalidData");
+                                return;
+                            }
                         }
 
                         if (!ValidateDefaultText(name, maxlength: 32))
