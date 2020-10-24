@@ -5,7 +5,7 @@ import { InputAdornment, TextField} from '@material-ui/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
 
-import { RoomItem, Button, IconButton } from 'components';
+import { Input, RoomItem, Button, IconButton } from 'components';
 import { Socket } from 'logic';
 
 import './RoomPanel.scss';
@@ -82,7 +82,7 @@ const RoomPanel = ({ onCreateRoom }) => {
         Socket.on('roomchange', socketRoomchange);
         Socket.on('joinroom', socketJoinroom);
         Socket.on('leaveroom', socketLeaveroom)
-        //Socket.emit('getrooms', {room: null});
+        //Socket.emit('getrooms', {room: null}); //TODO: Uncomment this in
     }
 
     const removeSocketListeners = () => {
@@ -110,17 +110,22 @@ const RoomPanel = ({ onCreateRoom }) => {
 
     return (
         <div className="room-panel">
-            <TextField className="room-panel__search" placeholder="Type room name" value={searchQuery} onChange={onSearchChange}
-                InputProps={{
-                    endAdornment: (
-                        <InputAdornment position="start">
-                            <IconButton disabled={searchQuery===''} onClick={onClearSearchBtn} size="small">
-                                <FontAwesomeIcon icon={FontAwesomeIcons.faTrash}></FontAwesomeIcon>
-                            </IconButton>
-                        </InputAdornment>
-                    )
-                }}
-            />
+            <div className="room-panel__search">
+                <Input
+                    className="room-panel__search"
+                    placeholder="Room search"
+                    value={searchQuery}
+                    onChange={onSearchChange}
+                    centered
+                />
+                <IconButton 
+                    disabled={searchQuery === ''}
+                    onClick={onClearSearchBtn}
+                    size="small"
+                >
+                    <FontAwesomeIcon icon={FontAwesomeIcons.faTrash}></FontAwesomeIcon>
+                </IconButton>
+            </div>
             <RoomList inRoom={inRoom} rooms={rooms} joinRoom={joinRoom} leaveRoom={leaveRoom}></RoomList>
             <Button onClick={onCreateRoom}>Create room</Button>
         </div>

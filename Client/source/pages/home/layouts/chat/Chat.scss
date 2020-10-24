@@ -3,10 +3,16 @@
 .chat {
     @include flex-layout(column, space-between, center);
     position: relative;
+    max-width: 100%;
     width: 100%;
     height: 100%;
 
+    background-color: #222429;
+    
+    border-left: 2px solid $main-border-color;
+
     &__history-wrapper {
+        @include flex-layout(column);
         margin: 4px 0;
         width: 90%;
         height: 100%;
@@ -18,35 +24,15 @@
         box-sizing: border-box;
         height: 100%;
         width: 100%;
+        
         overflow-y: scroll;
         overflow-x: hidden;
-    }
-}
 
-.room-header {
-    top: 8px;
-    width: 90%;
-    height: 56px;
-    border-radius: 8px;
-    background-color: #f0f0f0;
-    z-index: 2;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
 
-    &__wrapper {
-        @include flex-layout(row, center, center);
-        position: relative;
-        width: 100%;
-        height: 100%;
-    }
-
-    & &__leave-btn {
-        position: absolute;
-        left: 0;
-    }
-
-
-    &__name {
-        font-weight: 600;
-        font-size: 24px;
-        margin: 0 0 0 16px;
+        &::-webkit-scrollbar {
+            width: 0px;
+        }
     }
 }

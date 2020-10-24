@@ -40,7 +40,7 @@ const SignIn = () => {
 
   useEffect(() => {
       Socket.on('auth', socketAuth);
-      return () => Socket.removeEventListener('response', socketAuth);
+      return () => Socket.removeEventListener('auth', socketAuth);
   }, [])
 
   const onLoginKeyupHandler = (e) => {

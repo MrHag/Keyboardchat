@@ -2,11 +2,10 @@ import React, { useEffect, useReducer, useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import { TextField } from '@material-ui/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
 
-import { Button, IconButton } from 'components';
+import { Button, IconButton, InputPassword } from 'components';
 import { Socket } from 'logic';
 
 import './RoomItem.scss';
@@ -38,7 +37,7 @@ const RoomItemForm = ({roomName, onCancel, onJoin}) => {
 
     return (
         <div className="ri-form">
-            <TextField 
+            <InputPassword 
                 className="ri-form__password"
                 placeholder="Password"
                 onChange={e => setPassword(e.target.value)} 

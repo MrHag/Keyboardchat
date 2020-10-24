@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 
 import classNames from 'class-names';
-import { Input, InputAdornment, IconButton } from '@material-ui/core';
-import { Visibility, VisibilityOff } from '@material-ui/icons';
+import { Input, InputAdornment } from '@material-ui/core';
+//import { Visibility, VisibilityOff } from '@material-ui/icons';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
+
+import { IconButton } from 'components';
 import './InputPassword.scss';
 
 const InputPassword = ({ className, ...props }) => {
@@ -13,6 +17,12 @@ const InputPassword = ({ className, ...props }) => {
     setShow(!show);
   };
 
+  const icon = show ? (
+    <FontAwesomeIcon icon={FontAwesomeIcons.faEye} />
+  ) : ( 
+    <FontAwesomeIcon icon={FontAwesomeIcons.faEyeSlash} />
+  )
+  
   return (
     <Input
       type={show ? "text" : "password"}
@@ -21,12 +31,10 @@ const InputPassword = ({ className, ...props }) => {
       endAdornment={
         <InputAdornment position="end">
           <IconButton
-            aria-label="toggle password visibility"
             onClick={handleClickShowPassword}
-            //onMouseDown={handleMouseDownPassword}
             edge="end"
           >
-            {show ? <Visibility /> : <VisibilityOff />}
+            {icon}
           </IconButton>
         </InputAdornment>
       }

@@ -4,10 +4,10 @@
     @include flex-layout(column, center, center);
     position: relative;
     width: 100%;
-    //min-height: 32px;
+
     height: fit-content;
     margin: 8px 0 8px 0;
-    background-color: #f0f0f0;
+    background-color: transparent;
 
     &.active {
         background-color: #b3b3b3;
@@ -48,7 +48,7 @@
 
 .ri-form {
     @include flex-layout(column, flex-start, center);
-    background-color: #f0f0f0;
+    //background-color: #f0f0f0;
     top: 0;
     width: 100%;
     z-index: 20;

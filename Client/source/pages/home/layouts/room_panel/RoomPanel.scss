@@ -8,7 +8,19 @@
     box-sizing: border-box;
     
     &__search {
+        @include flex-layout(row, flex-start, center);
+        text-align: center;
         width: 100%;
+
+        input {
+            text-align: center;
+        }
+
+        .icon-btn {
+            position: absolute;
+            right: 0;
+            transform: translateX(-100%);
+        }
     }
 
     &__list {
@@ -19,6 +31,13 @@
         overflow-y: scroll;
         overflow-x: hidden;
         margin: 8px 0;
+
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+
+        &::-webkit-scrollbar {
+            width: 0px;
+        }
     }
 
     .button {

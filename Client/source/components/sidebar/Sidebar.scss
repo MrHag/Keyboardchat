@@ -4,8 +4,8 @@
     @include flex-layout(column, flex-start, center);
     height: 100%;
     position: relative;
-
-    background-color: $main-bg-color;
+    
+    background-color: #0f0f13;
 
     &__content {
         @include flex-layout(column, flex-start, center);

@@ -4,26 +4,13 @@ import PropTypes from 'prop-types';
 import { ChatMessage, ChatInput, IconButton } from 'components';
 import { Socket } from 'logic';
 
+import ChatHeader from './chat_header/ChatHeader';
+
 import './Chat.scss';
 
 try {
     var fake_messages = require('fake_data/fake.json').chat_messages;
 } catch (err) { }
-
-const RoomHeader = ({name}) => {
-    const room = (name === 'global') ? 'Палата №1' : name;
-    return (
-        <div className="room-header">
-            <div className="room-header__wrapper">
-                <h3 className="room-header__name">{room}</h3>
-            </div>
-        </div>
-    )
-};
-
-RoomHeader.propTypes = {
-    name: PropTypes.string.isRequired
-};
 
 const Chat = () => {
     if (fake_messages) {
@@ -46,14 +33,14 @@ const Chat = () => {
     }
 
     const socketJoinroom = data => {
-        console.log("Chat joinroom data = ", data);
-            console.log("room name = ", data.data.room);
-            if (data.successful) {
-                setState({
-                    messages: [],
-                    room_name: data.data.room
-                });
-            }
+        // console.log("Chat joinroom data = ", data);
+        // console.log("room name = ", data.data.room);
+        if (data.successful) {
+            setState({
+                messages: [],
+                room_name: data.data.room
+            });
+        }
     };
 
     const socketLeaveroom = () => {
@@ -83,7 +70,7 @@ const Chat = () => {
 
     return (
         <div className="chat">
-            <RoomHeader name={state.room_name}></RoomHeader>
+            <ChatHeader name={state.room_name}></ChatHeader>
             <div className="chat__history-wrapper">
                 <div ref={historyRef} className="chat__history">
                     { state.messages.map((msg, index) => <ChatMessage key={index} msg={msg}></ChatMessage>) }
