@@ -8,17 +8,13 @@ import { Welcome, Home } from './pages';
 
 import './App.scss';
 
-try {
-    var is_in_dev = require('../fake_data/fake.json');
-} catch (err) { }
-
 const App = () => (
     <BrowserRouter>
         <div className="app">
             <div className="app__wrapper">
                 <div className="app__content">
                     <Switch>
-                        <Route path={ROUTES.Chat.route}>
+                        <Route path={ROUTES.Home.route}>
                             <Home></Home>
                         </Route>
                         <Route path="/">

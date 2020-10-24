@@ -1,0 +1,21 @@
+@import 'styles/globals.scss';
+
+.scrn-selector {
+  @include flex-layout(column, flex-start, center);
+  width: 64px;
+  height: 100%;
+  background-color: $main-screen-selector-color;
+
+  &__item {
+    @include flex-layout(row, center, center);
+    font-size: 32px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+
+    &:hover {
+      cursor: pointer;
+      background-color: rgba(144, 238, 144, 0.15);
+    }
+  }
+}

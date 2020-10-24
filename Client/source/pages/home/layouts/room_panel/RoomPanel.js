@@ -72,16 +72,10 @@ const RoomPanel = ({ onCreateRoom }) => {
         }
     }
 
-    const socketLeaveroom = (data) => {
-        console.log("socketLeaveroom data = ", data);
-        setInRoom('global');
-    }
-
     const initSocketsListeners = () => {
         Socket.on('getrooms', socketGetrooms);
         Socket.on('roomchange', socketRoomchange);
         Socket.on('joinroom', socketJoinroom);
-        Socket.on('leaveroom', socketLeaveroom)
         //Socket.emit('getrooms', {room: null}); //TODO: Uncomment this in
     }
 
@@ -89,7 +83,6 @@ const RoomPanel = ({ onCreateRoom }) => {
         Socket.removeEventListener("getrooms", socketGetrooms);
         Socket.removeEventListener('joinroom', socketJoinroom);
         Socket.removeEventListener('roomchange', socketRoomchange);
-        Socket.removeEventListener('leaveroom', socketLeaveroom);
     }
 
     useEffect(() => {

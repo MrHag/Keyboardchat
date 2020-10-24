@@ -4,7 +4,7 @@
     @include flex-layout(column, flex-start, center);
     width: 256px;
     padding: 8px;
-    max-height: calc(100% - 56px);
+    max-height: calc(100%);
     box-sizing: border-box;
     
     &__search {

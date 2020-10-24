@@ -9,7 +9,6 @@ import './IconButton.scss';
 const IconButton = ({ className, ...props }) => {
     return (
         <BaseIconButton
-            color="secondary"
             className={classNames('icon-btn', className, {'disabled': props.disabled})}
             {...props}
         />

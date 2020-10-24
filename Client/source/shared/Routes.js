@@ -7,10 +7,10 @@ const ROUTES = {
     name: "Signup",
     route: "/signup",
   },
-  Chat: {
+  Home: {
     name: "Chat",
     route: "/chat"
-  }
+  },
 };
 
 export default ROUTES;

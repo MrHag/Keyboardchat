@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 
 import classNames from 'class-names';
 import { Input, InputAdornment } from '@material-ui/core';
-//import { Visibility, VisibilityOff } from '@material-ui/icons';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
