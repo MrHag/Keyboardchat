@@ -54,16 +54,60 @@
       }
     },
 
+    "ChangeProfile": {
+
+      "header": "changeprofile",
+      "request": {
+        "body": {
+          "!name": ":string:",
+          "!avatar": ":base64string:"
+        }
+      },
+
+      "response": {
+        "body": {
+          "data": {
+            "successful": ":string:",
+            "unsuccessful": [
+              "notAuth",
+              "badName",
+              "badImage",
+              "nameExists"
+            ],
+            "error": [
+              "invalidData"
+            ]
+          },
+          "successful": true,
+          "error": true
+        }
+      }
+    },
+
     "GetUsers": {
 
       "header": "getusers",
       "request": {
-        "body": [
+        "body": {
+          "Users": [
             [
+<<<<<<< HEAD
                ":int:"
             ],  
           null
         ]
+=======
+              ":uint:"
+            ],
+            null
+          ],
+          "Select": [
+            "name",
+            "avatar",
+            "avatarHash"
+          ]
+        }
+>>>>>>> bdd1e41da708d58883ca6e68a1813b2b2802b210
       },
 
       "response": {
@@ -72,9 +116,10 @@
             "successful": {
               "data": [
                 {
-                  "id": ":int:",
-                  "name": ":string:",
-                  "avatar": ":base64string:"
+                  "id": ":uint:",
+                  "!name": ":string:",
+                  "!avatar": ":base64string:",
+                  "!avatarHash": ":string:"
                 }
               ]
             },
@@ -160,9 +205,8 @@
 
       "response": {
         "body": {
-          "data": ":string:",
-          "successful": true,
-          "error": true
+          "userid": ":uint:",
+          "message": ":string:"
         }
       }
     },

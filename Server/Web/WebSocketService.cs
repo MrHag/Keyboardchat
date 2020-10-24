@@ -75,6 +75,11 @@ namespace Keyboardchat.Web
             ResponseMessage(client, header, data, succ, false);
         }
 
+        private void OnQueryMeessage(string header)
+        {
+            Program.LogService.Log($"Called {header}");
+        }
+
         private bool ValidateDefaultText(string text, int minlength = 0, int maxlength = -1)
         {
 
@@ -186,48 +191,40 @@ namespace Keyboardchat.Web
             if (!AuthCheckReport(user))
                 return;
 
-            try
+            if (room != null)
             {
+                SendChatMessage(room, user.Name + " disconnected", 0);
+                room.DeleteUser(user);
 
-                if (room != null)
+                int UserCount = 0;
+                room.Users.Open((UserInterface) => 
                 {
-                    SendChatMessage(room, user.Name + " disconnected", 0);
-                    room.DeleteUser(user);
+                    UserCount = UserInterface.Count;
+                });
 
-                    int UserCount = 0;
-                    room.Users.Open((UserInterface) => 
-                    {
-                        UserCount = UserInterface.Count;
-                    });
+                if (UserCount == 0)
+                {
 
-                    if (UserCount == 0)
-                    {
-
-                        _rooms.Open((RoomInterface) =>
-                        {
-                            for (int key = 0; key < RoomInterface.Count; key++)
-                            {
-                                var froom = RoomInterface[key];
-                                if (froom == room)
-                                {
-                                    RoomInterface.RemoveAt(key);
-                                    Program.LogService.Log("delete room: " + froom.Name);
-                                    Broadcast(SCalls["RoomChange"]["header"].ToString(), "Deleted room", true, false);
-                                    break;
-                                }
-                            }
-
-                        });
-                    }
                     _rooms.Open((RoomInterface) =>
                     {
-                        user.Room = null;
+                        for (int key = 0; key < RoomInterface.Count; key++)
+                        {
+                            var froom = RoomInterface[key];
+                            if (froom == room)
+                            {
+                                RoomInterface.RemoveAt(key);
+                                Program.LogService.Log("delete room: " + froom.Name);
+                                Broadcast(SCalls["RoomChange"]["header"].ToString(), "Deleted room", true, false);
+                                break;
+                            }
+                        }
+
                     });
                 }
-
-            }
-            catch (QueueExitException)
-            { 
+                _rooms.Open((RoomInterface) =>
+                {
+                    user.Room = null;
+                });
             }
 
         }
@@ -252,6 +249,9 @@ namespace Keyboardchat.Web
 
                 Action<bool> DisconnectAction = (disconnected) =>
                 {
+#if DEBUG
+                    OnQueryMeessage("disconnection");
+#endif
                     Task.Run(() =>
                     {
                         _connectionUsers.Open((UserInterface) =>
@@ -289,6 +289,9 @@ namespace Keyboardchat.Web
                 {
                     string header = Calls["Registration"]["header"].ToString();
 
+#if DEBUG
+                    OnQueryMeessage(header);
+#endif
                     Task.Run(() => 
                     {
                         List<JToken> values;
@@ -348,14 +351,21 @@ namespace Keyboardchat.Web
                 socket.On(Calls["Authorization"]["header"], (JToken[] data) =>
                 {
                     string header = Calls["Authorization"]["header"].ToString();
+#if DEBUG
+                    OnQueryMeessage(header);
+#endif
                     Task.Run(() => {
+                        string name = "";
+                        string pass = "";
 
-                        List<JToken> values;
-                        string name;
-                        string pass;
 
-                        if (data == null || data.GetValues(0, out values) == null || values[0].GetValue(out name, "name") == null || values[0].GetValue(out pass, "password") == null)
+                        if (data == null || data.Length > 0 || data[0] == null)
                         {
+                            var iterator = data[0].First;
+
+                            if(iterator is JProperty property && property.Name == "name" && property.Value.Value<string>() != null)
+                            name = (string)property.Value;
+
                             ErrorResponseMessage(socket, header, "invalidData");
                             return;
                         }
@@ -434,7 +444,9 @@ namespace Keyboardchat.Web
                 socket.On(Calls["DeAuthorization"]["header"], (JToken[] data) =>
                 {
                     string header = Calls["DeAuthorization"]["header"].ToString();
-
+#if DEBUG
+                    OnQueryMeessage(header);
+#endif
                     Task.Run(() =>
                     {
                         User user = GetUser(socket);
@@ -456,6 +468,9 @@ namespace Keyboardchat.Web
                 socket.On(Calls["Chat"]["header"], (JToken[] data) =>
                 {
                     string header = Calls["Chat"]["header"].ToString();
+#if DEBUG
+                    OnQueryMeessage(header);
+#endif
 
                     Task.Run(() =>
                     {
@@ -494,6 +509,9 @@ namespace Keyboardchat.Web
                 socket.On(Calls["JoinRoom"]["header"], (JToken[] data) =>
                 {
                     string header = Calls["JoinRoom"]["header"].ToString();
+#if DEBUG
+                    OnQueryMeessage(header);
+#endif
 
                     Task.Run(() =>
                     {
@@ -551,6 +569,10 @@ namespace Keyboardchat.Web
                 socket.On(Calls["LeaveRoom"]["header"], (JToken[] data) =>
                 {
                     string header = Calls["LeaveRoom"]["header"].ToString();
+
+#if DEBUG
+                    OnQueryMeessage(header);
+#endif
 
                     Task.Run(() =>
                     {
@@ -614,6 +636,10 @@ namespace Keyboardchat.Web
                 socket.On(Calls["GetRooms"]["header"], (JToken[] data) =>
                 {
                     string header = Calls["GetRooms"]["header"].ToString();
+
+#if DEBUG
+                    OnQueryMeessage(header);
+#endif
 
                     Task.Run(() =>
                     {
@@ -686,6 +712,10 @@ namespace Keyboardchat.Web
                 socket.On(Calls["ChangeProfile"]["header"], (JToken[] data) =>
                 {
                     string header = Calls["ChangeProfile"]["header"].ToString();
+
+#if DEBUG
+                    OnQueryMeessage(header);
+#endif
 
                     Task.Run(() =>
                     {
@@ -788,6 +818,10 @@ namespace Keyboardchat.Web
                 socket.On(Calls["GetUsers"]["header"], (JToken[] data) =>
                 {
                     string header = Calls["GetUsers"]["header"].ToString();
+
+#if DEBUG
+                    OnQueryMeessage(header);
+#endif
 
                     Task.Run(() =>
                     {
@@ -913,7 +947,9 @@ namespace Keyboardchat.Web
                 {
                     string header = Calls["CreateRoom"]["header"].ToString();
 
-                    Program.LogService.Log("create room call");
+#if DEBUG
+                    OnQueryMeessage(header);
+#endif
 
                     Task.Run(() => 
                     {
