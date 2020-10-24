@@ -91,12 +91,6 @@
         "body": {
           "Users": [
             [
-<<<<<<< HEAD
-               ":int:"
-            ],  
-          null
-        ]
-=======
               ":uint:"
             ],
             null
@@ -107,7 +101,6 @@
             "avatarHash"
           ]
         }
->>>>>>> bdd1e41da708d58883ca6e68a1813b2b2802b210
       },
 
       "response": {
