@@ -9,7 +9,7 @@ import ChatHeader from './chat_header/ChatHeader';
 import './Chat.scss';
 
 try {
-    var fake_messages = require('fake_data/fake.json').chat_messages;
+    var fake_messages = null; //require('fake_data/fake.json').chat_messages;
 } catch (err) { }
 
 const Chat = () => {

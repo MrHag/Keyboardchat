@@ -86,7 +86,6 @@ const SignUp = () => {
         <Button
             className="button"
             variant="contained"
-            color="secondary"
             onClick={onSignUpHandler}
             disabled={login.length === 0 || password.length === 0}
         >

@@ -5,6 +5,18 @@ import { Button as BaseButton, withStyles } from '@material-ui/core';
 
 import './Button.scss';
 
+const styles = {
+    root: {
+        '&:hover': {
+            backgroundColor: '#50b1ff',
+        },
+        '&:disabled': {
+            backgroundColor: '#758897',
+        },
+        backgroundColor: '#6fafe3',
+    },
+};
+
 const Button = (props) => {
     const disabled = props.disabled;
     return (
@@ -16,4 +28,4 @@ const Button = (props) => {
     )
 }
 
-export default Button;
+export default withStyles(styles)(Button);
