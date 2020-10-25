@@ -15,7 +15,7 @@ try {
 
 const RoomList = ({ inRoom, rooms, joinRoom, leaveRoom }) => {
     const listRef = useRef();
-    console.log("InRoom = ", inRoom);
+    
     return (
         <div ref={listRef} className="room-panel__list">
             {
@@ -102,23 +102,32 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
         setSearchQuery(e.target.value);
     }
 
+    const searchBtn = (
+        <IconButton 
+            disabled={searchQuery === ''}
+            onClick={onClearSearchBtn}
+        >
+            <FontAwesomeIcon icon={FontAwesomeIcons.faTrash}></FontAwesomeIcon>
+        </IconButton>
+    );
+
+    const search = (
+        <>
+            <Input
+                variant="round"
+                className="room-panel__search"
+                placeholder="Room search"
+                value={searchQuery}
+                onChange={onSearchChange}
+                button={searchBtn}
+            />
+        </>
+    );
+
     return (
         <div className="room-panel">
             <div className="room-panel__search">
-                <Input
-                    className="room-panel__search"
-                    placeholder="Room search"
-                    value={searchQuery}
-                    onChange={onSearchChange}
-                    centered
-                />
-                <IconButton 
-                    disabled={searchQuery === ''}
-                    onClick={onClearSearchBtn}
-                    size="small"
-                >
-                    <FontAwesomeIcon icon={FontAwesomeIcons.faTrash}></FontAwesomeIcon>
-                </IconButton>
+                {search}
             </div>
             <RoomList inRoom={UserData.inRoom} rooms={rooms} joinRoom={joinRoom} leaveRoom={leaveRoom}></RoomList>
             <Button onClick={onCreateRoom}>Create room</Button>

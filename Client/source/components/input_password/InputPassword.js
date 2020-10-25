@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 
 import classNames from 'class-names';
-import { Input, InputAdornment } from '@material-ui/core';
+import { InputAdornment } from '@material-ui/core';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
 
-import { IconButton } from 'components';
+import { IconButton, Input } from 'components';
 import './InputPassword.scss';
 
 const InputPassword = ({ className, ...props }) => {
@@ -26,8 +26,7 @@ const InputPassword = ({ className, ...props }) => {
     <Input
       type={show ? "text" : "password"}
       className={classNames('input-pass--round', className)}
-      {...props}
-      endAdornment={
+      button={
         <InputAdornment position="end">
           <IconButton
             onClick={handleClickShowPassword}
@@ -37,6 +36,7 @@ const InputPassword = ({ className, ...props }) => {
           </IconButton>
         </InputAdornment>
       }
+      {...props}
     />
   );
 };

@@ -1,7 +1,8 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import classNames from 'class-names';
-import { Input as BaseInput } from '@material-ui/core';
+import { Input as BaseInput, InputAdornment } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 import './Input.scss';
@@ -25,7 +26,18 @@ const useStyles = makeStyles({
 
     '&&.MuiInput-underline::after': {
       borderBottomColor: FOCUSED_UNDERLINE_COLOR,
-    }
+    },
+
+    '& .MuiInputBase-input': {
+      textAlign: 'center',
+    },
+
+    '& .MuiInputAdornment-root': {
+      position: 'absolute',
+      right: '8px',
+      width: '16px',
+      height: '16px'
+    },
   },
 
   'input--round': {
@@ -38,22 +50,49 @@ const useStyles = makeStyles({
       left: '14px',
       right: '14px',
     },
+
+    '&::after': {
+      left: '14px',
+      right: '14px',
+    },
   },
 });
 
-const Input = ({ className, centered, ...props }) => {
+const Input = ({ className, variant, button, ...props }) => {
   const classes = useStyles(); 
 
-  const class_name = classNames(classes.input, classes.root, { 
-    [classes['input--round']]: props.variant === 'round',
-  }, className);
+  const adornment = (button) ? (
+      <InputAdornment position="end">
+        {button}
+      </InputAdornment>
+  ) : null;
+
+  const class_name = classNames(classes.input, { 
+    [classes['input--round']]: variant === 'round',
+  }, className, );
 
   return (
     <BaseInput
       className={class_name}
+      endAdornment={adornment}
       {...props}
-    />
+    >
+      {button}
+    </BaseInput>
   );
+};
+
+Input.defaultProps = {
+  className: '',
+  variant: '',
+  button: null,
+};
+
+Input.propTypes = {
+  button: PropTypes.node,
+  className: PropTypes.string,
+  variant: PropTypes.string,
+  props: PropTypes.any,
 };
 
 export default Input;

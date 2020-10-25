@@ -10,16 +10,6 @@
         @include flex-layout(row, flex-start, center);
         text-align: center;
         width: 100%;
-
-        input {
-            text-align: center;
-        }
-
-        .icon-btn {
-            position: absolute;
-            right: 0;
-            transform: translateX(-100%);
-        }
     }
 
     &__list {

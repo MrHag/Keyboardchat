@@ -41,6 +41,7 @@ const ChatInput = () => {
             />
             <div className="chat-input__controls">
                 <IconButton
+                    className="chat-input__send"
                     disabled={text === ''}
                     onClick={sendMessage}
                 >

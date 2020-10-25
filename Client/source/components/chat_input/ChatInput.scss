@@ -2,7 +2,6 @@
 
 .chat-input {
     @include flex-layout(column, flex-end);
-    box-sizing: border-box;
     position: relative;
     font-size: 16px;
     margin-bottom: 8px;
@@ -32,7 +31,8 @@
         transform: translateY(-50%);
     }
 
-    &__send {
+    & &__send {
+        font-size: 24px !important;
         padding: 0;
     }
 }
