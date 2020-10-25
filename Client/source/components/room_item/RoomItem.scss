@@ -10,7 +10,6 @@
     background-color: transparent;
 
     &.active {
-        background-color: #b3b3b3;
     }
 
     &__content {
@@ -42,13 +41,12 @@
         font-size: 20px;
         padding: 4px;
         transform: translateY(-50%);
-        background-color: #b3b3b3;
+        background-color: $main-sidebar-bg-color;
     }
 }
 
 .ri-form {
     @include flex-layout(column, flex-start, center);
-    //background-color: #f0f0f0;
     top: 0;
     width: 100%;
     z-index: 20;

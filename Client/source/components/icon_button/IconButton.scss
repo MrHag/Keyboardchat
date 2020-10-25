@@ -3,7 +3,7 @@
 .icon-btn {
     &.MuiIconButton-root {
         padding: 0;
-
+        font-size: inherit;
         svg {
             color: $btn-active-bg-color;
         }

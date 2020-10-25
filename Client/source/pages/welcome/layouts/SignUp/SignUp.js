@@ -64,20 +64,20 @@ const SignUp = () => {
     <div className="sign-up">
         <h1>Sign up</h1>
         <Input
-            className="sign-up__login-input"
+            className="sign-up__login-input input"
             placeholder="Enter login"
             onChange={e => setLogin(e.target.value)}
             onKeyDown={onLoginKeyupHandler} 
             autoFocus={true} 
         />
         <InputPassword inputRef={passwordRef}
-            className="sign-up__pass-input"
+            className="sign-up__pass-input input"
             placeholder="Enter password"
             onChange={e => setPassword(e.target.value)}
             onKeyDown={onPasswordKeyupHandler} 
         />
         <InputPassword
-            className="sign-up__confirm-input"
+            className="sign-up__confirm-input input"
             placeholder="Confirm password"
             onChange={e => setConfirm(e.target.value)}
             onKeyDown={onPasswordKeyupHandler} 

@@ -8,17 +8,21 @@ import './Home.scss';
 import ROUTES from '../../shared/Routes';
 
 const RoomChat = () => {
+    const [force, forceUpdate] = useState(0);
+
     const routeHistory = useHistory();
 
     const onCreateRoom = () => {
-        console.log("hello world!");
         routeHistory.push(ROUTES.CreateRoom.route);
     }
 
     return (
         <div className="home__screen">
             <Sidebar>
-                <RoomPanel onCreateRoom={onCreateRoom}></RoomPanel>
+                <RoomPanel
+                    onCreateRoom={onCreateRoom}
+                    onRoomLeave={_ => forceUpdate(force + 1)}
+                />
             </Sidebar>
             <Chat></Chat>
         </div>
@@ -26,13 +30,6 @@ const RoomChat = () => {
 }
 
 const Home = () => {
-    const [stage, setStage] = useState('chat');
-
-    let content = null;
-    if (stage === 'creation_room') {
-        content = <CreationRoom onComplete={() => setStage('chat')}></CreationRoom>
-    }
-
     return (
         <div className="home">
             <Redirect exact path="/home" to={ROUTES.RoomChat.route}></Redirect>

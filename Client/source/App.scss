@@ -35,13 +35,12 @@ body {
 }
 
 .app {
-    //padding: 32px;
     width: 100%;
     height: 100%;
     background-color: lightgray;
 
     &__wrapper {
-        padding: 6px;
+        padding: 4px;
         background-color: $main-sidebar-bg-color;
         width: 100%;
         height: 100%;
@@ -66,15 +65,5 @@ body {
     &::-webkit-scrollbar-thumb {
         background-color: $main-border-color;
         border-radius: 20px;
-    }
-}
-
-.input, .input-password {
-    .MuiInputBase-input::placeholder {
-        color: $sub-text-color;
-    }
-
-    input {
-        color: $main-text-color;
     }
 }

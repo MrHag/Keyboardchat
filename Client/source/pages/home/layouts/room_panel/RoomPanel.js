@@ -1,12 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { history } from 'react-router-dom';
+import React, { useEffect, useRef, useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
 
 import { Input, RoomItem, Button, IconButton } from 'components';
-import { Socket } from 'logic';
+import { Socket, UserData } from 'logic';
 
 import './RoomPanel.scss';
 
@@ -16,7 +15,7 @@ try {
 
 const RoomList = ({ inRoom, rooms, joinRoom, leaveRoom }) => {
     const listRef = useRef();
-
+    console.log("InRoom = ", inRoom);
     return (
         <div ref={listRef} className="room-panel__list">
             {
@@ -36,10 +35,10 @@ const RoomList = ({ inRoom, rooms, joinRoom, leaveRoom }) => {
     );
 }
 
-const RoomPanel = ({ onCreateRoom }) => {
+const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
     const [rooms, setRooms] = useState((fake_rooms) ? fake_rooms : []);
-    const [inRoom, setInRoom] = useState('global');
     const [searchQuery, setSearchQuery] = useState('');
+    const [inRoom, setInRoom] = useState(UserData.inRoom);
 
     const joinRoom = (name, password) => {
         Socket.emit('joinroom', {
@@ -53,6 +52,7 @@ const RoomPanel = ({ onCreateRoom }) => {
         Socket.emit('leaveroom', {
             name: name
         });
+        onRoomLeave();
     };
 
     const socketGetrooms = (data) => {
@@ -68,6 +68,7 @@ const RoomPanel = ({ onCreateRoom }) => {
 
     const socketJoinroom = (data) => {
         if (data.successful) {
+            UserData.inRoom = data.data.room;
             setInRoom(data.data.room);
         }
     }
@@ -76,7 +77,7 @@ const RoomPanel = ({ onCreateRoom }) => {
         Socket.on('getrooms', socketGetrooms);
         Socket.on('roomchange', socketRoomchange);
         Socket.on('joinroom', socketJoinroom);
-        //Socket.emit('getrooms', {room: null}); //TODO: Uncomment this in
+        Socket.emit('getrooms', {room: null});
     }
 
     const removeSocketListeners = () => {
@@ -119,7 +120,7 @@ const RoomPanel = ({ onCreateRoom }) => {
                     <FontAwesomeIcon icon={FontAwesomeIcons.faTrash}></FontAwesomeIcon>
                 </IconButton>
             </div>
-            <RoomList inRoom={inRoom} rooms={rooms} joinRoom={joinRoom} leaveRoom={leaveRoom}></RoomList>
+            <RoomList inRoom={UserData.inRoom} rooms={rooms} joinRoom={joinRoom} leaveRoom={leaveRoom}></RoomList>
             <Button onClick={onCreateRoom}>Create room</Button>
         </div>
     )

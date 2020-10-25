@@ -8,7 +8,7 @@ import './Input.scss';
 const Input = ({ className, centered, ...props }) => {
   return (
     <BaseInput
-      className={classNames('input', className)}
+      className={classNames('input--round', className)}
       {...props}
     />
   )

@@ -2,7 +2,7 @@
 
 .sign-in {
   @include flex-layout(column, flex-start, center);
-  max-width: 250px;
+  width: 256px;
   max-height: 512px;
 
   h1 {
@@ -13,7 +13,7 @@
     width: 100%;
   }
 
-  .input, .input-password {
+  &__login-input, &__pass-input {
     width: 100%;
     margin: 8px 0;
   }

@@ -3,9 +3,8 @@
 .room-panel {
     @include flex-layout(column, flex-start, center);
     width: 256px;
-    padding: 8px;
+    padding: 30px 14px 30px 14px;
     max-height: calc(100%);
-    box-sizing: border-box;
     
     &__search {
         @include flex-layout(row, flex-start, center);

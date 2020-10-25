@@ -16,5 +16,40 @@ $main-text-color: #FFF;
 $sub-text-color: #c2c3c4;
 $third-text-color: #656669;
 
-$btn-active-bg-color: #A00;
-$btn-disabled-bg-color: #6a6b75;
+$btn-active-bg-color: #6fafe3;
+$btn-disabled-bg-color: #758897;
+$btn-disabled-color: $third-text-color;
+
+/****************   Input   **********************/
+
+$input-bg-color: #222429;
+$input-text-color: #c2c3c4;
+
+.input-base {
+    input {
+        text-align: center;
+        color: $input-text-color;
+        background-color: $input-bg-color;
+    }
+
+    &::before {
+        border: none !important;
+    }
+}
+
+.input-base--round {
+    @extend .input-base;
+    input {
+        padding: 6px 8px;
+        border-radius: 8px;
+    }
+
+    &.MuiInput-underline:after {
+        left: 4px;
+        right: 4px;
+    }
+
+    &::before {
+        border: none !important;
+    }
+}

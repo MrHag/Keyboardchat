@@ -1,7 +1,9 @@
 @import 'styles/globals.scss';
 
 .input {
-  input {
-    background-color: $main-dark-bg-color;
-  }
+  @extend .input-base;
+}
+
+.input--round {
+  @extend .input-base--round;
 }

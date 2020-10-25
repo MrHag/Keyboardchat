@@ -25,7 +25,7 @@ const InputPassword = ({ className, ...props }) => {
   return (
     <Input
       type={show ? "text" : "password"}
-      className={classNames('input-password', className)}
+      className={classNames('input-pass--round', className)}
       {...props}
       endAdornment={
         <InputAdornment position="end">
