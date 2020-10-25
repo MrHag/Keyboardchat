@@ -10,12 +10,12 @@ namespace Keyboardchat.SaveCollections
     {
         private Dictionary<TKey, TValue> _dictionary;
 
-        private Semaphore _semaphore;
+        private Mutex _mutex;
 
-        private int _currentThread;
+        private Thread _currentThread;
 
-        int ISaveCollection.CurrentThread { get => _currentThread; set => _currentThread = value; }
-        Semaphore ISaveCollection.Semaphore { get => _semaphore; set => _semaphore = value; }
+        Thread ISaveCollection.CurrentThread { get => _currentThread; set => _currentThread = value; }
+        Mutex ISaveCollection.Mutex { get => _mutex; set => _mutex = value; }
 
         public SaveDictionary()
         {

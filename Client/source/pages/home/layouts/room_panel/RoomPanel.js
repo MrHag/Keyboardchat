@@ -77,7 +77,8 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
         Socket.on('getrooms', socketGetrooms);
         Socket.on('roomchange', socketRoomchange);
         Socket.on('joinroom', socketJoinroom);
-        Socket.emit('getrooms', {room: null});
+        Socket.on('leaveroom', socketLeaveroom);
+        Socket.emit('getrooms', {room: null}); //TODO: Uncomment this in
     }
 
     const removeSocketListeners = () => {

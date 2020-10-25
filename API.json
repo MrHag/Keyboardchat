@@ -18,8 +18,7 @@
             "unsuccessful": [
               "badName",
               "badPassword",
-              "wrongNamePass",
-              "alreadyInSess"
+              "wrongNamePass"
             ],
             "error": [
               "invalidData"

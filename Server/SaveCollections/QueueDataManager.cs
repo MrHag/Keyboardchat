@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Keyboardchat.SaveCollections
 {
@@ -10,12 +9,9 @@ namespace Keyboardchat.SaveCollections
     {
         protected Queue<T> _data;
 
-        private Semaphore _semaphore;
-
         public QueueDataManager()
         {
             _data = new Queue<T>();
-            _semaphore = new Semaphore(1, 1);
         }
 
         public int Count { 
@@ -23,9 +19,7 @@ namespace Keyboardchat.SaveCollections
             {
                 int output;
 
-                _semaphore.WaitOne();
                 output = _data.Count;
-                _semaphore.Release();
 
                 return output;
             } 
@@ -35,9 +29,7 @@ namespace Keyboardchat.SaveCollections
         {
             T output;
 
-            _semaphore.WaitOne();
             output = _data.Dequeue();
-            _semaphore.Release();
 
             return output;
         }
@@ -46,18 +38,14 @@ namespace Keyboardchat.SaveCollections
         {
             T output;
 
-            _semaphore.WaitOne();
             output = _data.Peek();
-            _semaphore.Release();
 
             return output;
         }
 
         public virtual void PushElem(T elem)
         {
-            _semaphore.WaitOne();
             _data.Enqueue(elem);
-            _semaphore.Release();
         }
 
     }

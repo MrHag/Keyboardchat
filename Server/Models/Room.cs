@@ -8,13 +8,13 @@ namespace Keyboardchat.Models
     {
         public string Name { get; protected set; }
         public string Password { get; protected set; }
-        public SaveList<User> Users { get; protected set; }
+        public List<User> Users { get; protected set; }
 
-        public Room(string Name, string Password) : this(Name, Password, new SaveList<User>())
+        public Room(string Name, string Password) : this(Name, Password, new List<User>())
         {          
         }
 
-        private Room(string Name, string Password, SaveList<User> users) 
+        private Room(string Name, string Password, List<User> users) 
         {
             this.Name = Name;
             this.Password = Password;
@@ -22,19 +22,14 @@ namespace Keyboardchat.Models
         }
 
         public void AddUser(User user)
-        {
-            Users.Open((Interface) =>
-            { 
-                Interface.Add(user);
-            });
+        {  
+            if(!Users.Contains(user))
+                Users.Add(user);
         }
 
         public void DeleteUser(User user)
         {
-            Users.Open((Interface) =>
-            {
-                Interface.Remove(user);
-            });
+            Users.Remove(user);
         }
 
         public Room Copy()
