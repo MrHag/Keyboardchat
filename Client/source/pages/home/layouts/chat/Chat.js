@@ -12,6 +12,22 @@ try {
     var fake_messages = null; //require('fake_data/fake.json').chat_messages;
 } catch (err) { }
 
+const ChatHistory = ({ messages, historyRef }) => {
+    const historyMessages = messages.map(
+        (msg, index) => <ChatMessage key={index} msg={msg}></ChatMessage>
+    );
+
+    return (
+        <>
+            <div className="chat__history-wrapper">
+                <div ref={historyRef} className="chat__history">
+                    {historyMessages}
+                </div>
+            </div>
+        </>
+    );
+};
+
 const Chat = () => {
     if (fake_messages) {
         for (let msg of fake_messages) {
@@ -26,8 +42,9 @@ const Chat = () => {
     });
     const historyRef = React.useRef();
 
-    const onNewMessage = data => {
+    const onNewMessage = (data) => {
         data.date = new Date();
+        console.log("OnNewMessage data = ", data);
         setState({room_name: state.room_name, messages: [...state.messages, data]});
         historyRef.current.scrollTop = historyRef.current.scrollHeight;
     }
@@ -69,11 +86,10 @@ const Chat = () => {
     return (
         <div className="chat">
             <ChatHeader name={state.room_name}></ChatHeader>
-            <div className="chat__history-wrapper">
-                <div ref={historyRef} className="chat__history">
-                    { state.messages.map((msg, index) => <ChatMessage key={index} msg={msg}></ChatMessage>) }
-                </div>
-            </div>
+            <ChatHistory
+                historyRef={historyRef}
+                messages={state.messages}
+            />
             <ChatInput></ChatInput>
         </div>
     )

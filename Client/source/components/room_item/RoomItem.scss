@@ -1,4 +1,4 @@
-@import '../../styles/globals.scss';
+@import 'styles/globals.scss';
 
 .room-item {
     @include flex-layout(column, center, center);
@@ -8,8 +8,13 @@
     height: fit-content;
     margin: 8px 0 8px 0;
     background-color: transparent;
+    
+    border-bottom: 1px solid rgba(211, 211, 211, 0.075);
+    border-top: 1px solid rgba(211, 211, 211, 0.075);
+    font-size: 14px;
 
-    &.active {
+    &__lock-icon {
+        margin-right: 16px;
     }
 
     &__content {
@@ -19,15 +24,15 @@
         padding-bottom: 8px;
     }
 
-    &__name {
-        margin: 0;
+    & &__name {
+        font-family: "Source Sans Pro";
+        font-family: inherit;
         text-align: center;
-        font-weight: 600;
-        font-size: 18px;
+        font-weight: 400;
+        
         overflow: hidden;
         max-width: 90%;
         white-space: nowrap;
-        margin: 0 8px;
     }
 
     &:hover {

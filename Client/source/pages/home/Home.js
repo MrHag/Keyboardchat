@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory, Route, Switch, Redirect } from 'react-router-dom';
 
 import { Sidebar } from 'components';
 import { Chat, RoomPanel, CreationRoom, ScreenSelector, UserPanel } from './layouts';
+import { Socket, UserData } from 'logic';
+import ROUTES from 'shared/Routes';
 
 import './Home.scss';
-import ROUTES from '../../shared/Routes';
+
 
 const RoomChat = () => {
     const [force, forceUpdate] = useState(0);
@@ -14,7 +16,7 @@ const RoomChat = () => {
 
     const onCreateRoom = () => {
         routeHistory.push(ROUTES.CreateRoom.route);
-    }
+    };
 
     return (
         <div className="home__screen">
@@ -26,10 +28,23 @@ const RoomChat = () => {
             </Sidebar>
             <Chat></Chat>
         </div>
-    )
-}
+    );
+};
 
 const Home = () => {
+    const socketGetUsers = (data) => {
+        console.log("Data = ", data);
+    }
+
+    useEffect(() => {
+        Socket.addEventListener('getusers', socketGetUsers);
+        Socket.emit('getusers', {
+            Users: [3, 2, 1],
+            Select: ["name", "avatar", "avatarHash"]
+        });
+        return () => Socket.removeEventListener('getusers', socketGetUsers);
+    }, []);
+
     return (
         <div className="home">
             <Redirect exact path="/home" to={ROUTES.RoomChat.route}></Redirect>

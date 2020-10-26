@@ -4,13 +4,13 @@ import PropTypes from 'prop-types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
 
-import { Input, RoomItem, Button, IconButton } from 'components';
+import { Input, RoomItem, Button, LabelButton, IconButton } from 'components';
 import { Socket, UserData } from 'logic';
 
 import './RoomPanel.scss';
 
 try {
-    var fake_rooms = require('fake_data/fake.json').rooms;
+    var fake_rooms = null;//require('fake_data/fake.json').rooms;
 } catch (err) { }
 
 const RoomList = ({ inRoom, rooms, joinRoom, leaveRoom }) => {
@@ -41,6 +41,7 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
     const [inRoom, setInRoom] = useState(UserData.inRoom);
 
     const joinRoom = (name, password) => {
+        console.log("Trying to join room!");
         Socket.emit('joinroom', {
             name: name,
             password: password
@@ -63,10 +64,12 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
     }
 
     const socketRoomchange = (data) => {
+        console.warn("SocketRoomchange...");
         Socket.emit('getrooms', { room: null});
     }
 
     const socketJoinroom = (data) => {
+        console.log("socketJoinroom data = ", data);
         if (data.successful) {
             UserData.inRoom = data.data.room;
             setInRoom(data.data.room);
@@ -77,7 +80,6 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
         Socket.on('getrooms', socketGetrooms);
         Socket.on('roomchange', socketRoomchange);
         Socket.on('joinroom', socketJoinroom);
-        Socket.on('leaveroom', socketLeaveroom);
         Socket.emit('getrooms', {room: null}); //TODO: Uncomment this in
     }
 
@@ -127,17 +129,24 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
 
     return (
         <div className="room-panel">
-            <div className="room-panel__search">
-                {search}
-            </div>
+            {search}
+            <LabelButton
+                className={'room-panel__add-btn'}
+                label="Rooms"
+                button={
+                    <IconButton
+                        onClick={onCreateRoom}>
+                        <FontAwesomeIcon icon={FontAwesomeIcons.faPlus}></FontAwesomeIcon>
+                    </IconButton>
+                }
+            />
             <RoomList inRoom={UserData.inRoom} rooms={rooms} joinRoom={joinRoom} leaveRoom={leaveRoom}></RoomList>
-            <Button onClick={onCreateRoom}>Create room</Button>
         </div>
-    )
+    );
 }
 
 RoomPanel.propTypes = {
     onCreateRoom: PropTypes.func.isRequired
-}
+};
 
 export default RoomPanel;

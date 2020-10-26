@@ -104,7 +104,7 @@ const RoomItem = ({active, roomData, onRoomJoin, onRoomLeave}) => {
         <div onClick={onClickHandler} className={classNames("room-item", {"active": active})}>
             <div className="room-item__content">
                 {haspass && <FontAwesomeIcon className="room-item__lock-icon" icon={FontAwesomeIcons.faLock}></FontAwesomeIcon>}
-                <p className="room-item__name" title={name}>{name}</p>
+                <div className="room-item__name" title={name}>{name}</div>
                 {roomLeaveButton}
             </div>
             {form}

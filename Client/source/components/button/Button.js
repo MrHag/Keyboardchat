@@ -14,6 +14,10 @@ const styles = {
             backgroundColor: '#758897',
         },
         backgroundColor: '#6fafe3',
+
+        '&&.disabled': {
+            color: 'red',
+        },
     },
 };
 
@@ -21,9 +25,9 @@ const Button = (props) => {
     const disabled = props.disabled;
     return (
         <BaseButton 
-            className={classNames("button", {"disabled": disabled})} 
-            variant="contained"
             {...props}
+            variant="contained"
+            className={classNames("button", {"disabled": disabled})} 
         />
     )
 }

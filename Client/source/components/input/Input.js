@@ -41,19 +41,19 @@ const useStyles = makeStyles({
   },
 
   'input--round': {
-    borderRadius: '16px',
+    borderRadius: '8px',
     backgroundColor: '#222429',
 
     '&::before': {
       borderBottom: 'none',
       transition: 'none',
-      left: '14px',
-      right: '14px',
+      left: '6px',
+      right: '6px',
     },
 
     '&::after': {
-      left: '14px',
-      right: '14px',
+      left: '6px',
+      right: '6px',
     },
   },
 });
