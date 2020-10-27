@@ -8,7 +8,7 @@ namespace Keyboardchat.Models
     public class User
     {
         public List<Connection> Connections { get; private set; }
-        public uint UID { get; set; }
+        public uint UID { get; private set; }
         public string Name { get; set; }
         public Room Room { get; set; }
 

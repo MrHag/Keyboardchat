@@ -7,7 +7,7 @@ namespace Keyboardchat.Models
 {
     public class Connection
     {
-        public SocketIOSocket Socket {get; set;}
+        public SocketIOSocket Socket {get;}
 
         public Connection(SocketIOSocket socket)
         {

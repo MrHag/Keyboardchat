@@ -4,13 +4,13 @@ namespace Keyboardchat.UseClasses
 {
     class UIDmanager
     {
-        protected List<int> _uids;
+        protected SortedSet<int> _uids;
 
         protected Stack<int> _freeUids;
 
         public UIDmanager()
         {
-            _uids = new List<int>();
+            _uids = new SortedSet<int>();
             _freeUids = new Stack<int>();     
         }
 
@@ -18,26 +18,34 @@ namespace Keyboardchat.UseClasses
         {
             int UID;
 
-            if (_freeUids.Count > 0)
-                UID = _freeUids.Pop();
-            else
+            lock (this)
             {
-                UID = _uids.Count;
+                if (_freeUids.Count > 0)
+                    UID = _freeUids.Pop();
+                else
+                {
+                    UID = _uids.Count;
+                }
+                _uids.Add(UID);
             }
-            _uids.Add(UID);
-
             return UID;
         }
 
         public virtual bool HasUID(int UID)
         {
-            return _uids.Contains(UID);
+            lock (this)
+            {
+                return _uids.Contains(UID);
+            }
         }
 
         public virtual void ReleaseUID(int UID)
         {
-            if (_uids.Remove(UID))
-                _freeUids.Push(UID);
+            lock (this)
+            {
+                if (_uids.Remove(UID))
+                    _freeUids.Push(UID);
+            }
         }
 
     }

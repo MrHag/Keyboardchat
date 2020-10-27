@@ -18,7 +18,8 @@
             "unsuccessful": [
               "badName",
               "badPassword",
-              "wrongNamePass"
+              "wrongNamePass",
+              "alreadyInSess"
             ],
             "error": [
               "invalidData"
@@ -174,6 +175,7 @@
         "body": {
           "data": [
             {
+              "id": ":int:",
               "room": ":string:",
               "haspass": true
             }
@@ -198,6 +200,7 @@
       "response": {
         "body": {
           "userid": ":uint:",
+          "roomid": ":int:",
           "message": ":string:"
         }
       }
@@ -208,7 +211,7 @@
       "header": "joinroom",
       "request": {
         "body": {
-          "name": ":string:",
+          "id": ":int:",
           "password": [
             ":string:",
             null
@@ -220,8 +223,9 @@
         "body": {
           "data": {
             "successful": {
-              "message": ":string:",
-              "room": ":string:"
+              "id": ":int:",
+              "room": ":string:",
+              "message": ":string:"
             },
             "unsuccessful": [
               "invalidPass",
@@ -243,7 +247,7 @@
       "header": "leaveroom",
       "request": {
         "body": {
-          "name": ":string:"
+          "id": ":int:"
         }
       },
 
@@ -251,8 +255,9 @@
         "body": {
           "data": {
             "successful": {
-              "message": ":string:",
-              "room": ":string:"
+              "id": ":int:",
+              "room": ":string:",
+              "message": ":string:"
             },
             "unsuccessful": [
               "roomNotFound",
@@ -285,7 +290,11 @@
       "response": {
         "body": {
           "data": {
-            "successful": ":string:",
+            "successful": {
+              "id": ":int:",
+              "name": ":string:",
+              "message": ":string:"
+            },
             "unsuccessful": [
               "roomExists",
               "badName"

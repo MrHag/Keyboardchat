@@ -1,6 +1,7 @@
 using Keyboardchat.DataBase;
 using Keyboardchat.DataBase.Models;
 using Keyboardchat.Web;
+using Keyboardchat.Web.WebSocketService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;

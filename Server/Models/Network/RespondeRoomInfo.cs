@@ -1,13 +1,15 @@
 ﻿
 namespace Keyboardchat.Models.Network
 {
-    public struct LeftJoinedRoom
+    public struct RespondeRoomInfo
     {
+        public int id;
         public string room;
         public string message;
 
-        public LeftJoinedRoom(string room, string message)
+        public RespondeRoomInfo(int id, string room, string message)
         {
+            this.id = id;
             this.room = room;
             this.message = message;
         }
