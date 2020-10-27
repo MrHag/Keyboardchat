@@ -3,7 +3,7 @@ import { useHistory, NavLink } from 'react-router-dom';
 
 import { Socket } from 'logic';
 import { ROUTES } from 'shared';
-import { Button, Input, InputPassword } from 'components';
+import { Button, Input, InputPassword, Form } from 'components';
 
 import './SignIn.scss';
 
@@ -62,36 +62,39 @@ const SignIn = () => {
 
   return (
       <div className="sign-in">
-        <h1>Sign in</h1>
-        <Input
-            className="sign-in__login-input"
-            placeholder="Enter login"
-            onChange={e => setLogin(e.target.value)}
-            onKeyDown={onLoginKeyupHandler} 
-            autoFocus={true} 
-        />
-        <InputPassword inputRef={passwordRef}
-            className="sign-in__pass-input"
-            placeholder="Enter password"
-            onChange={e => setPassword(e.target.value)}
-            onKeyDown={onPasswordKeyupHandler} 
-        />
-        <p className="sign-in__error">{err}</p>
-        <Button
-            className="button"
-            variant="contained"
-            onClick={onLoginHandler}
-            disabled={login.length === 0 || password.length === 0}
-        >
-            Login
-        </Button>
+          <Form
+            name="SignIn"
+          >
+            <Input
+                className="sign-in__login-input"
+                placeholder="Enter login"
+                onChange={e => setLogin(e.target.value)}
+                onKeyDown={onLoginKeyupHandler} 
+                autoFocus={true} 
+            />
+            <InputPassword inputRef={passwordRef}
+                className="sign-in__pass-input"
+                placeholder="Enter password"
+                onChange={e => setPassword(e.target.value)}
+                onKeyDown={onPasswordKeyupHandler} 
+            />
+            <p className="sign-in__error">{err}</p>
+            <Button
+                className="button"
+                variant="contained"
+                onClick={onLoginHandler}
+                disabled={login.length === 0 || password.length === 0}
+            >
+                Login
+            </Button>
 
-        <NavLink
-            className="sign-in__register"
-            to='/signup'
-        >
-            Don't have account? Register!
-        </NavLink>
+            <NavLink
+                className="sign-in__register"
+                to='/signup'
+            >
+                Don't have account? Register!
+            </NavLink>
+          </Form>
       </div>
   )
 }

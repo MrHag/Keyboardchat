@@ -4,36 +4,4 @@
   @include flex-layout(column, flex-start, center);
   width: 256px;
   max-height: 512px;
-
-  h1 {
-    margin-bottom: 32px;
-  }
-
-  .button {
-    margin-top: 32px;
-    width: 100%;
-  }
-
-  .input, .input-password {
-      width: 100%;
-      margin: 8px 0;
-  }
-
-  & &__pass-input {
-    margin-top: 32px;
-    margin-bottom: 8px;
-  }
-
-  &__error {
-      color: red;
-      text-align: center;
-  }
-
-  &__register {
-    margin-top: 16px;
-    color: rgb(84, 149, 170);
-    display: inline-block;
-    width: 100%;
-    text-align: center;
-  }
 }

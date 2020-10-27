@@ -67,7 +67,7 @@ const Input = ({ className, variant, button, ...props }) => {
       </InputAdornment>
   ) : null;
 
-  const class_name = classNames(classes.input, { 
+  const class_name = classNames('input', classes.input, { 
     [classes['input--round']]: variant === 'round',
   }, className, );
 

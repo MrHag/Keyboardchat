@@ -20,12 +20,12 @@ const InputPassword = ({ className, ...props }) => {
     <FontAwesomeIcon icon={FontAwesomeIcons.faEye} />
   ) : ( 
     <FontAwesomeIcon icon={FontAwesomeIcons.faEyeSlash} />
-  )
+  );
   
   return (
     <Input
       type={show ? "text" : "password"}
-      className={classNames('input-pass--round', className)}
+      className={classNames('input-pass', className)}
       button={
         <InputAdornment position="end">
           <IconButton

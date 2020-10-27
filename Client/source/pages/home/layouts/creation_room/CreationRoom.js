@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory, Redirect } from 'react-router-dom';
 
-import { Input, InputPassword, Button } from 'components';
+import { Input, InputPassword, Button, Form } from 'components';
 import { Socket } from 'logic';
 import { ROUTES } from 'shared';
 
@@ -53,24 +53,27 @@ const CreationRoom = () => {
         <div className="creation-room">
             <div className="creation-room__bg"></div>
             <div className="creation-room__content">
-                <h2 className="creation-room__header">Create room</h2>
-                <Input
-                    onChange={e => setName(e.target.value)}
-                    className="creation-room__input"
-                    placeholder="Room name"
-                    onKeyDown={onInputKeydown} autoFocus
-                />
-                <InputPassword
-                    onChange={e => setPassword(e.target.value)}
-                    className="creation-room__input"
-                    placeholder="Room password"
-                    onKeyDown={onInputKeydown}
-                />
-                <p className="creation-room__error">{err}</p>
-                <div className="creation-room__buttons">
-                    <Button onClick={onCancelBtn}>Cancel</Button>
-                    <Button disabled={name === ''} onClick={onCreateBtn}>Create</Button>
-                </div>
+                <Form
+                    name="Create room"
+                >
+                    <Input
+                        onChange={e => setName(e.target.value)}
+                        className="creation-room__input"
+                        placeholder="Room name"
+                        onKeyDown={onInputKeydown} autoFocus
+                    />
+                    <InputPassword
+                        onChange={e => setPassword(e.target.value)}
+                        className="creation-room__input"
+                        placeholder="Room password"
+                        onKeyDown={onInputKeydown}
+                    />
+                    <p className="creation-room__error">{err}</p>
+                    <div className="creation-room__buttons form__controls">
+                        <Button onClick={onCancelBtn}>Cancel</Button>
+                        <Button disabled={name === ''} onClick={onCreateBtn}>Create</Button>
+                    </div>
+                </Form>
             </div>
         </div>
     )

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useHistory, NavLink } from 'react-router-dom';
 
 import { Socket } from 'logic';
-import { Button, Input, InputPassword } from 'components';
+import { Button, Input, InputPassword, Form } from 'components';
 
 import './SignUp.scss';
 
@@ -62,42 +62,47 @@ const SignUp = () => {
 
   return (
     <div className="sign-up">
-        <h1>Sign up</h1>
-        <Input
-            className="sign-up__login-input input"
-            placeholder="Enter login"
-            onChange={e => setLogin(e.target.value)}
-            onKeyDown={onLoginKeyupHandler} 
-            autoFocus={true} 
-        />
-        <InputPassword inputRef={passwordRef}
-            className="sign-up__pass-input input"
-            placeholder="Enter password"
-            onChange={e => setPassword(e.target.value)}
-            onKeyDown={onPasswordKeyupHandler} 
-        />
-        <InputPassword
-            className="sign-up__confirm-input input"
-            placeholder="Confirm password"
-            onChange={e => setConfirm(e.target.value)}
-            onKeyDown={onPasswordKeyupHandler} 
-        />
-        <p className="sign-up__error">{err}</p>
-        <Button
-            className="button"
-            variant="contained"
-            onClick={onSignUpHandler}
-            disabled={login.length === 0 || password.length === 0}
+        <Form
+            name="SignUp"
         >
-            Signup
-        </Button>
+            <Input
+                className="sign-up__login-input"
+                placeholder="Enter login"
+                onChange={e => setLogin(e.target.value)}
+                onKeyDown={onLoginKeyupHandler} 
+                autoFocus={true} 
+            />
+            <div className="group">
+                <InputPassword inputRef={passwordRef}
+                    className="sign-up__pass-input"
+                    placeholder="Enter password"
+                    onChange={e => setPassword(e.target.value)}
+                    onKeyDown={onPasswordKeyupHandler} 
+                />
+                <InputPassword
+                    className="sign-up__confirm-input"
+                    placeholder="Confirm password"
+                    onChange={e => setConfirm(e.target.value)}
+                    onKeyDown={onPasswordKeyupHandler} 
+                />
+            </div>
+            <p className="sign-up__error">{err}</p>
+            <Button
+                className="button"
+                variant="contained"
+                onClick={onSignUpHandler}
+                disabled={login.length === 0 || password.length === 0}
+            >
+                Signup
+            </Button>
 
-        <NavLink
-            className="sign-up__register"
-            to='/'
-        >
-            Already have account? Sigin!
-        </NavLink>
+            <NavLink
+                className="sign-up__register"
+                to='/'
+            >
+                Already have account? Sigin!
+            </NavLink>
+        </Form>
     </div>
   )
 }
