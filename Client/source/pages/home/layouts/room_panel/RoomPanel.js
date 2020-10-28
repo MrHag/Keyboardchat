@@ -61,10 +61,10 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
         }
     };
 
-    const leaveRoom = (room) => {
-        console.log("Trying to leave room: ", room);
+    const leaveRoom = (roomid) => {
+        console.log("Trying to leave room: ", roomid);
         Socket.emit('leaveroom', {
-            id: room.id,
+            id: roomid,
         });
         onRoomLeave();
     };

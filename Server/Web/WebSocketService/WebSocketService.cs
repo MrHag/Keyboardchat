@@ -345,9 +345,13 @@ namespace Keyboardchat.Web.WebSocketService
 
         public static bool GetPropValue<T>(ref JToken iterator, string name, out T output)
         {
+            output = default;
+
+            if (iterator == null)
+                return false;
+
             try
             {
-                output = default;
 
                 if (iterator != null && iterator is JProperty nameproperty && nameproperty.Name == name && nameproperty.Value.Value<T>() is T value)
                 {

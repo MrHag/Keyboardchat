@@ -110,7 +110,7 @@ namespace Keyboardchat.Web.WebSocketService.Handler
 
                     string json = Encoding.UTF8.GetString(memoryStream.ToArray());
 
-                    var jObject = JObject.Parse(json);
+                    var jObject = JArray.Parse(json);
 
                     outcallback.Add(new HandlerCallBack(header: header, data: jObject, successfull: true, error: false));
                 }
