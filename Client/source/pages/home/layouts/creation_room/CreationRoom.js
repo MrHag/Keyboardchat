@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useHistory, Redirect } from 'react-router-dom';
 
 import { Input, InputPassword, Button, Form } from 'components';
-import { Socket } from 'logic';
+import { Socket, UserData } from 'logic';
 import { ROUTES } from 'shared';
 
 import './CreationRoom.scss';
@@ -30,8 +30,8 @@ const CreationRoom = () => {
     const socketCreateRoom = (data) => {
         console.log("Socket create room = ", data);
         if (data.successful) {
+            UserData.setInRoomJSON(data.data);
             routeHistory.push(ROUTES.RoomChat.route);
-            
         } else {
             //Here might be other types of errors
             setErr('Room with this name already exist!');
@@ -68,7 +68,7 @@ const CreationRoom = () => {
                         placeholder="Room password"
                         onKeyDown={onInputKeydown}
                     />
-                    <p className="creation-room__error">{err}</p>
+                    <p className="creation-room__error form__error">{err}</p>
                     <div className="creation-room__buttons form__controls">
                         <Button onClick={onCancelBtn}>Cancel</Button>
                         <Button disabled={name === ''} onClick={onCreateBtn}>Create</Button>

@@ -19,12 +19,17 @@
     width: 100%;
   }
 
+  &__error {
+    margin: 24px 0;
+    color: red;
+  }
+
   button {
-    margin: 32px 0;
     width: 100%;
   }
 
   a {
+    margin-top: 32px;
     color: rgb(84, 149, 170);
     display: inline-block;
   }

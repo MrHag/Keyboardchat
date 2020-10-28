@@ -20,13 +20,13 @@ const RoomList = ({ inRoom, rooms, joinRoom, leaveRoom }) => {
         <div ref={listRef} className="room-panel__list">
             {
                 rooms.map((room, index) => {
-                    const isActive = room.name === inRoom;
+                    const isActive = room.name === inRoom.name;
                     return (
                         <RoomItem
-                            key={room.name + index}
+                            key={room.id + index}
                             roomData={room} active={isActive}
                             onRoomJoin={joinRoom}
-                            onRoomLeave={() => leaveRoom(room.name)}
+                            onRoomLeave={() => leaveRoom(room.id)}
                         />
                     )
                 })
@@ -40,40 +40,44 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [inRoom, setInRoom] = useState(UserData.inRoom);
 
-    const joinRoom = (name, password) => {
-        console.log("Trying to join room!");
-        Socket.emit('joinroom', {
-            name: name,
+    const joinRoom = (room, password) => {
+        console.log("Trying to join room! RoomData = ", room);
+        const request =  {
+            id: room.id,
             password: password
-        });
+        };
+        console.log("Request = ", request);
+        Socket.emit('joinroom', request);
     };
 
-    const leaveRoom = (name) => {
-        console.log("Leaving room... Name = ", name);
+    const socketJoinroom = (data) => {
+        console.log("socketJoinroom data = ", data);
+        if (data.successful) {
+            console.log("You've joined to room = ", data.data);
+            UserData.setInRoom(data.data);
+            setInRoom(UserData.inRoom);
+        } else {
+            console.error("Can't joint room!", data);
+        }
+    };
+
+    const leaveRoom = (room) => {
+        console.log("Trying to leave room: ", room);
         Socket.emit('leaveroom', {
-            name: name
+            id: room.id,
         });
         onRoomLeave();
     };
 
     const socketGetrooms = (data) => {
-        const rooms = data.data.map(room => {
-            return { name: room.room, haspass: room.haspass }
-        });
-        setRooms(rooms);
+        UserData.existingRooms.setRoomsJSON(data);
+        console.log("UserData.existingRooms.rooms = ", UserData.existingRooms.rooms);
+        setRooms(UserData.existingRooms.rooms);
     }
 
     const socketRoomchange = (data) => {
         console.warn("SocketRoomchange...");
         Socket.emit('getrooms', { room: null});
-    }
-
-    const socketJoinroom = (data) => {
-        console.log("socketJoinroom data = ", data);
-        if (data.successful) {
-            UserData.inRoom = data.data.room;
-            setInRoom(data.data.room);
-        }
     }
 
     const initSocketsListeners = () => {

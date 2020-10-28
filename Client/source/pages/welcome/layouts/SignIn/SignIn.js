@@ -78,7 +78,7 @@ const SignIn = () => {
                 onChange={e => setPassword(e.target.value)}
                 onKeyDown={onPasswordKeyupHandler} 
             />
-            <p className="sign-in__error">{err}</p>
+            <p className="sign-in__error form__error">{err}</p>
             <Button
                 className="button"
                 variant="contained"

@@ -64,6 +64,7 @@ const SignUp = () => {
     <div className="sign-up">
         <Form
             name="SignUp"
+            error={err}
         >
             <Input
                 className="sign-up__login-input"
@@ -86,7 +87,7 @@ const SignUp = () => {
                     onKeyDown={onPasswordKeyupHandler} 
                 />
             </div>
-            <p className="sign-up__error">{err}</p>
+            <p className="sign-up__error form__error">{err}</p>
             <Button
                 className="button"
                 variant="contained"

@@ -10,7 +10,7 @@ import { Socket } from 'logic';
 
 import './RoomItem.scss';
 
-const RoomItemForm = ({roomName, onCancel, onJoin}) => {
+const RoomItemForm = ({roomId, onCancel, onJoin}) => {
     const [password, setPassword] = useState('');
     const [err, setErr] = useState('');
 
@@ -25,7 +25,7 @@ const RoomItemForm = ({roomName, onCancel, onJoin}) => {
 
     const onJoinBtn = () => {
         Socket.emit('joinroom', {
-            name: roomName,
+            id: roomId,
             password: password
         });
     }
@@ -53,21 +53,26 @@ const RoomItemForm = ({roomName, onCancel, onJoin}) => {
                 <Button disabled={password === ''} onClick={onJoinBtn}>Join</Button>
             </div>
         </div>
-    )
-}
+    );
+};
+
+RoomItemForm.propTypes = {
+    room: PropTypes.object.isRequired,
+    onCancel: PropTypes.func.isRequired,
+    onJoin: PropTypes.func.isRequired,
+};
 
 const RoomItem = ({active, roomData, onRoomJoin, onRoomLeave}) => {
-    const { name, haspass } = roomData;
     const [ stage, setStage ] = useState('');
 
     const onClickHandler = (e) => {
         if (!active) {
-            if (haspass) {
+            if (roomData.haspass) {
                 if (stage !== 'joining') {
                     setStage('joining');
                 }
             } else {
-                onRoomJoin(name, null);
+                onRoomJoin(roomData, null);
             }
         }
     }
@@ -80,7 +85,7 @@ const RoomItem = ({active, roomData, onRoomJoin, onRoomLeave}) => {
     if (stage === 'joining') {
         form = (
             <RoomItemForm
-                roomName={name}
+                room={roomData}
                 onCancel={() => {setStage('')}}
                 onJoin={onJoin}
             />
@@ -99,7 +104,7 @@ const RoomItem = ({active, roomData, onRoomJoin, onRoomLeave}) => {
             />
         </IconButton>
     )
-        
+    const { haspass, name } = {...roomData};
     return (
         <div onClick={onClickHandler} className={classNames("room-item", {"active": active})}>
             <div className="room-item__content">
@@ -109,7 +114,7 @@ const RoomItem = ({active, roomData, onRoomJoin, onRoomLeave}) => {
             </div>
             {form}
         </div>
-    )
+    );
 }
 
 RoomItem.propType = {
