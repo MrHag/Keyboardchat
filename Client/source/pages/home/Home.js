@@ -3,7 +3,7 @@ import { useHistory, Route, Switch, Redirect } from 'react-router-dom';
 
 import { Sidebar } from 'components';
 import { Chat, RoomPanel, CreationRoom, ScreenSelector, UserPanel } from './layouts';
-import { Socket, UserData } from 'logic';
+import { Socket, UserData, Room } from 'logic';
 import ROUTES from 'shared/Routes';
 
 import './Home.scss';
@@ -18,12 +18,18 @@ const RoomChat = () => {
         routeHistory.push(ROUTES.CreateRoom.route);
     };
 
+    const onRoomLeave = () => {
+        UserData.setInRoom(new Room(-1, 'globals', false));
+        console.log("UserData.inRoom = ", UserData.inRoom);
+        forceUpdate(force + 1);
+    }
+
     return (
         <div className="home__screen">
             <Sidebar>
                 <RoomPanel
                     onCreateRoom={onCreateRoom}
-                    onRoomLeave={_ => forceUpdate(force + 1)}
+                    onRoomLeave={onRoomLeave}
                 />
             </Sidebar>
             <Chat></Chat>
@@ -32,10 +38,11 @@ const RoomChat = () => {
 };
 
 const Home = () => {
+    const [force, forceUpdate] = useState(0);
+
     const socketGetUsers = (data) => {
         console.log("Data = ", data);
     }
-
     useEffect(() => {
         Socket.addEventListener('getusers', socketGetUsers);
         Socket.emit('getusers', {
@@ -52,7 +59,11 @@ const Home = () => {
             <Switch>
                 <Route path={ROUTES.RoomChat.route} component={RoomChat} />
                 <Route path={ROUTES.UserPanel.route} component={UserPanel} />
-                <Route path={ROUTES.CreateRoom.route} component={CreationRoom} />
+                <Route path={ROUTES.CreateRoom.route}>
+                    <CreationRoom
+                        onRoomCreate={_ => forceUpdate(force + 1)}
+                    />
+                </Route>
             </Switch>
         </div>
     );

@@ -15,15 +15,21 @@ try {
 
 const RoomList = ({ inRoom, rooms, joinRoom, leaveRoom }) => {
     const listRef = useRef();
-    
+
+    const activeRooms = rooms.filter((room) => room.compare(inRoom));
+    let list = rooms.filter((room) => !room.compare(inRoom));
+    if (activeRooms.length != 0) {
+        list.unshift(...activeRooms);
+    }
+
     return (
         <div ref={listRef} className="room-panel__list">
             {
-                rooms.map((room, index) => {
-                    const isActive = room.name === inRoom.name;
+                list.map((room, index) => {
+                    const isActive = room.compare(inRoom);
                     return (
                         <RoomItem
-                            key={room.id + index}
+                            key={`${room.id}_${index}`}
                             roomData={room} active={isActive}
                             onRoomJoin={joinRoom}
                             onRoomLeave={() => leaveRoom(room.id)}
@@ -46,7 +52,6 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
             id: room.id,
             password: password
         };
-        console.log("Request = ", request);
         Socket.emit('joinroom', request);
     };
 
@@ -54,7 +59,7 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
         console.log("socketJoinroom data = ", data);
         if (data.successful) {
             console.log("You've joined to room = ", data.data);
-            UserData.setInRoom(data.data);
+            UserData.setInRoomJSON(data.data);
             setInRoom(UserData.inRoom);
         } else {
             console.error("Can't joint room!", data);
@@ -70,6 +75,7 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
     };
 
     const socketGetrooms = (data) => {
+        console.log("Getrooms data = ", data);
         UserData.existingRooms.setRoomsJSON(data);
         console.log("UserData.existingRooms.rooms = ", UserData.existingRooms.rooms);
         setRooms(UserData.existingRooms.rooms);

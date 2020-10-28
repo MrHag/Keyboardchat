@@ -8,11 +8,17 @@ class Room {
   static fromJSON(json) {
     return new Room(
         json.id,
-        json.room && `КП:${json.id}`,
+        json.room,
         json.haspass
     );
   }
+
+  compare(room) {
+    return (this.id === room.id) && (this.name === room.name);
+  }
 }
+
+export { Room };
 
 const UserData = {
   username: 'Hello world!',

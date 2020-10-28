@@ -7,7 +7,7 @@ import { ROUTES } from 'shared';
 
 import './CreationRoom.scss';
 
-const CreationRoom = () => {
+const CreationRoom = ({ onRoomCreate }) => {
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
     const [err, setErr] = useState('');
@@ -32,6 +32,7 @@ const CreationRoom = () => {
         if (data.successful) {
             UserData.setInRoomJSON(data.data);
             routeHistory.push(ROUTES.RoomChat.route);
+            onRoomCreate();
         } else {
             //Here might be other types of errors
             setErr('Room with this name already exist!');

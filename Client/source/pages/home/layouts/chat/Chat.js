@@ -7,6 +7,7 @@ import { Socket } from 'logic';
 import ChatHeader from './chat_header/ChatHeader';
 
 import './Chat.scss';
+import UserData from '../../../../logic/UserData';
 
 try {
     var fake_messages = null; //require('fake_data/fake.json').chat_messages;
@@ -85,7 +86,7 @@ const Chat = () => {
 
     return (
         <div className="chat">
-            <ChatHeader name={state.room_name}></ChatHeader>
+            <ChatHeader name={UserData.inRoom.name}></ChatHeader>
             <ChatHistory
                 historyRef={historyRef}
                 messages={state.messages}
