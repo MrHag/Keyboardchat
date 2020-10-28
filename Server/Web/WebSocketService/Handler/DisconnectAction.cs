@@ -15,63 +15,73 @@ namespace Keyboardchat.Web.WebSocketService.Handler
             _webSocketService.OnQueryMeessage("disconnection");
 #endif
 
-            Connection currentConnection = _webSocketService.GetConnection(SocketConnection.Socket);
-
-            User user = _webSocketService.GetAuthUser(currentConnection);
-
-            if (user == null)
+            try
             {
-                lock (_webSocketService._connectionConnections)
+                if (disconnected)
                 {
-                    _webSocketService._connectionConnections.Remove(SocketConnection.Socket);
-                }
-                return;
-            }
-
-            var userConnections = user.Connections;
-
-            int userConnectionsCount = 0;
-
-            lock (userConnections)
-            {
-
-                for (int i = 0; i < userConnections.Count; i++)
-                {
-                    var connection = userConnections[i];
-                    if (connection == currentConnection)
+                    lock (_webSocketService._connectionConnections)
                     {
-                        userConnections.RemoveAt(i);
-                        break;
+                        _webSocketService._connectionConnections.Remove(SocketConnection.Socket);
                     }
                 }
 
-                userConnectionsCount = userConnections.Count;
-            }
+                Connection currentConnection = _webSocketService.GetConnection(SocketConnection.Socket);
 
-            
-            if (userConnectionsCount == 0)
-            {
-                Room userroom = user.Room;
+                User user = _webSocketService.GetAuthUser(currentConnection);
 
-                _webSocketService.LeaveRoom(user, userroom);
-
-                if (disconnected)
-                    _webSocketService.DeleteUser(user);
-
-                lock (_webSocketService._authUsers)
+                if (user == null)
                 {
-                    _webSocketService._authUsers.Remove(user.UID);
+                    return;
                 }
+
+                var userConnections = user.Connections;
+
+                int userConnectionsCount = 0;
+
+                lock (userConnections)
+                {
+
+                    for (int i = 0; i < userConnections.Count; i++)
+                    {
+                        var connection = userConnections[i];
+                        if (connection == currentConnection)
+                        {
+                            userConnections.RemoveAt(i);
+                            break;
+                        }
+                    }
+
+                    userConnectionsCount = userConnections.Count;
+                }
+
+
+                if (userConnectionsCount == 0)
+                {
+                    Room userroom = user.Room;
+
+                    _webSocketService.LeaveRoom(user, userroom);
+
+                    if (disconnected)
+                    {
+                        _webSocketService.DeleteUser(user);
+                    }
+
+                    lock (_webSocketService._authUsers)
+                    {
+                        _webSocketService._authUsers.Remove(user.UID);
+                    }
+                }
+
             }
-
-            
-
-#if DEBUG
-            lock (_webSocketService._connectionConnections)
+            finally
             {
-                Program.LogService.Log("Users:" + _webSocketService._connectionConnections.Count);
-            }
+#if DEBUG
+                lock (_webSocketService._connectionConnections)
+                {
+                    Program.LogService.Log("Connections:" + _webSocketService._connectionConnections.Count);
+                }
 #endif
+            }
         }
 
     }
