@@ -38,6 +38,8 @@ const SignIn = () => {
         case 'invalidData':
           setErr('Invalid data!');
           break;
+        default:
+          break;
       }
     }
   };
@@ -92,6 +94,7 @@ const SignIn = () => {
         <NavLink
           className="sign-in__register"
           to="/signup"
+
         >
           Don't have account? Register!
         </NavLink>

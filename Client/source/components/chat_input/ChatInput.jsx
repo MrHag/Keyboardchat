@@ -12,6 +12,13 @@ import './ChatInput.scss';
 const ChatInput = () => {
   const [text, setText] = useState('');
 
+  const sendMessage = () => {
+    setText('');
+    Socket.emit('chat', {
+      message: text,
+    });
+  };
+
   const onChatKeydown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -19,13 +26,6 @@ const ChatInput = () => {
         sendMessage();
       }
     }
-  };
-
-  const sendMessage = () => {
-    setText('');
-    Socket.emit('chat', {
-      message: text,
-    });
   };
 
   return (

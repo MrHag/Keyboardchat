@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useHistory, Redirect } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 import { Input, InputPassword, Button, Form } from 'components';
 import { Socket, UserData } from 'logic';
@@ -13,9 +14,9 @@ const CreationRoom = ({ onRoomCreate }) => {
   const [err, setErr] = useState('');
   const routeHistory = useHistory();
   /*
-        Пока joinroom всегда возвращает success. Если это изменится, то нужно будет хендлить ошибки здесь
-    */
-
+    Пока joinroom всегда возвращает success. Если это изменится,
+    то нужно будет хендлить ошибки здесь
+  */
   const onCreateBtn = () => {
     Socket.emit('createRoom', {
       name,
@@ -79,6 +80,10 @@ const CreationRoom = ({ onRoomCreate }) => {
       </div>
     </div>
   );
+};
+
+CreationRoom.propTypes = {
+  onRoomCreate: PropTypes.func.isRequired,
 };
 
 export default CreationRoom;

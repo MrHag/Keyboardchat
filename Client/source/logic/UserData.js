@@ -18,7 +18,16 @@ class Room {
   }
 }
 
-export { Room };
+class Message {
+  constructor(author, content, roomId, date) {
+    this.roomdId = roomId;
+    this.author = author;
+    this.content = content;
+    this.date = date;
+  }
+}
+
+export { Room, Message };
 
 const UserData = {
   username: 'Hello world!',

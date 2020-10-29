@@ -48,7 +48,6 @@ function generatePlugins() {
   ];
 
   if (!isDev) {
-    console.log('Ignore fake.json!');
     plugins.push(
       new Webpack.IgnorePlugin({
         resourceRegExp: /fake\.json$/,
@@ -62,7 +61,6 @@ function generatePlugins() {
         extensions: ['js', 'jsx'],
         emitWarning: true,
         failOnError: !isDev,
-        fix: true,
       }),
     );
   }
@@ -86,7 +84,7 @@ function generateConfig() {
 
     mode: isDev ? 'development' : 'production',
 
-    entry: path.resolve(__dirname, './source/index.js'),
+    entry: path.resolve(__dirname, './source/index.jsx'),
 
     module: generateModule(),
 

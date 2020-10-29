@@ -1,24 +1,20 @@
-import React, { useEffect, useRef, useState, useContext } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
 
-import { Input, RoomItem, Button, LabelButton, IconButton } from 'components';
-import { Socket, UserData } from 'logic';
+import { Input, RoomItem, LabelButton, IconButton } from 'components';
+import { Socket, UserData, Room } from 'logic';
 
 import './RoomPanel.scss';
-
-try {
-  var fake_rooms = null;// require('fake_data/fake.json').rooms;
-} catch (err) { }
 
 const RoomList = ({ inRoom, rooms, joinRoom, leaveRoom }) => {
   const listRef = useRef();
 
   const activeRooms = rooms.filter((room) => room.compare(inRoom));
   const list = rooms.filter((room) => !room.compare(inRoom));
-  if (activeRooms.length != 0) {
+  if (activeRooms.length !== 0) {
     list.unshift(...activeRooms);
   }
 
@@ -29,7 +25,7 @@ const RoomList = ({ inRoom, rooms, joinRoom, leaveRoom }) => {
           const isActive = room.compare(inRoom);
           return (
             <RoomItem
-              key={`${room.id}_${index}`}
+              key={`${room.id}`}
               roomData={room}
               active={isActive}
               onRoomJoin={joinRoom}
@@ -42,10 +38,17 @@ const RoomList = ({ inRoom, rooms, joinRoom, leaveRoom }) => {
   );
 };
 
+RoomList.propTypes = {
+  inRoom: PropTypes.instanceOf(Room).isRequired,
+  rooms: PropTypes.arrayOf(PropTypes.object).isRequired,
+  joinRoom: PropTypes.func.isRequired,
+  leaveRoom: PropTypes.func.isRequired,
+};
+
 const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
-  const [rooms, setRooms] = useState((fake_rooms) || []);
+  const [rooms, setRooms] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [inRoom, setInRoom] = useState(UserData.inRoom);
+  const [_, setInRoom] = useState(UserData.inRoom);
 
   const joinRoom = (room, password) => {
     console.log('Trying to join room! RoomData = ', room);
@@ -159,6 +162,7 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
 
 RoomPanel.propTypes = {
   onCreateRoom: PropTypes.func.isRequired,
+  onRoomLeave: PropTypes.func.isRequired,
 };
 
 export default RoomPanel;

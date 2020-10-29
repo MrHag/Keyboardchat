@@ -5,13 +5,9 @@ import { ChatMessage, ChatInput } from 'components';
 import { Socket } from 'logic';
 
 import ChatHeader from './chat_header/ChatHeader';
+import { UserData, Message }  from 'logic';
 
 import './Chat.scss';
-import UserData from '../../../../logic/UserData';
-
-try {
-  var fake_messages = null; // require('fake_data/fake.json').chat_messages;
-} catch (err) { }
 
 const ChatHistory = ({ messages, historyRef }) => {
   const historyMessages = messages.map(
@@ -29,24 +25,35 @@ const ChatHistory = ({ messages, historyRef }) => {
   );
 };
 
-const Chat = () => {
-  if (fake_messages) {
-    for (const msg of fake_messages) {
-      msg.date = new Date();
-      msg.date.setSeconds(Math.random() * 1000);
-    }
-  }
+ChatHistory.propTypes = {
+  messages: PropTypes.arrayOf(PropTypes.shape).isRequired,
+  historyRef: PropTypes.oneOfType([
+    PropTypes.func, 
+    PropTypes.shape({ current: PropTypes.any })
+  ]),
+};
 
+const Chat = () => {
   const [state, setState] = useState({
-    messages: (fake_messages) || [],
+    messages: [],
     room_name: 'Палата №1',
   });
   const historyRef = React.useRef();
 
   const onNewMessage = (data) => {
-    data.date = new Date();
-    console.log('OnNewMessage data = ', data);
-    setState({ room_name: state.room_name, messages: [...state.messages, data] });
+    const msg = new Message(
+      {
+        id: data.userid,
+        avatar: null,
+      },
+      {
+        text: data.message,
+      },
+      data.roomid,
+      new Date(),
+    );
+    console.log('OnNewMessage data = ', msg);
+    setState({ room_name: state.room_name, messages: [...state.messages, msg] });
     historyRef.current.scrollTop = historyRef.current.scrollHeight;
   };
 

@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
 
 import { Button, IconButton, InputPassword } from 'components';
-import { Socket } from 'logic';
+import { Socket, Room } from 'logic';
 
 import './RoomItem.scss';
 
@@ -120,8 +120,8 @@ const RoomItem = ({ active, roomData, onRoomJoin, onRoomLeave }) => {
   );
 };
 
-RoomItem.propType = {
-  roomData: PropTypes.object.isRequired,
+RoomItem.propTypes = {
+  roomData: PropTypes.instanceOf(Room).isRequired,
   active: PropTypes.bool.isRequired,
   onRoomJoin: PropTypes.func.isRequired,
   onRoomLeave: PropTypes.func.isRequired,

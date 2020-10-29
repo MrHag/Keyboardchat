@@ -67,13 +67,13 @@ const Input = ({ className, variant, button, ...props }) => {
     </InputAdornment>
   ) : null;
 
-  const class_name = classNames('input', classes.input, {
+  const classList = classNames('input', classes.input, {
     [classes['input--round']]: variant === 'round',
   }, className);
 
   return (
     <BaseInput
-      className={class_name}
+      className={classList}
       endAdornment={adornment}
       {...props}
     >
@@ -92,7 +92,6 @@ Input.propTypes = {
   button: PropTypes.node,
   className: PropTypes.string,
   variant: PropTypes.string,
-  props: PropTypes.any,
 };
 
 export default Input;

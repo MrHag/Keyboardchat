@@ -38,6 +38,8 @@ const SignUp = () => {
         case 'nameExists':
           setErr('This name is already taken');
           break;
+        default:
+          break;
       }
     }
   };

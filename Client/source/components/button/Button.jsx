@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import classNames from 'classnames';
 import { Button as BaseButton, withStyles } from '@material-ui/core';
@@ -30,6 +31,14 @@ const Button = (props) => {
       className={classNames('button', { 'disabled': disabled })}
     />
   );
+};
+
+Button.defaultProps = {
+  disabled: false,
+};
+
+Button.propTypes = {
+  disabled: PropTypes.bool,
 };
 
 export default withStyles(styles)(Button);
