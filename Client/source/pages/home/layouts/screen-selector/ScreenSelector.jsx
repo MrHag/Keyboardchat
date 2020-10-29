@@ -10,7 +10,7 @@ import { UserData } from 'logic';
 import './ScreenSelectors.scss';
 
 const ScreenSelector = () => {
-  const userAvatar = (UserData.user.avatar) ? (
+  const userAvatar = (UserData.user !== null && UserData.user.avatar) ? (
     <p>Av</p>
   )
     : (

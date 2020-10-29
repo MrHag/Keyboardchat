@@ -67,15 +67,22 @@ const UserData = {
     },
 
     setRoomsJSON(json) {
-      console.log('json = ', json);
       this.rooms = json.data.map((room) => Room.fromJSON(room));
-      console.log('this.rooms = ', this.rooms);
     },
+  },
+
+  toDefault: function() {
+    this.user = null;
+    this.inRoom = new Room(undefined, 'globals');
+    this.existingRooms.rooms = [];
+    this.cache.rooms = [];
   },
 
   cache: {
     rooms: [],
   },
 };
+
+UserData.toDefault();
 
 export default UserData;

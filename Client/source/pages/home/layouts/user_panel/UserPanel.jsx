@@ -13,6 +13,7 @@ const UserPanel = () => {
   const onLogoutButton = () => {
     Socket.emit('deAuth', {});
     routeHistory.push(ROUTES.Authorization.route);
+    UserData.toDefault();
   };
 
   return (

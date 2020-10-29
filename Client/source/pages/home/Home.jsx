@@ -55,23 +55,19 @@ const Home = () => {
   }, []);
 
   return (
-    (force !== 0) ? (
-      <div className="home">
-        <Redirect exact path="/home" to={ROUTES.RoomChat.route} />
-        <ScreenSelector />
-        <Switch>
-          <Route path={ROUTES.RoomChat.route} component={RoomChat} />
-          <Route path={ROUTES.UserPanel.route} component={UserPanel} />
-          <Route path={ROUTES.CreateRoom.route}>
-            <CreationRoom
-              onRoomCreate={(_) => forceUpdate(force + 1)}
-            />
-          </Route>
-        </Switch>
-      </div>)
-    : (
-        null
-      )
+    <div className="home">
+      <Redirect exact path="/home" to={ROUTES.RoomChat.route} />
+      <ScreenSelector />
+      <Switch>
+        <Route path={ROUTES.RoomChat.route} component={RoomChat} />
+        <Route path={ROUTES.UserPanel.route} component={UserPanel} />
+        <Route path={ROUTES.CreateRoom.route}>
+          <CreationRoom
+            onRoomCreate={(_) => forceUpdate(force + 1)}
+          />
+        </Route>
+      </Switch>
+    </div>
   );
 };
 
