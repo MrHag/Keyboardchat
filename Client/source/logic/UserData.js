@@ -27,10 +27,29 @@ class Message {
   }
 }
 
-export { Room, Message };
+class User {
+  constructor(id, name, avatar, avatarHash) {
+    this.id = id;
+    this.name = name;
+    this.avatar = avatar;
+    this.avatarHash = avatarHash;
+  }
+
+  static fromJSON(json) {
+    return new User(
+      json.id,
+      json.name,
+      // json.avatar,
+      "Hello",
+      json.avatarHash,
+    );
+  }
+}
+
+export { Room, Message, User };
 
 const UserData = {
-  username: 'Hello world!',
+  user: null,
 
   inRoom: new Room(undefined, 'globals'),
   setInRoomJSON(json) {

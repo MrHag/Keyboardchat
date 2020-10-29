@@ -12,6 +12,8 @@ import './RoomPanel.scss';
 const RoomList = ({ inRoom, rooms, joinRoom, leaveRoom }) => {
   const listRef = useRef();
 
+  console.log("RoomList.InRoomObject = ", inRoom);
+
   const activeRooms = rooms.filter((room) => room.compare(inRoom));
   const list = rooms.filter((room) => !room.compare(inRoom));
   if (activeRooms.length !== 0) {
@@ -71,11 +73,15 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
   };
 
   const leaveRoom = (roomid) => {
-    console.log('Trying to leave room: ', roomid);
+    console.log('Trying to leave roomId: ', roomid);
     Socket.emit('leaveRoom', {
       id: roomid,
     });
     onRoomLeave();
+  };
+
+  const socketRoomLeave = (data) => {
+    console.log("ON ROOM LEAVE RESPONSE: ", data);
   };
 
   const socketGetrooms = (data) => {
@@ -94,6 +100,7 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
     Socket.on('getRooms', socketGetrooms);
     Socket.on('roomChange', socketRoomchange);
     Socket.on('joinRoom', socketJoinroom);
+    Socket.on('leaveRoom', socketRoomLeave);
     Socket.emit('getRooms', { room: null }); // TODO: Uncomment this in
   };
 
@@ -101,6 +108,7 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
     Socket.removeEventListener('getRooms', socketGetrooms);
     Socket.removeEventListener('joinRoom', socketJoinroom);
     Socket.removeEventListener('roomChange', socketRoomchange);
+    Socket.removeEventListener('leaveRoom', socketRoomLeave);
   };
 
   useEffect(() => {
