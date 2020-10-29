@@ -368,9 +368,8 @@ namespace Keyboardchat.Web.WebSocketService
 
         public void Start()
         {
-
-            _globalRooms.Add(new Room(0, "global", ""));
-
+            int UID = _roomUIDmanager.GetUID();
+            _globalRooms.Add(new Room(UID, "global", ""));
 
 #if DEBUG
 
