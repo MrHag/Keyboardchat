@@ -33,7 +33,7 @@
 
     "DeAuthorization": {
 
-      "header": "deauth",
+      "header": "deAuth",
       "request": {
         "body": {
         }
@@ -56,7 +56,7 @@
 
     "ChangeProfile": {
 
-      "header": "changeprofile",
+      "header": "changeProfile",
       "request": {
         "body": {
           "!name": ":string:",
@@ -86,7 +86,7 @@
 
     "GetUsers": {
 
-      "header": "getusers",
+      "header": "getUsers",
       "request": {
         "body": {
           "Users": [
@@ -159,7 +159,7 @@
 
     "GetRooms": {
 
-      "header": "getrooms",
+      "header": "getRooms",
 
       "request": {
         "body": {
@@ -208,7 +208,7 @@
 
     "JoinRoom": {
 
-      "header": "joinroom",
+      "header": "joinRoom",
       "request": {
         "body": {
           "id": ":int:",
@@ -244,7 +244,7 @@
 
     "LeaveRoom": {
 
-      "header": "leaveroom",
+      "header": "leaveRoom",
       "request": {
         "body": {
           "id": ":int:"
@@ -276,7 +276,7 @@
 
     "CreateRoom": {
 
-      "header": "createroom",
+      "header": "createRoom",
       "request": {
         "body": {
           "name": ":string:",
@@ -330,7 +330,7 @@
     },
 
     "RoomChange": {
-      "header": "roomchange",
+      "header": "roomChange",
       "response": {
         "body": {
           "data": ":string:",

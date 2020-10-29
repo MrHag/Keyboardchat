@@ -24,15 +24,15 @@ const RoomItemForm = ({roomId, onCancel, onJoin}) => {
     }
 
     const onJoinBtn = () => {
-        Socket.emit('joinroom', {
+        Socket.emit('joinRoom', {
             id: roomId,
             password: password
         });
     }
 
     useEffect(() => {
-        Socket.on('joinroom', socketJoinroom);
-        return () => Socket.removeEventListener('joinroom', socketJoinroom);
+        Socket.on('joinRoom', socketJoinroom);
+        return () => Socket.removeEventListener('joinRoom', socketJoinroom);
     }, []);
 
     return (

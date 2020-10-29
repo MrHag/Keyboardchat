@@ -17,7 +17,7 @@ const CreationRoom = ({ onRoomCreate }) => {
     */
 
     const onCreateBtn = () => {
-        Socket.emit('createroom', {
+        Socket.emit('createRoom', {
             name: name,
             password: (password.length === 0) ? null : password
         });
@@ -40,8 +40,8 @@ const CreationRoom = ({ onRoomCreate }) => {
     }
 
     useEffect(() => {
-        Socket.on('createroom', socketCreateRoom)
-        return () => Socket.removeEventListener('createroom', socketCreateRoom);
+        Socket.on('createRoom', socketCreateRoom)
+        return () => Socket.removeEventListener('createRoom', socketCreateRoom);
     }, [])
 
     const onInputKeydown = (e) => {

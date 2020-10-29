@@ -44,12 +44,12 @@ const Home = () => {
         console.log("Data = ", data);
     }
     useEffect(() => {
-        Socket.addEventListener('getusers', socketGetUsers);
-        Socket.emit('getusers', {
+        Socket.addEventListener('getUsers', socketGetUsers);
+        Socket.emit('getUsers', {
             Users: [3, 2, 1],
             Select: ["name", "avatar", "avatarHash"]
         });
-        return () => Socket.removeEventListener('getusers', socketGetUsers);
+        return () => Socket.removeEventListener('getUsers', socketGetUsers);
     }, []);
 
     return (

@@ -68,14 +68,14 @@ const Chat = () => {
 
     const initSockets = () => {
         Socket.on('chat', onNewMessage);
-        Socket.on('joinroom', socketJoinroom);
-        Socket.on('leaveroom', socketLeaveroom);
+        Socket.on('joinRoom', socketJoinroom);
+        Socket.on('leaveRoom', socketLeaveroom);
     }
 
     const cleanSockets = () => {
         Socket.removeEventListener('chat', onNewMessage);
-        Socket.removeEventListener('joinroom', socketJoinroom);
-        Socket.removeEventListener('leaveroom', socketLeaveroom);
+        Socket.removeEventListener('joinRoom', socketJoinroom);
+        Socket.removeEventListener('leaveRoom', socketLeaveroom);
     }
 
     useEffect(() => {

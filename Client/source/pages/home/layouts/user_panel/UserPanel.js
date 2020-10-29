@@ -11,7 +11,7 @@ const UserPanel = () => {
   const routeHistory = useHistory();
 
   const onLogoutButton = () => {
-    Socket.emit('deauth', {});
+    Socket.emit('deAuth', {});
     routeHistory.push(ROUTES.Authorization.route);
   }
 
