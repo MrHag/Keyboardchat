@@ -24,10 +24,12 @@ const RoomItemForm = ({ roomId, onCancel, onJoin }) => {
   };
 
   const onJoinBtn = () => {
-    Socket.emit('joinRoom', {
+    const request = {
       id: roomId,
       password,
-    });
+    };
+    console.log('request = ', request);
+    Socket.emit('joinRoom', request);
   };
 
   useEffect(() => {
@@ -58,7 +60,7 @@ const RoomItemForm = ({ roomId, onCancel, onJoin }) => {
 };
 
 RoomItemForm.propTypes = {
-  room: PropTypes.object.isRequired,
+  roomId: PropTypes.number.isRequired,
   onCancel: PropTypes.func.isRequired,
   onJoin: PropTypes.func.isRequired,
 };
@@ -86,7 +88,7 @@ const RoomItem = ({ active, roomData, onRoomJoin, onRoomLeave }) => {
   if (stage === 'joining') {
     form = (
       <RoomItemForm
-        room={roomData}
+        roomId={roomData.id}
         onCancel={() => { setStage(''); }}
         onJoin={onJoin}
       />
