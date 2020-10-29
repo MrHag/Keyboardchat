@@ -7,9 +7,9 @@ class Room {
 
   static fromJSON(json) {
     return new Room(
-        json.id,
-        json.room,
-        json.haspass
+      json.id,
+      json.room,
+      json.haspass,
     );
   }
 
@@ -22,7 +22,7 @@ export { Room };
 
 const UserData = {
   username: 'Hello world!',
-  
+
   inRoom: new Room(undefined, 'globals'),
   setInRoomJSON(json) {
     this.inRoom = Room.fromJSON(json);
@@ -39,17 +39,15 @@ const UserData = {
     },
 
     setRoomsJSON(json) {
-      console.log("json = ", json);
-      this.rooms = json.data.map(room => {
-        return Room.fromJSON(room)
-      });
-      console.log("this.rooms = ", this.rooms);
+      console.log('json = ', json);
+      this.rooms = json.data.map((room) => Room.fromJSON(room));
+      console.log('this.rooms = ', this.rooms);
     },
   },
 
   cache: {
     rooms: [],
-  }
-}
+  },
+};
 
 export default UserData;

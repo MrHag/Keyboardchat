@@ -2,9 +2,10 @@ const Webpack = require('webpack');
 const path = require('path');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const MiniSCCExtrractPlugin = require('mini-css-extract-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 const isDev = (/development/).test(process.env.NODE_ENV);
-const outputPath = `../public/`;
+const outputPath = '../public/';
 
 function generateModule() {
   return {
@@ -17,7 +18,7 @@ function generateModule() {
             loader: 'babel-loader',
             options: {
               presets: ['@babel/preset-react'],
-              plugins: ["react-hot-loader/babel"]
+              plugins: ['react-hot-loader/babel'],
             },
           },
         ],
@@ -35,7 +36,7 @@ function generateModule() {
 }
 
 function generatePlugins() {
-  let plugins = [
+  const plugins = [
     new HTMLWebpackPlugin({
       template: './source/index.html',
       favicon: './favicon.ico',
@@ -47,12 +48,23 @@ function generatePlugins() {
   ];
 
   if (!isDev) {
-    console.log("Ignore fake.json!");
+    console.log('Ignore fake.json!');
     plugins.push(
-        new Webpack.IgnorePlugin({
-            resourceRegExp: /fake\.json$/,
-        })
-    )
+      new Webpack.IgnorePlugin({
+        resourceRegExp: /fake\.json$/,
+      }),
+    );
+  }
+
+  if (isDev) {
+    plugins.push(
+      new ESLintPlugin({
+        extensions: ['js', 'jsx'],
+        emitWarning: true,
+        failOnError: !isDev,
+        fix: true,
+      }),
+    );
   }
 
   return plugins;
@@ -100,7 +112,7 @@ function generateConfig() {
 
 module.exports = generateConfig();
 
-/*const webpack = require('webpack');
+/* const webpack = require('webpack');
 const path = require('path');
 const htmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -165,7 +177,7 @@ function generateConfig(output_path) {
         },
 
         devtool: 'eval-source-map',
-        
+
         devServer: {
             contentBase: output_path,
             port: 3000,
@@ -188,4 +200,4 @@ function makeOutputPath() {
     return path.resolve(__dirname, `../public/`);
 }
 
-module.exports = generateConfig(makeOutputPath());*/
+module.exports = generateConfig(makeOutputPath()); */

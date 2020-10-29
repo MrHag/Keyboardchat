@@ -36,7 +36,7 @@ const useStyles = makeStyles({
       position: 'absolute',
       right: '8px',
       width: '16px',
-      height: '16px'
+      height: '16px',
     },
   },
 
@@ -59,17 +59,17 @@ const useStyles = makeStyles({
 });
 
 const Input = ({ className, variant, button, ...props }) => {
-  const classes = useStyles(); 
+  const classes = useStyles();
 
   const adornment = (button) ? (
-      <InputAdornment position="end">
-        {button}
-      </InputAdornment>
+    <InputAdornment position="end">
+      {button}
+    </InputAdornment>
   ) : null;
 
-  const class_name = classNames('input', classes.input, { 
+  const class_name = classNames('input', classes.input, {
     [classes['input--round']]: variant === 'round',
-  }, className, );
+  }, className);
 
   return (
     <BaseInput

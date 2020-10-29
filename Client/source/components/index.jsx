@@ -10,5 +10,5 @@ export { default as InputPassword } from './input_password/InputPassword';
 
 export { default as Form } from './Form/Form';
 
-export { default as RoomItem }  from './room_item/RoomItem';
+export { default as RoomItem } from './room_item/RoomItem';
 export { default as Sidebar } from './sidebar/Sidebar';

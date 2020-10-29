@@ -9,20 +9,20 @@ const ROUTES = {
   },
   Home: {
     name: 'Home',
-    route: '/home'
+    route: '/home',
   },
   RoomChat: {
     name: 'RoomChat',
-    route: '/home/room-chat/'
+    route: '/home/room-chat/',
   },
   CreateRoom: {
     name: 'CreateRoom',
-    route: '/home/create-room/'
+    route: '/home/create-room/',
   },
   UserPanel: {
     name: 'UserRoom',
-    route: '/home/user-panel/'
-  }
+    route: '/home/user-panel/',
+  },
 };
 
 export default ROUTES;

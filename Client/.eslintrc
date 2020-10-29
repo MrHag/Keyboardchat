@@ -1,0 +1,25 @@
+{
+    "parser": "babel-eslint",
+    "extends": [
+      "airbnb",
+      "plugin:react-hooks/recommended",
+      "plugin:react/recommended"
+    ],
+  
+    "rules": {
+      "linebreak-style": 0,
+      "no-unused-vars": ["warn", { "vars": "all", "args": "after-used", "ignoreRestSiblings": false }],
+      "react/jsx-props-no-spreading": "off",
+      "import/no-unresolved": "off",
+      "object-curly-newline": ["error", {
+        "ImportDeclaration": "never"
+      }],
+      "quote-props": "off",
+      "no-plusplus": "off",
+    },
+  
+    "env": {
+      "browser": true,
+      "node": true
+    }
+  }

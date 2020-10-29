@@ -18,15 +18,15 @@ const InputPassword = ({ className, ...props }) => {
 
   const icon = show ? (
     <FontAwesomeIcon icon={FontAwesomeIcons.faEye} />
-  ) : ( 
+  ) : (
     <FontAwesomeIcon icon={FontAwesomeIcons.faEyeSlash} />
   );
-  
+
   return (
     <Input
-      type={show ? "text" : "password"}
+      type={show ? 'text' : 'password'}
       className={classNames('input-pass', className)}
-      button={
+      button={(
         <InputAdornment position="end">
           <IconButton
             onClick={handleClickShowPassword}
@@ -35,7 +35,7 @@ const InputPassword = ({ className, ...props }) => {
             {icon}
           </IconButton>
         </InputAdornment>
-      }
+      )}
       {...props}
     />
   );
