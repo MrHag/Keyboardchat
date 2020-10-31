@@ -1,7 +1,7 @@
-﻿using Keyboardchat.UseClasses;
-using System.Threading;
+﻿using System.Threading;
+using KeyBoardChat.UseClasses;
 
-namespace Keyboardchat.SaveObjects
+namespace KeyBoardChat.SaveObjects
 {
     class SaveUIDmanager : UIDmanager
     {

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Keyboardchat.SaveCollections
+namespace KeyBoardChat.SaveCollections
 {
     public class SaveList<T> : ISaveCollection
     {

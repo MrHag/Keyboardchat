@@ -1,8 +1,6 @@
-﻿using Keyboardchat.SaveCollections;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace Keyboardchat.Models
+namespace KeyBoardChat.Models
 {
     public class Room
     {

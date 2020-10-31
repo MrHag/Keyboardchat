@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace Keyboardchat.SaveCollections
+namespace KeyBoardChat.SaveCollections
 {
     public interface ISaveObject
     {

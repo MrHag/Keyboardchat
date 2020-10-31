@@ -1,12 +1,11 @@
-﻿using Keyboardchat.DataBase;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
+using KeyBoardChat.DataBase;
 
-namespace Keyboardchat.Web.WebSocketService.Handler
+namespace KeyBoardChat.Web.WebSocketService.Handler
 {
     public partial class WebSocketServiceHandler
     {

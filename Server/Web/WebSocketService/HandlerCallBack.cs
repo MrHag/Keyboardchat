@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Keyboardchat.Web.WebSocketService
+﻿namespace KeyBoardChat.Web.WebSocketService
 {
     public class HandlerCallBack
     {

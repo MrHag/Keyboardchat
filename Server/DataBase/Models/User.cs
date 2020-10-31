@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-
-namespace Keyboardchat.DataBase.Models
+namespace KeyBoardChat.DataBase.Models
 {
     public class User
     {

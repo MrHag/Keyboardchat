@@ -1,16 +1,11 @@
-using Keyboardchat.DataBase;
-using Keyboardchat.DataBase.Models;
-using Keyboardchat.Web;
-using Keyboardchat.Web.WebSocketService;
+using KeyBoardChat.Web.WebSocketService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Text;
 
-namespace Keyboardchat
+namespace KeyBoardChat
 {
     public class Startup
     {

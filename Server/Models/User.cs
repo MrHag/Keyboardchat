@@ -1,9 +1,6 @@
-﻿using Keyboardchat.SaveCollections;
-using SocketIOSharp.Server.Client;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace Keyboardchat.Models
+namespace KeyBoardChat.Models
 {
     public class User
     {

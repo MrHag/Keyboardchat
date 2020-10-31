@@ -1,12 +1,10 @@
-﻿using Keyboardchat.Models;
-using Keyboardchat.Models.Network;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using KeyBoardChat.Models;
+using KeyBoardChat.Models.Network;
 
-namespace Keyboardchat.Web.WebSocketService.Handler
+namespace KeyBoardChat.Web.WebSocketService.Handler
 {
     public partial class WebSocketServiceHandler
     {

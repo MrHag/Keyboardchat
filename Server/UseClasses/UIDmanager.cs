@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Keyboardchat.UseClasses
+namespace KeyBoardChat.UseClasses
 {
     class UIDmanager
     {

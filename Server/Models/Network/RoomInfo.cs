@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Keyboardchat.Models.Network
+﻿namespace KeyBoardChat.Models.Network
 {
     public struct RoomInfo
     {

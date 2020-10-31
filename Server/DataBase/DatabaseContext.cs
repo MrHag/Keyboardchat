@@ -1,6 +1,7 @@
-﻿using Keyboardchat.DataBase.Models;
+﻿using KeyBoardChat.DataBase.Models;
 using Microsoft.EntityFrameworkCore;
-namespace Keyboardchat.DataBase
+
+namespace KeyBoardChat.DataBase
 {
     public class DatabaseContext : DbContext
     {

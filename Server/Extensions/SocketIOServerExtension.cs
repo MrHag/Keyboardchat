@@ -1,7 +1,7 @@
-﻿using Keyboardchat.Models;
+﻿using KeyBoardChat.Models;
 using SocketIOSharp.Server;
 
-namespace Keyboardchat.Extensions
+namespace KeyBoardChat.Extensions
 {
     public static class SocketIOServerExtension
     {

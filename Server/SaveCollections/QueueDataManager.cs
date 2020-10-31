@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
+﻿using System.Collections.Generic;
 
-namespace Keyboardchat.SaveCollections
+namespace KeyBoardChat.SaveCollections
 {
     public class QueueDataManager<T>
     {
