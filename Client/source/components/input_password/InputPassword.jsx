@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 
 import classNames from 'class-names';
 import { InputAdornment } from '@material-ui/core';
@@ -39,6 +40,14 @@ const InputPassword = ({ className, ...props }) => {
       {...props}
     />
   );
+};
+
+InputPassword.defaultProps = {
+  className: '',
+};
+
+InputPassword.propTypes = {
+  className: PropTypes.string,
 };
 
 export default InputPassword;

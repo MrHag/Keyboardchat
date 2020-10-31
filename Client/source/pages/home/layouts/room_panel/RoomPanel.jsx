@@ -12,7 +12,7 @@ import './RoomPanel.scss';
 const RoomList = ({ inRoom, rooms, joinRoom, leaveRoom }) => {
   const listRef = useRef();
 
-  console.log("RoomList.InRoomObject = ", inRoom);
+  // console.log("RoomList.InRoomObject = ", inRoom);
 
   const activeRooms = rooms.filter((room) => room.compare(inRoom));
   const list = rooms.filter((room) => !room.compare(inRoom));
@@ -92,7 +92,7 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
   };
 
   const socketRoomchange = (data) => {
-    console.warn('SocketRoomchange...');
+    console.log('SocketRoomchange...');
     Socket.emit('getRooms', { room: null });
   };
 

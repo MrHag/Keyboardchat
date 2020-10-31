@@ -11,6 +11,10 @@ const Form = ({ name, children, ...props }) => (
 );
 
 Form.propTypes = {
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node),
+    PropTypes.node,
+  ]).isRequired,
   name: PropTypes.string.isRequired,
 };
 

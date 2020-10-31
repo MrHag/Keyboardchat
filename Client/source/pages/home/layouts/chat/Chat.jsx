@@ -2,16 +2,14 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { ChatMessage, ChatInput } from 'components';
-import { Socket } from 'logic';
+import { UserData, Message, Socket } from 'logic';
 
 import ChatHeader from './chat_header/ChatHeader';
-import { UserData, Message }  from 'logic';
-
 import './Chat.scss';
 
 const ChatHistory = ({ messages, historyRef }) => {
   const historyMessages = messages.map(
-    (msg, index) => <ChatMessage key={index} msg={msg} />,
+    (msg, index) => <ChatMessage key={index + msg.author.id} msg={msg} />,
   );
 
   return (
@@ -28,9 +26,9 @@ const ChatHistory = ({ messages, historyRef }) => {
 ChatHistory.propTypes = {
   messages: PropTypes.arrayOf(PropTypes.shape).isRequired,
   historyRef: PropTypes.oneOfType([
-    PropTypes.func, 
-    PropTypes.shape({ current: PropTypes.any })
-  ]),
+    PropTypes.func,
+    PropTypes.shape({ current: PropTypes.shape }),
+  ]).isRequired,
 };
 
 const Chat = () => {

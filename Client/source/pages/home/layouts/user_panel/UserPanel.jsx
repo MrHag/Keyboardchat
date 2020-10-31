@@ -18,7 +18,11 @@ const UserPanel = () => {
 
   return (
     <div className="user-panel">
-      <h3 className="user-panel__username">Username: {UserData.user.name}</h3>
+      <h3 
+        className="user-panel__username"
+      >
+        {`Username: ${UserData.user.name}`}
+      </h3>
       <Button onClick={onLogoutButton}>Log Out</Button>
     </div>
   );

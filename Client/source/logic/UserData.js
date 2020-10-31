@@ -71,7 +71,7 @@ const UserData = {
     },
   },
 
-  toDefault: function() {
+  toDefault() {
     this.user = null;
     this.inRoom = new Room(undefined, 'globals');
     this.existingRooms.rooms = [];

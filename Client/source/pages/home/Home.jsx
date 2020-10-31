@@ -42,7 +42,7 @@ const Home = () => {
   const socketGetUsers = (data) => {
     UserData.user = User.fromJSON(data.data[0]);
     forceUpdate(force + 1);
-    console.log("socketGetUsers userData = ", UserData.user);
+    console.log('socketGetUsers userData = ', UserData.user);
   };
 
   useEffect(() => {

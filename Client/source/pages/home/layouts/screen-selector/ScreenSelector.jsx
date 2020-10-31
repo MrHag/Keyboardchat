@@ -14,7 +14,9 @@ const ScreenSelector = () => {
     <p>Av</p>
   )
     : (
-    <FontAwesomeIcon icon={FontAwesomeIcons.faUser}></FontAwesomeIcon>
+    <FontAwesomeIcon
+      icon={FontAwesomeIcons.faUser}
+    />
   );
 
   return (

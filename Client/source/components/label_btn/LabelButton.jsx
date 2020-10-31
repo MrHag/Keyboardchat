@@ -17,6 +17,7 @@ const LabelButton = ({ className, button, label }) => (
 
 LabelButton.defaultProps = {
   className: '',
+  button: null,
 };
 
 LabelButton.propTypes = {

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import './ChatHeader.scss';
 
 const ChatHeader = ({ name }) => {
-  const roomName = (name === 'global') ? 'Палата №1' : name;
+  const roomName = (name === 'globals') ? 'Палата №1' : name;
   return (
     <div className="chat-header">
       <div className="chat-header__wrapper">
