@@ -43,12 +43,17 @@
     @include flex-layout(column, flex-start, center);
     background-color: #f0f0f0;
     top: 0;
-    //position: absolute;
     width: 100%;
     z-index: 20;
+    padding-bottom: 4px;
 
     .button {
-        width: 50%;
+        width: 40%;
+    }
+
+    &__buttons {
+        @include flex-layout(row, space-between, center);
+        width: 90%;
     }
 
     &__password {

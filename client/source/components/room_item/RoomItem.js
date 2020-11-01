@@ -42,7 +42,7 @@ const RoomItemForm = ({roomName, onCancel, onJoin}) => {
                  if (e.key === 'Enter') onJoinBtn();
              }}></TextField>
             <p className="ri-form__error">{err}</p>
-            <div className="ri_form__buttons">
+            <div className="ri-form__buttons">
                 <Button onClick={onCancel}>Cancel</Button>
                 <Button disabled={password === ''} onClick={onJoinBtn}>Join</Button>
             </div>
