@@ -1,23 +1,18 @@
 const express = require('express');
 const socket = require('socket.io');
 
-const Room = require("./room.js");
-const User = require("./user.js");
+// const Room = require("./room.js");
+// const User = require("./user.js");
 
-const messageBody = require("./messageBody.js");
-const responceBody = require("./responseBody.js");
+// const messageBody = require("./messageBody.js");
+// const responceBody = require("./responseBody.js");
 
 const Path = '../public/';
 
-const API = require("../API");
-
-const Calls = API.Calls;
-const SCalls = API.ServerCalls;
-
 const app = express();
 app.get('/', (req, res) => {
-    console.log("Required files / = ", req.url);
-    res.sendFile("index.html", {root: Path});
+  console.log("Required files / = ", req.url);
+  res.sendFile("index.html", {root: Path});
 });
 
 app.get('/*', (req, res) => {
@@ -25,8 +20,9 @@ app.get('/*', (req, res) => {
     res.sendFile(req.url, {root: Path});
 });
 
-const server = app.listen(4000);
+const server = app.listen(5000);
 
+/*
 const io = socket(server);
 io.origins('*:*');
 
@@ -34,7 +30,6 @@ const globalRoom = new Room("global");
 
 const user_list = [];
 const room_list = [];
-
 
 const fakeRooms = require("./fake.js").rooms;
 
@@ -383,3 +378,4 @@ function WebSocket(io) {
 }
 
 WebSocket(io);
+*/
