@@ -1,0 +1,35 @@
+@import 'styles/globals.scss';
+
+.room-panel {
+    @include flex-layout(column, flex-start, center);
+    width: 256px;
+    padding: 30px 14px 30px 14px;
+    max-height: calc(100%);
+    
+    &__search {
+        @include flex-layout(row, flex-start, center);
+        text-align: center;
+        width: 100%;
+    }
+
+    &__list {
+        @include flex-layout(column, flex-start, flex-start);
+        height: 100%;
+        width: 90%;
+        overflow: scroll;
+        overflow-y: scroll;
+        overflow-x: hidden;
+
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+
+        &::-webkit-scrollbar {
+            width: 0px;
+        }
+    }
+
+    &__add-btn {
+        margin: 16px 16px 8px 16px;
+        width: 100%;
+    }
+}

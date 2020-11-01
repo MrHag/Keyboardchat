@@ -1,39 +1,132 @@
-const webpack = require('webpack');
+const Webpack = require('webpack');
+const path = require('path');
+const HTMLWebpackPlugin = require('html-webpack-plugin');
+const MiniSCCExtrractPlugin = require('mini-css-extract-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
+
+const isDev = (/development/).test(process.env.NODE_ENV);
+const outputPath = '../public/';
+
+function generateModule() {
+  return {
+    rules: [
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              presets: ['@babel/preset-react'],
+              plugins: ['react-hot-loader/babel'],
+            },
+          },
+        ],
+      },
+      {
+        test: /\.s[ac]ss$/i,
+        use: [
+          MiniSCCExtrractPlugin.loader,
+          'css-loader',
+          'sass-loader',
+        ],
+      },
+    ],
+  };
+}
+
+function generatePlugins() {
+  const plugins = [
+    new HTMLWebpackPlugin({
+      template: './source/index.html',
+      favicon: './favicon.ico',
+
+    }),
+    new MiniSCCExtrractPlugin({
+      filename: 'bundle.css',
+    }),
+  ];
+
+  if (!isDev) {
+    plugins.push(
+      new Webpack.IgnorePlugin({
+        resourceRegExp: /fake\.json$/,
+      }),
+    );
+  }
+
+  if (isDev) {
+    plugins.push(
+      new ESLintPlugin({
+        extensions: ['js', 'jsx'],
+        emitWarning: true,
+        failOnError: !isDev,
+      }),
+    );
+  }
+
+  return plugins;
+}
+
+function generateConfig() {
+  return {
+    resolve: {
+      extensions: ['.js', '.jsx'],
+      alias: {
+        shared: path.resolve(__dirname, './source/shared/'),
+        fake_data: path.resolve(__dirname, './fake_data/'),
+        styles: path.resolve(__dirname, './source/styles/'),
+        logic: path.resolve(__dirname, './source/logic/'),
+        components: path.resolve(__dirname, './source/components/'),
+        layouts: path.resolve(__dirname, './source/layouts/'),
+      },
+    },
+
+    mode: isDev ? 'development' : 'production',
+
+    entry: path.resolve(__dirname, './source/index.jsx'),
+
+    module: generateModule(),
+
+    plugins: generatePlugins(),
+
+    devtool: isDev ? 'eval-source-map' : false,
+    devServer: {
+      // open: s,
+      hot: true,
+      contentBase: outputPath,
+      port: 3000,
+      proxy: {
+        '/': 'http://localhost:5000',
+      },
+    },
+
+    output: {
+      path: path.resolve(__dirname, outputPath),
+      filename: 'bundle.js',
+    },
+  };
+}
+
+module.exports = generateConfig();
+
+/* const webpack = require('webpack');
 const path = require('path');
 const htmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-const isDevelopment = /development/.test(process.env.NODE_ENV);
-
-function CreateTemplateHTML(app_name)
-{
-    return (
-`<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta content="ie=edge" http-equiv="x-ua-compatible">
-        <meta name="viewport" content="width=device-width, height=device-height initial-scale=1.0">
-        <title>${app_name}</title>
-    </head>
-    <body>
-        <div id="root"></div>
-    </body>
-</html>`
-    )
-}
+/*const isDevelopment = /development/.test(process.env.NODE_ENV);
 
 const APP_NAME = 'Keyboardchat';
 
 function includePlugins() {
     let plugins = [
         new htmlWebpackPlugin({
-            templateContent: CreateTemplateHTML(APP_NAME)
+            template: './source/index.html',
         }),
         new MiniCssExtractPlugin({
             filename: "bundle.css"
-        }),
-        new webpack.HotModuleReplacementPlugin()
+        })
     ];
     //Don't include fake data if you're building production version
     if (!isDevelopment) {
@@ -50,7 +143,14 @@ function includePlugins() {
 
 function generateConfig(output_path) {
     return {
-        entry: [path.resolve(__dirname, "./source/App.js")],
+        entry: [path.resolve(__dirname, "./source/index.js")],
+
+        resolve: {
+            extensions: ['.js', '.jsx'],
+            alias: {
+                'react-dom': '@hot-loader/react-dom'
+            },
+        },
 
         module: {
             rules: [
@@ -59,7 +159,8 @@ function generateConfig(output_path) {
                     exclude: /node_modules/,
                     loader: 'babel-loader',
                     options: {
-                        presets: ["@babel/preset-env", "@babel/preset-react"]
+                        presets: ["@babel/preset-react"],
+                        plugins: ["react-hot-loader/babel"],
                     }
                 },
                 {
@@ -74,12 +175,13 @@ function generateConfig(output_path) {
         },
 
         devtool: 'eval-source-map',
+
         devServer: {
-            open: !isDevelopment,
             contentBase: output_path,
             port: 3000,
+            hot: true,
             proxy: {
-                '/': 'http://localhost:4000' //Allows to make request from React.app to server on 4000
+                '/': 'http://localhost:5000' //Allows to make request from React.app to server on 4000
             }
         },
 
@@ -96,4 +198,4 @@ function makeOutputPath() {
     return path.resolve(__dirname, `../public/`);
 }
 
-module.exports = generateConfig(makeOutputPath());
+module.exports = generateConfig(makeOutputPath()); */

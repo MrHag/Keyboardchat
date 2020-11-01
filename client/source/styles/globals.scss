@@ -4,3 +4,19 @@
     justify-content: $justify-content;
     align-items: $align-items;
 }
+
+$main-bg-color: rgb(233, 233, 233);
+
+$main-dark-bg-color: #333539;
+$main-sidebar-bg-color: #0f0f13;
+$main-border-color: #2f3136;
+$main-screen-selector-color: #141419;
+
+$main-text-color: #FFF;
+$sub-text-color: #c2c3c4;
+$third-text-color: #656669;
+
+$btn-active-bg-color: #6fafe3;
+$btn-active-hover-bg-color: rgb(122, 187, 240);
+$btn-disabled-bg-color: #758897;
+$btn-disabled-color: $third-text-color;

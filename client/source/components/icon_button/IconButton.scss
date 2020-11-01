@@ -1,4 +1,20 @@
+@import 'styles/globals.scss';
+
 .icon-btn {
+    &.MuiIconButton-root {
+        padding: 0;
+        font-size: inherit;
+        svg {
+            color: $btn-active-bg-color;
+        }
+    }
+
+    &.MuiIconButton-root.disabled {
+        svg {
+            color: $btn-disabled-bg-color;
+        }
+    }
+
     &:hover {
         cursor: pointer;
     }

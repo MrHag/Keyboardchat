@@ -1,0 +1,48 @@
+@import 'styles/globals.scss';
+
+.form {
+  @include flex-layout(column, flex-start);
+  width: 100%;
+
+  &__name {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .input {
+    width: 100%;
+    margin-top: 16px;
+  }
+
+  &__controls {
+    @include flex-layout(row);
+    width: 100%;
+  }
+
+  &__error {
+    margin: 24px 0;
+    color: red;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  a {
+    margin-top: 32px;
+    color: rgb(84, 149, 170);
+    display: inline-block;
+  }
+
+  .group {
+    margin-top: 32px;
+
+    .input {
+      margin-top: 8px;
+    }
+
+    & > :first-child {
+      margin-top: 0px;
+    }
+  }
+}

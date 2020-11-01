@@ -15,7 +15,7 @@
         ],
     
     "rooms": [
-        { "name": "First Room" },
+        { "name": "First Room aj;sdlf", "haspass": true },
         { "name": "::alsd as; ldkf" },
         { "name": "2234 adsf asdf" },
         { "name": "Programming" },

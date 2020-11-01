@@ -1,0 +1,17 @@
+@import 'styles/globals.scss';
+
+.label-btn {
+  @include flex-layout(row, space-between, center);
+  color: $sub-text-color;
+
+  &__label {
+    font-family: 'Source Sans Pro';
+    color: inherit;
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+
+  .icon-btn svg {
+    color: inherit;
+  }
+}
