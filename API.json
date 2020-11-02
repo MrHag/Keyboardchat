@@ -1,0 +1,309 @@
+{
+    "description": [
+      "� ������ ������ response: {data: null, error: {}}.  ���� �� ������ response: {data: {}, error: null}"
+    ],
+    
+    "Calls": {
+  
+      "Authorization": {
+  
+        "header": "auth",
+        "request": {
+          "body": {
+            "name": ":string:",
+            "password": ":string:"
+          }
+        },
+  
+        "response": {
+          "body": {
+            "data": {
+            },
+            "error":  [
+              "wrongNamePass",
+              "alreadyInSess",
+              "SERVER-shiza badName",
+              "SERVER-shiza badPassword"
+            ]
+        }
+      },
+  
+      "DeAuthorization": {
+  
+        "header": "deAuth",
+        "request": {
+          "body": {
+          }
+        },
+  
+        "response": {
+          "body": {
+            "data": {
+            },
+            "error": []
+          }
+        }
+      },
+  
+      "ChangeProfile": {
+  
+        "header": "changeProfile",
+        "request": {
+          "body": {
+            "name": ":string: not required",
+            "avatar": ":base64string: not required"
+          }
+        },
+  
+        "response": {
+          "body": {
+            "data": {
+            },
+            "error": [
+              "SERVER-shiza badName",
+              "badImage",
+              "nameExists"
+            ]
+          }
+        }
+      },
+  
+      "GetUsers": {
+  
+        "header": "getUsers",
+        "request": {
+          "body": {
+            "Users": [
+              [
+                ":uint:"
+              ],
+              ":null: current's user data"
+            ],
+            "Select": [
+              "all",
+              "name",
+              "avatar"
+            ]
+          }
+        },
+  
+        "response": {
+          "body": {
+            "data": [
+              {
+                "id": ":uint:",
+                "name": ":string:",
+                "avatar": ":string: link"
+              }
+            ],
+            "error": [
+              "invalidData"
+            ]
+          }
+        }
+      },
+  
+      "Registration": {
+  
+        "header": "registration",
+        "request": {
+          "body": {
+            "name": ":string:",
+            "password": ":string:"
+          }
+        },
+  
+        "response": {
+          "body": {
+            "data": {
+            },
+            "error": [
+              "nameExists",
+              "SERVER-shiza badName",
+              "SERVER-shiza badPassword",
+              "SERVER-shiza invalidData",
+              "SERVER-shiza uknownError"
+            ]
+          }
+        }
+      },
+  
+      "GetRooms": {
+  
+        "description": "Send string to get rooms by name. Send null to get all rooms.",
+        "header": "getRooms",
+  
+        "request": {
+          "body": {
+            "room": [
+              ":string:",
+              null
+            ]
+          }
+        },
+  
+        "response": {
+          "body": {
+            "data": [
+              {
+                "id": ":int:",
+                "room": ":string:",
+                "haspass": true
+              }
+            ],
+            "error": [
+              "invalidData"
+            ]
+          }
+        }
+      },
+  
+      "SendMsg": {
+  
+        "header": "sendMsg",
+        "request": {
+          "body": {
+            "message": ":string:"
+          }
+        },
+  
+        "response": {
+          "body": {
+            "data": {},
+            "error": [
+              "invalidData"
+            ]
+          }
+        }
+      },
+  
+      "JoinRoom": {
+  
+        "header": "joinRoom",
+        "request": {
+          "body": {
+            "id": ":int:",
+            "password": [
+              ":string:",
+              null
+            ]
+          }
+        },
+  
+        "response": {
+          "body": {
+            "data": {
+              "id": ":int:",
+              "room": ":string:",
+              "message": ":string:"
+            },
+            "error": [
+              "invalidData",
+              "invalidPass",
+              "roomNotFound"
+            ]
+          }
+        }
+      },
+  
+  
+      "LeaveRoom": {
+  
+        "header": "leaveRoom",
+        "request": {
+          "body": {
+            "id": ":int:"
+          }
+        },
+  
+        "response": {
+          "body": {
+            "data": {
+              "id": ":int:",
+              "room": ":string:",
+              "message": ":string:"
+            },
+            "error": [
+              "roomNotFound",
+              "notInRoom",
+              "invalidData"
+            ]
+          }
+        }
+      },
+  
+  
+      "CreateRoom": {
+  
+        "header": "createRoom",
+        "request": {
+          "body": {
+            "name": ":string:",
+            "password": [
+              ":string:",
+              null
+            ]
+          }
+        },
+  
+        "response": {
+          "body": {
+            "data": {
+              "id": ":int:",
+              "name": ":string:",
+              "message": ":string:"
+            },
+            "error": [
+              "roomExists",
+              "badName",
+              "invalidData"
+            ]
+          }
+        }
+      }
+    },
+  
+    "ServerCalls": {
+  
+      "OnNewMsg": {
+        "header": "onNewMsg",
+        "description": "On new message in chat",
+  
+        "response": {
+          "body": {
+            "data": {
+              "userid": ":uint:",
+              "roomid": ":int:",
+              "message": ":string:"            
+            }
+          }
+        }
+      },
+  
+      "Access": {
+        "header": "access",
+        "description": "SERVER_SHIZOID",
+  
+        "response": {
+          "body": {
+            "data": {},
+            "error": [
+              "notAuth"
+            ]
+          }
+        }
+      },
+  
+      "RoomListChange": {
+        "header": "roomListChange",
+        "description": "Room list change",
+        
+        "response": {
+          "body": {
+            "data": ":string:"
+          }
+        }
+      }
+    }
+  }
+}
