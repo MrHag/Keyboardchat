@@ -28,17 +28,16 @@ const SignIn = () => {
   const socketAuth = (data) => {
     console.log('Auth response!');
     console.log('Response data = ', data);
-    if (data.successful) {
+
+    if (data.error === null) {
       routeHistory.push(ROUTES.Home.route);
     } else {
-      switch (data.data) {
-        case 'badName':
-          setErr('Bad name!');
-          break;
-        case 'invalidData':
-          setErr('Invalid data!');
+      switch (data.error) {
+        case 'wrongNamePass':
+          setErr('Wrong password or username!');
           break;
         default:
+          setErr(data.error);
           break;
       }
     }

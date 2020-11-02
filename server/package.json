@@ -2,16 +2,17 @@
   "name": "keyboardchat",
   "version": "1.0.0",
   "description": "chat",
-  "main": "MyServer.js",
   "dependencies": {
     "express": "^4.17.0",
+    "mongodb": "^3.6.2",
     "mongoose": "^5.5.11",
     "nodemon": "^2.0.4",
     "socket.io": "^2.2.0"
   },
   "devDependencies": {},
   "scripts": {
-    "start": "nodemon ./source/app.js"
+    "start-dev": "nodemon ./source/app.js",
+    "start-pro": "node ./source/app.js"
   },
   "repository": {
     "type": "git",

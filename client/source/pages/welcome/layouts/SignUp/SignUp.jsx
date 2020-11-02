@@ -31,10 +31,11 @@ const SignUp = () => {
   const socketRegistration = (data) => {
     console.log('Auth response!');
     console.log('Response data = ', data);
-    if (data.successful) {
+    if (data.error === null) {
       routeHistory.push('/');
     } else {
-      switch (data.data) {
+      console.log("Registration error!");
+      switch (data.error) {
         case 'nameExists':
           setErr('This name is already taken');
           break;

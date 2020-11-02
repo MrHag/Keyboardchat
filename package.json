@@ -7,7 +7,8 @@
   "devDependencies": {},
   "scripts": {
     "start": "npm --prefix ./client/ run build-pro && npm --prefix ./server/ run start",
-    "start-server": "npm --prefix ./server/ run start",
+    "start-dev-server": "npm --prefix ./server/ run start-dev",
+    "start-pro-server": "npm --prefix ./server/ run start-pro",
     "start-dev": "npm --prefix ./client/ run build-dev && npm --prefix ./server/ run start",
     "install": "cd server/ && npm install && cd ../client/ && npm install"
   },
