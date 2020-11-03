@@ -1,51 +1,59 @@
 ﻿using Keyboardchat.Models;
 using Keyboardchat.Models.Network;
-using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Keyboardchat.Web.WebSocketService.Handler
 {
-    public partial class WebSocketServiceHandler
+    public class CreateRoomHandler : WebSocketServiceHandler
     {
-        public IEnumerable<HandlerCallBack> CreateRoom(User user, string header, string RoomName, string Password)
+        [JsonProperty("name")]
+        public string RoomName { get; set; }
+
+        [JsonProperty("password", Required = Required.AllowNull)]
+        public string Password { get; set; }
+
+        public override IEnumerable<HandlerCallBack> Handle(Connection connection)
         {
             var outcallback = new List<HandlerCallBack>();
 
+
             ((Action)(() =>
             {
-                Room NewRoom;
 
-                lock (_webSocketService._rooms)
+                RoomName = RoomName.Trim();
+
+                if (!_webSocketService.ValidateDefaultText(RoomName))
                 {
-                    Room room = _webSocketService.GetRoom(RoomName);
-
-                    if (room != null)
-                    {
-                        outcallback.Add(new HandlerCallBack(header: header, data: "roomExists", successfull: false, error: false));
-                        return;
-                    }
-
-                    int Id = _webSocketService._roomUIDmanager.GetUID();
-
-                    NewRoom = new Room(Id, RoomName, Password);
-
-                    _webSocketService._rooms.Add(Id, NewRoom);
+                    outcallback.Add(new HandlerCallBack(data: "badName", error: true));
+                    return;
                 }
 
-                outcallback.Add(new HandlerCallBack(header: header, data: new RespondeRoomInfo(NewRoom.Id, NewRoom.Name, "Created room"), successfull: true, error: false));
+                Room NewRoom;
 
-                _webSocketService.Broadcast(_webSocketService.SCalls["RoomChange"]["header"].ToString(), "Changed: Created room", true, false);
 
-                _webSocketService.JoinRoom(user, NewRoom);
+                Room room = _webSocketService.GetRoom(RoomName);
+
+                if (room != null)
+                {
+                    outcallback.Add(new HandlerCallBack(data: "roomExists", error: true));
+                    return;
+                }
+
+                int Id = _webSocketService._roomUIDmanager.GetUID();
+
+                NewRoom = new Room(RoomName, Password);
+
+                _webSocketService.AddRoom(NewRoom);
+
+                outcallback.Add(new HandlerCallBack(data: new RespondeRoomInfo(NewRoom.Id, NewRoom.Name, "Created room"), error: false));
+
+                NewRoom.AddUser(connection.Session.User);
 
             })).Invoke();
 
-
             return outcallback;
-
         }
 
     }

@@ -64,12 +64,12 @@ namespace Keyboardchat.SaveCollections
             }
             set
             {
-               _dictionary[key] = value;
+                _dictionary[key] = value;
             }
 
         }
 
-        private ICollection<TKey> Keys 
+        private ICollection<TKey> Keys
         {
             get
             {
@@ -179,16 +179,16 @@ namespace Keyboardchat.SaveCollections
 
         ISaveInterface<T4> ISaveCollection.CreateInterface<T4>()
         {
-            return  (ISaveInterface<T4>) new SaveDictionaryInterface(this);
+            return (ISaveInterface<T4>)new SaveDictionaryInterface(this);
         }
 
         public class SaveDictionaryInterface : ISaveInterface<SaveDictionary<TKey, TValue>>, IEnumerable<KeyValuePair<TKey, TValue>>
         {
-            private SaveDictionary<TKey,TValue> _saveDictionary;
+            private SaveDictionary<TKey, TValue> _saveDictionary;
 
             SaveDictionary<TKey, TValue> ISaveInterface<SaveDictionary<TKey, TValue>>.SaveCollection { get => _saveDictionary; set => _saveDictionary = value; }
 
-            internal SaveDictionaryInterface(SaveDictionary<TKey, TValue> _dictionary) 
+            internal SaveDictionaryInterface(SaveDictionary<TKey, TValue> _dictionary)
             {
                 _saveDictionary = _dictionary;
             }

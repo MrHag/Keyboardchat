@@ -1,22 +1,17 @@
-﻿using Keyboardchat.DataBase;
-using Keyboardchat.Models;
-using System;
+﻿using Keyboardchat.Models;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Keyboardchat.Web.WebSocketService.Handler
 {
-    public partial class WebSocketServiceHandler
+    public abstract class WebSocketServiceHandler
     {
-        private WebSocketService _webSocketService;
+        protected WebSocketService _webSocketService;
 
-        public WebSocketServiceHandler(WebSocketService socketService)
+        public WebSocketService WebSocketService { get { return _webSocketService; } set { _webSocketService = value; } }
+        public WebSocketServiceHandler()
         {
-            _webSocketService = socketService;
         }
+
+        public abstract IEnumerable<HandlerCallBack> Handle(Connection connection);
     }
 }

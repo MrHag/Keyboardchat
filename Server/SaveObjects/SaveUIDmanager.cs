@@ -8,7 +8,7 @@ namespace Keyboardchat.SaveObjects
         protected Semaphore _semaphore;
         public SaveUIDmanager() : base()
         {
-            _semaphore = new Semaphore(1, 1);     
+            _semaphore = new Semaphore(1, 1);
         }
 
         public override int GetUID()

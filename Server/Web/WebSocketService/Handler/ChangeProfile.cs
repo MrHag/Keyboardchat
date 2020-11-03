@@ -1,71 +1,90 @@
 ﻿using Keyboardchat.DataBase;
+using Keyboardchat.DataBase.Models;
 using Keyboardchat.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
 
 namespace Keyboardchat.Web.WebSocketService.Handler
 {
-    public partial class WebSocketServiceHandler
+    public class ChangeProfileHandler : WebSocketServiceHandler
     {
-        public IEnumerable<HandlerCallBack> ChangeProfile(string header, User user, string name, byte[] avatar)
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("avatar")]
+        public string Avatar { get; set; }
+
+        private object locker = new object();
+
+        public override IEnumerable<HandlerCallBack> Handle(Connection connection)
         {
             var outcallback = new List<HandlerCallBack>();
 
+            byte[] bytes;
+
             ((Action)(() =>
             {
-                lock (user)
+                try
                 {
-                    using (var dbcontext = new DatabaseContext())
+                    bytes = Convert.FromBase64String(Avatar);
+                }
+                catch (FormatException)
+                {
+                    outcallback.Add(new HandlerCallBack(data: "invalidData", error: true));
+                    return;
+                }
+
+                var user = connection.Session.User;
+
+
+                using (var dbcontext = new DatabaseContext())
+                {
+                    lock (locker)
                     {
                         try
                         {
-                            string userName = user.Name;
-                            lock (userName)
-                            {
-                                dbcontext.Users.Single(user => userName == name);
-                            }
+                            dbcontext.Users.Single(user => user.Name == Name);
 
-                            outcallback.Add(new HandlerCallBack(header: header, data: "nameExists", successfull: false, error: false));
+                            outcallback.Add(new HandlerCallBack(data: "nameExists", error: true));
                             return;
                         }
                         catch (InvalidOperationException)
                         {
                             var dbuser = dbcontext.Users.Single(dbuser => dbuser.UserId == user.UID);
 
-                            if (name != null)
+                            if (Name != null)
                             {
-                                dbuser.Name = name;
+                                dbuser.Name = Name;
                             }
 
-                            if (avatar != null)
+                            if (bytes != null)
                             {
-                                using (MemoryStream ms = new MemoryStream(avatar))
+                                using (MemoryStream ms = new MemoryStream(bytes))
                                 {
                                     System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(ms);
 
                                     if (bitmap.Width > 128 || bitmap.Height > 128)
                                     {
-                                        outcallback.Add(new HandlerCallBack(header: header, data: "badImage", successfull: false, error: false));
+                                        outcallback.Add(new HandlerCallBack(data: "badImage", error: true));
                                         return;
                                     }
 
-                                    dbuser.Avatar = avatar;
+                                    var dbAvatar = new Avatar() { Id = dbuser.UserId, AvatarData = bytes };
 
-                                    var sha256 = SHA256.Create();
-                                    var avatarHash = sha256.ComputeHash(dbuser.Avatar);
+                                    dbcontext.Avatars.Add(dbAvatar);
 
-                                    dbuser.AvatarHash = avatarHash;
+                                    dbuser.AvatarId = dbAvatar.Id;
                                 }
 
                             }
 
                             dbcontext.SaveChanges();
 
-                            outcallback.Add(new HandlerCallBack(header: header, data: "Data changed", successfull: true, error: false));
+                            outcallback.Add(new HandlerCallBack(data: "Data changed", error: false));
 
                         }
                     }

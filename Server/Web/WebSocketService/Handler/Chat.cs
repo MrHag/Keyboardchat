@@ -1,13 +1,21 @@
 ﻿using Keyboardchat.Models;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Keyboardchat.Web.WebSocketService.Handler
 {
-    public partial class WebSocketServiceHandler
+    public class ChatHandler : WebSocketServiceHandler
     {
+        [JsonProperty("id")]
+        public uint Id { get; set; }
 
-        public void Chat(Room room, string message, uint id)
+        [JsonProperty("message")]
+        public string Message { get; set; }
+
+        public override IEnumerable<HandlerCallBack> Handle(Connection connection)
         {
-           _webSocketService.SendChatMessage(room, message, id);
+            _webSocketService.SendChatMessage(connection.Session.Room, Message, connection.Session.User.UID);
+            return null;
         }
 
     }

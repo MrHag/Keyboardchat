@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Keyboardchat.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20201023185729_Init")]
+    [Migration("20201102165841_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -19,17 +19,28 @@ namespace Keyboardchat.Migrations
                 .HasAnnotation("ProductVersion", "3.1.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            modelBuilder.Entity("Keyboardchat.DataBase.Models.Avatar", b =>
+                {
+                    b.Property<uint>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int unsigned");
+
+                    b.Property<byte[]>("AvatarData")
+                        .HasColumnType("longblob");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Avatars");
+                });
+
             modelBuilder.Entity("Keyboardchat.DataBase.Models.User", b =>
                 {
                     b.Property<uint>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int unsigned");
 
-                    b.Property<byte[]>("Avatar")
-                        .HasColumnType("longblob");
-
-                    b.Property<byte[]>("AvatarHash")
-                        .HasColumnType("longblob");
+                    b.Property<uint>("AvatarId")
+                        .HasColumnType("int unsigned");
 
                     b.Property<string>("Name")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");

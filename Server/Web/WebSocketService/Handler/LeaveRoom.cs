@@ -1,39 +1,36 @@
 ﻿using Keyboardchat.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Keyboardchat.Web.WebSocketService.Handler
 {
-    public partial class WebSocketServiceHandler
+    public class LeaveRoomHandler : WebSocketServiceHandler
     {
-        public IEnumerable<HandlerCallBack> LeaveRoom(string header, User user, Room room)
+        [JsonProperty("id")]
+        public int Id { get; set; }
+
+        public override IEnumerable<HandlerCallBack> Handle(Connection connection)
         {
             var outcallback = new List<HandlerCallBack>();
 
+            var room = _webSocketService.GetRoom(Id);
+
             ((Action)(() =>
             {
-                lock (room)
-                {
-                    if (room == null || user.Room != room)
-                    {
-                        outcallback.Add(new HandlerCallBack(header: header, data: "roomNotFound", successfull: false, error: false));
-                        return;
-                    }
+                var user = connection.Session.User;
 
-                    if (!_webSocketService.LeaveRoom(user, room))
-                        return;
+                if (room == null || user.Session.Room != room)
+                {
+                    outcallback.Add(new HandlerCallBack(data: "roomNotFound", error: true));
+                    return;
                 }
 
-                Room globalRoom;
+                if (!room.DeleteUser(user))
+                    return;
 
-                lock (_webSocketService._globalRooms)
-                {
-                    globalRoom = _webSocketService._globalRooms[0];
-                }
-
-                _webSocketService.JoinRoom(user, globalRoom);
+                var globalrooms = _webSocketService._globalRooms;
+                globalrooms[0].AddUser(user);
 
             })).Invoke();
 

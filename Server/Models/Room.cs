@@ -1,43 +1,50 @@
-﻿using Keyboardchat.SaveCollections;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Keyboardchat.Models
 {
     public class Room
     {
-        public int Id { get; protected set; }
+        public int Id { get; set; }
         public string Name { get; protected set; }
         public string Password { get; protected set; }
-        public List<User> Users { get; protected set; }
 
-        public Room(int Id, string Name, string Password) : this(Id, Name, Password, new List<User>())
-        {          
+        private List<User> _users;
+        public IEnumerable<User> Users { get { return _users; } }
+
+        public event DataDelegate<User> UserJoined;
+
+        public event DataDelegate<User> UserLeaved;
+
+        public Room(string Name, string Password) : this(Name, Password, new List<User>())
+        {
         }
 
-        private Room(int Id, string Name, string Password, List<User> users) 
+        private Room(string Name, string Password, List<User> users)
         {
-            this.Id = Id;
             this.Name = Name;
             this.Password = Password;
-            Users = users;
+            _users = users;
         }
 
         public void AddUser(User user)
         {
-            lock (Users)
+            if (!_users.Contains(user))
             {
-                if (!Users.Contains(user))
-                    Users.Add(user);
+                _users.Add(user);
+                user.Session.Room = this;
+                UserJoined?.Invoke(this, user);
             }
         }
 
-        public void DeleteUser(User user)
+        public bool DeleteUser(User user)
         {
-            lock (Users)
+            if (_users.Remove(user))
             {
-                Users.Remove(user);
+                user.Session.Room = null;
+                UserLeaved?.Invoke(this, user);
+                return true;
             }
+            return false;
         }
 
     }

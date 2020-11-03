@@ -15,3 +15,5 @@ Keyboardchat.code-workspace
 
 /.vs/Keyboardchat/DesignTimeBuild/
 /.vs/Keyboardchat/v16/
+
+packages/*

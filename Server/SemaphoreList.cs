@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 
 namespace Semafored
@@ -9,13 +8,13 @@ namespace Semafored
     class SemaphoreList<T> : IList<T>
     {
 
-        private List<T>_list;
+        private List<T> _list;
 
         private Semaphore _semaphore;
 
-        public int Count 
+        public int Count
         {
-            get 
+            get
             {
                 int output;
 
@@ -24,14 +23,14 @@ namespace Semafored
                 _semaphore.Release();
 
                 return output;
-            } 
+            }
         }
 
         public bool IsReadOnly => false;
 
-        public T this[int index] 
-        { 
-            get 
+        public T this[int index]
+        {
+            get
             {
                 T output;
 
@@ -44,12 +43,12 @@ namespace Semafored
                 catch (ArgumentOutOfRangeException ex)
                 {
                     _semaphore.Release();
-                    throw ex;
+                    throw new Exception(ex.Message, ex);
                 }
 
                 return output;
-            } 
-            set 
+            }
+            set
             {
                 _semaphore.WaitOne();
                 try
@@ -60,9 +59,9 @@ namespace Semafored
                 catch (ArgumentOutOfRangeException ex)
                 {
                     _semaphore.Release();
-                    throw ex;
+                    throw new Exception(ex.Message, ex);
                 }
-            } 
+            }
         }
 
         public SemaphoreList(IEnumerable<T> Collection)
@@ -118,7 +117,7 @@ namespace Semafored
             catch (ArgumentOutOfRangeException ex)
             {
                 _semaphore.Release();
-                throw ex;
+                throw new Exception(ex.Message, ex);
             }
         }
 
@@ -133,7 +132,7 @@ namespace Semafored
             catch (ArgumentOutOfRangeException ex)
             {
                 _semaphore.Release();
-                throw ex;
+                throw new Exception(ex.Message, ex);
             }
         }
 

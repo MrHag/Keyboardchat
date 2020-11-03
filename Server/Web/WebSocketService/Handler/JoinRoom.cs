@@ -1,39 +1,43 @@
 ﻿using Keyboardchat.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Keyboardchat.Web.WebSocketService.Handler
 {
-    public partial class WebSocketServiceHandler
+    public class JoinRoomHandler : WebSocketServiceHandler
     {
+        [JsonProperty("id")]
+        public int Id { get; set; }
 
-        public IEnumerable<HandlerCallBack> JoinRoom(string header, User user, Room room, string Password)
+        [JsonProperty("password", Required = Required.AllowNull)]
+        public string Password { get; set; }
+
+        public override IEnumerable<HandlerCallBack> Handle(Connection connection)
         {
 
             var outcallback = new List<HandlerCallBack>();
+
+            Room room = _webSocketService.GetRoom(Id);
 
             ((Action)(() =>
             {
 
                 if (room == null)
                 {
-                    outcallback.Add(new HandlerCallBack(header: header, data: "roomNotFound", successfull: false, error: false));
+                    outcallback.Add(new HandlerCallBack(data: "roomNotFound", error: true));
                     return;
                 }
 
                 string roomPassword = room.Password;
-                lock (roomPassword)
+
+                if (roomPassword == null || roomPassword == "" || roomPassword == Password)
                 {
-                    if (roomPassword == "" || roomPassword == Password)
-                    {
-                        _webSocketService.JoinRoom(user, room);
-                    }
-                    else
-                    {
-                        outcallback.Add(new HandlerCallBack(header: header, data: "invalidPass", successfull: false, error: false));
-                    }
+                    room.AddUser(connection.Session.User);
+                }
+                else
+                {
+                    outcallback.Add(new HandlerCallBack(data: "invalidPass", error: true));
                 }
 
             })).Invoke();
