@@ -1,8 +1,6 @@
-﻿using Keyboardchat.DataBase;
-using Keyboardchat.Extensions;
+﻿using Keyboardchat.Extensions;
 using Keyboardchat.Models;
 using Keyboardchat.Models.Network;
-using Keyboardchat.SaveCollections;
 using Keyboardchat.UseClasses;
 using Keyboardchat.Web.WebSocketService.Handler;
 using Newtonsoft.Json;
@@ -11,19 +9,15 @@ using SocketIOSharp.Common;
 using SocketIOSharp.Server;
 using SocketIOSharp.Server.Client;
 using System;
-using System.Buffers.Text;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Numerics;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Keyboardchat.Web.WebSocketService
 {
-    public class WebSocketService
+    public class WebSocketService : IDisposable
     {
 
         internal JToken Calls;
@@ -35,10 +29,13 @@ namespace Keyboardchat.Web.WebSocketService
         internal SortedDictionary<uint, User> _authUsers;
 
         internal UIDmanager _roomUIDmanager;
-        internal SortedDictionary<int, Room> _rooms;
-        internal List<Room> _globalRooms;
+        private SortedDictionary<int, Room> _rooms;
+        public IEnumerable<KeyValuePair<int, Room>> Rooms { get { return _rooms; } }
 
-        private WebSocketServiceHandler _webSocketServiceHandler;
+        internal event DataDelegate<Room> OnRoomAdded;
+        internal event DataDelegate<Room> OnRoomRemoved;
+
+        internal List<Room> _globalRooms;
 
         public WebSocketService()
         {
@@ -49,26 +46,189 @@ namespace Keyboardchat.Web.WebSocketService
             _connectionConnections = new Dictionary<SocketIOSocket, Connection>();
             _roomUIDmanager = new UIDmanager();
             _rooms = new SortedDictionary<int, Room>();
+
+            OnRoomAdded += WebSocketService_OnRoomAdded;
+            OnRoomRemoved += WebSocketService_OnRoomRemoved;
+
             _globalRooms = new List<Room>();
-            _webSocketServiceHandler = new WebSocketServiceHandler(this);
         }
 
-        private void CallbackHandler(Connection connection, IEnumerable<HandlerCallBack> callBacks)
+        private void WebSocketService_OnRoomRemoved(object sender, Room room)
+        {
+            Broadcast(SCalls["RoomListChange"]["header"].ToString(), "Deleted room");
+
+            room.UserJoined -= Room_UserJoined;
+            room.UserLeaved -= Room_UserLeaved;
+        }
+
+        private void WebSocketService_OnRoomAdded(object sender, Room room)
+        {
+            Broadcast(SCalls["RoomListChange"]["header"].ToString(), "Created room");
+
+            room.UserJoined += Room_UserJoined;
+            room.UserLeaved += Room_UserLeaved;
+        }
+
+        private void Room_UserLeaved(object room, User user)
+        {
+            user.OnNameChanged -= User_OnNameChanged;
+
+            Room instRoom = (Room)room;
+
+            var roomUsers = instRoom.Users;
+
+            if (roomUsers.Count() == 0)
+            {
+                RemoveRoom(instRoom.Id);
+            }
+
+        }
+
+        private void Room_UserJoined(object room, User user)
+        {
+            user.OnNameChanged += User_OnNameChanged;
+        }
+
+        private void User_OnNameChanged(object sender, string data)
+        {
+
+        }
+
+        public Session CreateSession()
+        {
+            Session session = new Session();
+
+            session.OnConnectionAdded += Session_OnConnectionAdded;
+            session.OnConnectionRemoved += Session_OnConnectionRemoved;
+            session.RoomChanged += Session_RoomChanged;
+            session.UserChanged += Session_UserChanged;
+
+            return session;
+        }
+
+        public void DeleteSession(Session session)
+        {
+            session.Room = null;
+            session.User = null;
+            session.ClearConnections();
+
+            session.OnConnectionAdded -= Session_OnConnectionAdded;
+            session.OnConnectionRemoved -= Session_OnConnectionRemoved;
+            session.RoomChanged -= Session_RoomChanged;
+            session.UserChanged -= Session_UserChanged;
+        }
+
+        private void Session_UserChanged(object session, User user)
+        {
+            Session sess = (Session)session;
+
+            if (sess.User != null)
+            {
+                _authUsers.Remove(sess.User.UID);
+            }
+
+            if (user != null)
+            {
+                _authUsers.Add(user.UID, user);
+            }
+
+        }
+
+        private void Session_RoomChanged(object session, Room room)
+        {
+            Session sess = (Session)session;
+            var sessConnections = sess.Connections;
+
+            var sessRoom = sess.Room;
+            if (sessRoom != null)
+            {
+                ServiceResponseMessage(sessConnections, Calls["LeaveRoom"]["header"].ToString(), new RespondeRoomInfo(sessRoom.Id, sessRoom.Name, "Leaved from room"));
+                SendChatMessage(sessRoom, sess.User.Name + " disconnected", 0);
+            }
+
+            if (room != null)
+            {
+                ServiceResponseMessage(sessConnections, Calls["JoinRoom"]["header"].ToString(), new RespondeRoomInfo(room.Id, room.Name, "Join room"));
+                SendChatMessage(room, sess.User.Name + " connected", 0);
+            }
+        }
+
+
+        private void Session_OnConnectionRemoved(object session, Connection connection)
+        {
+            ServiceResponseMessage(connection, Calls["DeAuthorization"]["header"].ToString(), "Deauthorization successful");
+
+            _connectionConnections.Remove(connection.Socket);
+
+            var sess = (Session)session;
+            var sessConnections = sess.Connections;
+
+            if (sessConnections.Count() == 0)
+            {
+                DeleteSession(sess);
+            }
+
+        }
+
+        private void Session_OnConnectionAdded(object session, Connection connection)
+        {
+            ServiceResponseMessage(connection, Calls["Authorization"]["header"].ToString(), "Aunthentication successful");
+
+            Session sess = (Session)session;
+
+            var sessRoom = sess.Room;
+            if (sessRoom != null)
+                ServiceResponseMessage(connection, Calls["JoinRoom"]["header"].ToString(), new RespondeRoomInfo(sessRoom.Id, sessRoom.Name, "Join room"));
+        }
+
+        internal bool AddRoom(Room room)
+        {
+            var id = _roomUIDmanager.GetUID();
+            room.Id = id;
+
+            if (_rooms.TryAdd(room.Id, room))
+            {
+                OnRoomAdded?.Invoke(this, room);
+                return true;
+            }
+            return false;
+        }
+
+        internal bool RemoveRoom(int roomid)
+        {
+            Room room;
+            if (_rooms.Remove(roomid, out room))
+            {
+                var id = room.Id;
+                _roomUIDmanager.ReleaseUID(id);
+
+                OnRoomRemoved?.Invoke(this, room);
+                return true;
+            }
+            return false;
+        }
+
+        private void CallbackHandler(Connection connection, string header, IEnumerable<HandlerCallBack> callBacks)
         {
             foreach (var callBack in callBacks)
-                ResponseMessage(connection, callBack.Header, callBack.Data, callBack.Successfull, callBack.Error);
+            {
+                if (callBack.Error)
+                    ServiceResponseMessage(connection, header, callBack.Data);
+                else
+                    ErrorResponseMessage(connection, header, callBack.Data);
+            }
         }
 
-        private void CallbackHandler(IEnumerable<Connection> connections, IEnumerable<HandlerCallBack> callBacks)
+        private void CallbackHandler(IEnumerable<Connection> connections, string header, IEnumerable<HandlerCallBack> callBacks)
         {
             foreach (var connection in connections)
-                CallbackHandler(connection, callBacks);
+                CallbackHandler(connection, header, callBacks);
         }
 
-        internal void ResponseMessage(Connection connetion, string header, object data, bool succ, bool err)
+        internal void ResponseMessage(Connection connetion, string header, object data, object err = null)
         {
-            ResponseBody responseBody = new ResponseBody(data, succ, err);
-            connetion.Socket.Emit(header, responseBody);
+            ResponseBody responseBody = new ResponseBody(data, err);
+            connetion.Socket.Server.EmitTo(connetion.Socket, header, responseBody);
 
 #if DEBUG
 
@@ -84,51 +244,47 @@ namespace Keyboardchat.Web.WebSocketService
                     name = user.Name;
                 }
 
-                lock (name)
-                    Program.LogService.Log($"{header} Responsebody to {name}\n{responseBody.Json()}");
+                Program.LogService.Log($"{header} Responsebody to {name}\n{responseBody.Json()}");
 
             }, TaskCreationOptions.DenyChildAttach);
 #endif
         }
 
-        internal void ResponseMessage(IEnumerable<Connection> connections, string header, object data, bool succ, bool err)
+        internal void ResponseMessage(IEnumerable<Connection> connections, string header, object data, string err = null)
         {
             foreach (var connection in connections)
-                ResponseMessage(connection, header, data, succ, err);
+                ResponseMessage(connection, header, data, err);
         }
 
         internal void SendChatMessage(Room room, string message, uint userId)
         {
             var MessageBody = new MessageBody(userId, room.Id, message);
-            server.EmitTo(room, Calls["Chat"]["header"].ToString(), MessageBody);
+            server.EmitTo(room, SCalls["OnNewMsg"]["header"].ToString(), MessageBody);
 #if DEBUG
             string name = room.Name;
 
-            lock (name)
-            {
-                Program.LogService.Log($"Message to\n{name}, {message}, from {userId}");
-            }
+            Program.LogService.Log($"Message to\n{name}, {message}, from {userId}");
 #endif
         }
 
-        internal void ErrorResponseMessage(Connection connection, string header, object data)
+        internal void ErrorResponseMessage(Connection connection, string header, object error, object data = null)
         {
-            ResponseMessage(connection, header, data, false, true);
+            ResponseMessage(connection, header, data, error);
         }
 
-        internal void ErrorResponseMessage(IEnumerable<Connection> connections, string header, object data)
+        internal void ErrorResponseMessage(IEnumerable<Connection> connections, string header, object data, string error)
         {
-            ResponseMessage(connections, header, data, false, true);
+            ResponseMessage(connections, header, data, error);
         }
 
-        internal void ServiceResponseMessage(Connection connection, string header, object data, bool succ)
+        internal void ServiceResponseMessage(Connection connection, string header, object data)
         {
-            ResponseMessage(connection, header, data, succ, false);
+            ResponseMessage(connection, header, data);
         }
 
-        internal void ServiceResponseMessage(IEnumerable<Connection> connections, string header, object data, bool succ)
+        internal void ServiceResponseMessage(IEnumerable<Connection> connections, string header, object data)
         {
-            ResponseMessage(connections, header, data, succ, false);
+            ResponseMessage(connections, header, data);
         }
 
         internal void OnQueryMeessage(string header)
@@ -136,7 +292,7 @@ namespace Keyboardchat.Web.WebSocketService
             Program.LogService.Log($"Called {header}");
         }
 
-        private bool ValidateDefaultText(string text, int minlength = 0, int maxlength = -1)
+        internal bool ValidateDefaultText(string text, int minlength = 0, int maxlength = -1)
         {
 
             if (text.Length < minlength)
@@ -155,8 +311,7 @@ namespace Keyboardchat.Web.WebSocketService
         {
             bool containsUser;
 
-            lock (_authUsers)
-                containsUser = _authUsers.Values.Contains(user);
+            containsUser = _authUsers.Values.Contains(user);
 
             if (user == null || !containsUser)
             {
@@ -169,207 +324,85 @@ namespace Keyboardchat.Web.WebSocketService
 
         public Connection GetConnection(SocketIOSocket client)
         {
-            lock (_connectionConnections)
-            {
-                Connection connection;
-                if (_connectionConnections.TryGetValue(client, out connection))
-                    return connection;
-            }
+            Connection connection;
+            if (_connectionConnections.TryGetValue(client, out connection))
+                return connection;
             return null;
         }
 
         public User GetAuthUser(Connection client)
         {
-            lock (_authUsers)
+            foreach (var user in _authUsers)
             {
-                foreach (var user in _authUsers)
-                {
-                    lock (user.Value.Connections)
-                    {
-                        foreach (var connection in user.Value.Connections)
-                            if (connection == client)
-                                return user.Value;
-                    }
-                }
+                var connections = user.Value.Session.Connections;
+                foreach (var connection in connections)
+                    if (connection == client)
+                        return user.Value;
             }
             return null;
         }
 
         public User GetAuthUser(uint id)
         {
-            lock (_authUsers)
-            {
-                User user;
-                if (_authUsers.TryGetValue(id, out user))
-                    return user;
-            }
+            User user;
+            if (_authUsers.TryGetValue(id, out user))
+                return user;
             return null;
         }
 
         public Room GetRoom(string RoomName)
         {
-            lock (_rooms)
-            {
-                foreach (var room in _rooms.Values)
-                    if (room.Name == RoomName)
-                        return room;
-            }
+            foreach (var room in _rooms.Values)
+                if (room.Name == RoomName)
+                    return room;
             return null;
         }
 
         public Room GetRoom(int RoomId)
         {
-            lock (_rooms)
-            {
-                Room room;
-                if (_rooms.TryGetValue(RoomId, out room))
-                    return room;
-            }
+            Room room;
+            if (_rooms.TryGetValue(RoomId, out room))
+                return room;
             return null;
         }
 
-        public void Broadcast(string header, object data, bool successful, bool error)
+        public void Broadcast(string header, object data, string error = null)
         {
-            lock (_authUsers)
+            foreach (var user in _authUsers.Values)
             {
-                foreach (var user in _authUsers.Values)
-                    ResponseMessage(user.Connections, header, data, successful, error);
+                var sessionConnections = user.Session.Connections;
+                ResponseMessage(sessionConnections, header, data, error);
             }
         }
 
-        public bool DeleteUser(User user)
+        public void DisconnectAction(Connection SocketConnection)
         {
-            if (user == null)
-                return false;
-
-            lock (user.Connections)
-            {
-                foreach (var client in user.Connections)
-                    if (!_connectionConnections.Remove(client.Socket))
-                        return false;
-            }
-            return true;
-        }
-
-        public bool JoinRoom(User user, Room room)
-        {
-            lock (user) lock (room)
-                {
-                    Room userRoom = user.Room;
-
-                    if (userRoom != null)
-                    {
-                        if (userRoom == room)
-                            return false;
-
-                        if (!LeaveRoom(user, userRoom))
-                            return false;
-                    }
-
-                    room.AddUser(user);
-                    user.Room = room;
-                }
-
-            string userName = user.Name;
-            lock (userName)
-            {
-                SendChatMessage(room, userName + " connected", 0);
-            }
-
-            ServiceResponseMessage(user.Connections, Calls["JoinRoom"]["header"].ToString(), new RespondeRoomInfo(room.Id, room.Name, "Join room"), true);
-
-            return true;
-        }
-
-        public bool LeaveRoom(User user, Room room)
-        {
-            lock (user) lock (room)
-                {
-                    if (room != null)
-                    {
-                        string userName = user.Name;
-
-                        lock (userName)
-                        {
-                            SendChatMessage(room, userName + " disconnected", 0);
-                        }
-
-                        room.DeleteUser(user);
-
-                        int UserCount;
-
-                        var roomUsers = room.Users;
-
-                        lock (roomUsers)
-                        {
-                            UserCount = roomUsers.Count;
-                        }
-
-                        if (UserCount == 0)
-                        {
-                            lock (_rooms)
-                            {
-                                foreach (var key in _rooms.Keys)
-                                {
-                                    var froom = _rooms[key];
-                                    if (froom == room)
-                                    {
-                                        _rooms.Remove(key);
-                                        _roomUIDmanager.ReleaseUID(key);
-
-                                        string froomName = froom.Name;
-
-                                        lock (froomName)
-                                        {
-                                            Program.LogService.Log("delete room: " + froomName);
-                                        }
-
-                                        Broadcast(SCalls["RoomChange"]["header"].ToString(), "Deleted room", true, false);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        user.Room = null;
-
-                        var userConnections = user.Connections;
-                        lock (userConnections)
-                        {
-                            ServiceResponseMessage(userConnections, Calls["LeaveRoom"]["header"].ToString(), new RespondeRoomInfo(room.Id, room.Name, "Leaved from room"), true);
-                        }
-                        return true;
-                    }
-                    return false;
-                }
-        }
-
-        public static bool GetPropValue<T>(ref JToken iterator, string name, out T output)
-        {
-            output = default;
-
-            if (iterator == null)
-                return false;
+#if DEBUG
+            OnQueryMeessage("disconnection");
+#endif
 
             try
             {
-
-                if (iterator != null && iterator is JProperty nameproperty && nameproperty.Name == name && nameproperty.Value.Value<T>() is T value)
+                if (SocketConnection.Session != null)
                 {
-                    output = value;
-                    return true;
+                    SocketConnection.Session.RemoveConnection(SocketConnection);
                 }
-                return false;
+                _connectionConnections.Remove(SocketConnection.Socket);
             }
             finally
             {
-                iterator = iterator.Next;
+#if DEBUG
+                Program.LogService.Log("Connections:" + _connectionConnections.Count);
+#endif
             }
         }
 
         public void Start()
         {
             int UID = _roomUIDmanager.GetUID();
-            _globalRooms.Add(new Room(UID, "global", ""));
+            var room = new Room("global", "") { Id = UID };
+            _globalRooms.Add(room);
+            OnRoomAdded?.Invoke(this, room);
 
 #if DEBUG
 
@@ -389,12 +422,10 @@ namespace Keyboardchat.Web.WebSocketService
                     pass = hassp.ToString();
 
                 int id = _roomUIDmanager.GetUID();
-                _rooms.Add(id, new Room(id, name, pass));
-
+                AddRoom(new Room(name, pass));
             }
 
 #endif
-
 
             server.Start();
 
@@ -404,10 +435,7 @@ namespace Keyboardchat.Web.WebSocketService
 
                 Connection SocketConnection = new Connection(socket);
 
-                lock (_connectionConnections)
-                {
-                    _connectionConnections.Add(socket, SocketConnection);
-                }
+                _connectionConnections.Add(socket, SocketConnection);
 
                 socket.On(Calls["Registration"]["header"], (JToken[] data) =>
                 {
@@ -416,35 +444,34 @@ namespace Keyboardchat.Web.WebSocketService
                     OnQueryMeessage(header);
 #endif
 
-                    Task.Factory.StartNew(() =>
+                    RegistrationHandler registrationHandler;
+
+                    try
                     {
+                        registrationHandler = data[0].ToObject<RegistrationHandler>();
+                    }
+                    catch (Exception)
+                    {
+                        ErrorResponseMessage(SocketConnection, header, "invalidData");
+                        return;
+                    }
 
-                        string name = "";
-                        string pass = "";
+                    registrationHandler.WebSocketService = this;
 
-                        var iterator = data[0].First;
-                        if (data == null || data.Length == 0 || data[0] == null || !GetPropValue(ref iterator, "name", out name) || !GetPropValue(ref iterator, "password", out pass))
-                        {
-                            ErrorResponseMessage(SocketConnection, header, "invalidData");
-                            return;
-                        }
+                    if (!ValidateDefaultText(registrationHandler.Name, maxlength: 32))
+                    {
+                        ErrorResponseMessage(SocketConnection, header, "badName");
+                        return;
+                    }
 
-                        if (!ValidateDefaultText(name, maxlength: 32))
-                        {
-                            ServiceResponseMessage(SocketConnection, header, "badName", false);
-                            return;
-                        }
+                    if (!ValidateDefaultText(registrationHandler.Password, maxlength: 64))
+                    {
+                        ErrorResponseMessage(SocketConnection, header, "badPass");
+                        return;
+                    }
 
-                        if (!ValidateDefaultText(pass, maxlength: 64))
-                        {
-                            ServiceResponseMessage(SocketConnection, header, "badPass", false);
-                            return;
-                        }
-
-                        var callBacks = _webSocketServiceHandler.Registration(header, name, pass);
-                        CallbackHandler(SocketConnection, callBacks);
-
-                    }, TaskCreationOptions.DenyChildAttach);
+                    var callBacks = registrationHandler.Handle(SocketConnection);
+                    CallbackHandler(SocketConnection, header, callBacks);
 
                 });
 
@@ -455,30 +482,34 @@ namespace Keyboardchat.Web.WebSocketService
                     OnQueryMeessage(header);
 #endif
 
-                    string name = "";
-                    string pass = "";
+                    AuthorizationHandler authorizationHandler;
 
-                    var iterator = data[0].First;
-                    if (data == null || data.Length == 0 || data[0] == null || !GetPropValue(ref iterator, "name", out name) || !GetPropValue(ref iterator, "password", out pass))
+                    try
+                    {
+                        authorizationHandler = data[0].ToObject<AuthorizationHandler>();
+                    }
+                    catch (Exception)
                     {
                         ErrorResponseMessage(SocketConnection, header, "invalidData");
                         return;
                     }
 
-                    if (!ValidateDefaultText(name, maxlength: 32))
+                    authorizationHandler.WebSocketService = this;
+
+                    if (!ValidateDefaultText(authorizationHandler.Name, maxlength: 32))
                     {
-                        ServiceResponseMessage(SocketConnection, header, "badName", false);
+                        ErrorResponseMessage(SocketConnection, header, "badName", false);
                         return;
                     }
 
-                    if (!ValidateDefaultText(pass, maxlength: 64))
+                    if (!ValidateDefaultText(authorizationHandler.Password, maxlength: 64))
                     {
-                        ServiceResponseMessage(SocketConnection, header, "badPass", false);
+                        ErrorResponseMessage(SocketConnection, header, "badPass", false);
                         return;
                     }
 
-                    var callBacks = _webSocketServiceHandler.Authorization(SocketConnection, header, name, pass);
-                    CallbackHandler(SocketConnection, callBacks);
+                    var callBacks = authorizationHandler.Handle(SocketConnection);
+                    CallbackHandler(SocketConnection, header, callBacks);
 
                 });
 
@@ -489,55 +520,57 @@ namespace Keyboardchat.Web.WebSocketService
                     OnQueryMeessage(header);
 #endif
 
-                    User user = GetAuthUser(SocketConnection);
-                    if (user == null)
-                    {
-                        ServiceResponseMessage(SocketConnection, header, "notAuth", false);
-                        return;
-                    }
+                    DeauthorizationHandler deauthorizationHandler = new DeauthorizationHandler();
+                    deauthorizationHandler.WebSocketService = this;
 
-                    var callBacks = _webSocketServiceHandler.Deauthorization(header, SocketConnection);
-                    CallbackHandler(SocketConnection, callBacks);
+                    User user = GetAuthUser(SocketConnection);
+
+                    if (!AuthCheckReport(user, SocketConnection))
+                        return;
+
+                    var callBacks = deauthorizationHandler.Handle(SocketConnection);
+                    CallbackHandler(SocketConnection, header, callBacks);
 
                 });
 
 
-                socket.On(Calls["Chat"]["header"], (JToken[] data) =>
+                socket.On(Calls["SendMsg"]["header"], (JToken[] data) =>
                 {
-                    string header = Calls["Chat"]["header"].ToString();
+                    string header = Calls["SendMsg"]["header"].ToString();
 #if DEBUG
                     OnQueryMeessage(header);
 #endif
 
-                    Task.Factory.StartNew(() =>
+                    User user = GetAuthUser(SocketConnection);
+
+                    if (!AuthCheckReport(user, SocketConnection))
+                        return;
+
+                    ChatHandler chatHandler;
+
+                    try
                     {
-                        User user = GetAuthUser(SocketConnection);
+                        chatHandler = data[0].ToObject<ChatHandler>();
+                    }
+                    catch (Exception)
+                    {
+                        ErrorResponseMessage(SocketConnection, header, "invalidData");
+                        return;
+                    }
 
-                        if (!AuthCheckReport(user, SocketConnection))
-                            return;
+                    chatHandler.WebSocketService = this;
 
-                        string message;
+                    Room room = user.Session.Room;
 
-                        var iterator = data[0].First;
-                        if (data == null || data.Length == 0 || data[0] == null || !GetPropValue(ref iterator, "message", out message))
-                        {
-                            ErrorResponseMessage(SocketConnection, header, "invalidData");
-                            return;
-                        }
+                    if (room == null)
+                        return;
 
-                        Room room = user.Room;
+                    string message = chatHandler.Message.Trim();
 
-                        if (room == null)
-                            return;
+                    if (!ValidateDefaultText(message))
+                        return;
 
-                        message = message.Trim();
-
-                        if (!ValidateDefaultText(message))
-                            return;
-
-                        _webSocketServiceHandler.Chat(room, message, user.UID);
-
-                    }, TaskCreationOptions.DenyChildAttach);
+                    chatHandler.Handle(SocketConnection);
 
                 });
 
@@ -548,34 +581,27 @@ namespace Keyboardchat.Web.WebSocketService
                     OnQueryMeessage(header);
 #endif
 
-                    Task.Factory.StartNew(() =>
+                    User user = GetAuthUser(SocketConnection);
+
+                    if (!AuthCheckReport(user, SocketConnection))
+                        return;
+
+                    JoinRoomHandler joinRoomHandler;
+
+                    try
                     {
+                        joinRoomHandler = data[0].ToObject<JoinRoomHandler>();
+                    }
+                    catch (Exception)
+                    {
+                        ErrorResponseMessage(SocketConnection, header, "invalidData");
+                        return;
+                    }
 
-                        User user = GetAuthUser(SocketConnection);
+                    joinRoomHandler.WebSocketService = this;
 
-                        if (!AuthCheckReport(user, SocketConnection))
-                            return;
-
-                        int RoomId;
-                        string Password;
-
-                        var iterator = data[0].First;
-                        if (data == null || data.Length == 0 || data[0] == null || !GetPropValue(ref iterator, "id", out RoomId))
-                        {
-                            ErrorResponseMessage(SocketConnection, header, "invalidData");
-                            return;
-                        }
-
-                        if (!GetPropValue(ref iterator, "password", out Password))
-                            Password = "";
-
-
-                        Room room = GetRoom(RoomId);
-
-                        var callBacks = _webSocketServiceHandler.JoinRoom(header, user, room, Password);
-                        CallbackHandler(SocketConnection, callBacks);
-
-                    }, TaskCreationOptions.DenyChildAttach);
+                    var callBacks = joinRoomHandler.Handle(SocketConnection);
+                    CallbackHandler(SocketConnection, header, callBacks);
 
                 });
 
@@ -587,62 +613,65 @@ namespace Keyboardchat.Web.WebSocketService
                     OnQueryMeessage(header);
 #endif
 
-                    Task.Factory.StartNew(() =>
+                    User user = GetAuthUser(SocketConnection);
+
+                    if (!AuthCheckReport(user, SocketConnection) || user.Session.Room == null)
                     {
+                        ErrorResponseMessage(SocketConnection, header, "notInRoom");
+                        return;
+                    }
 
-                        User user = GetAuthUser(SocketConnection);
+                    LeaveRoomHandler leaveRoomHandler;
 
-                        if (!AuthCheckReport(user, SocketConnection) || user.Room == null)
-                        {
-                            ServiceResponseMessage(SocketConnection, header, "notInRoom", false);
-                            return;
-                        }
+                    try
+                    {
+                        leaveRoomHandler = data[0].ToObject<LeaveRoomHandler>();
+                    }
+                    catch (Exception)
+                    {
+                        ErrorResponseMessage(SocketConnection, header, "invalidData");
+                        return;
+                    }
 
-                        int RoomId;
+                    leaveRoomHandler.WebSocketService = this;
 
-                        var iterator = data[0].First;
-                        if (data == null || data.Length == 0 || data[0] == null || !GetPropValue(ref iterator, "id", out RoomId))
-                        {
-                            ErrorResponseMessage(SocketConnection, header, "invalidData");
-                            return;
-                        }
-
-                        Room room = GetRoom(RoomId);
-
-                        var callBacks = _webSocketServiceHandler.LeaveRoom(header, user, room);
-                        CallbackHandler(SocketConnection, callBacks);
-
-                    }, TaskCreationOptions.DenyChildAttach);
+                    var callBacks = leaveRoomHandler.Handle(SocketConnection);
+                    CallbackHandler(SocketConnection, header, callBacks);
 
                 });
 
                 socket.On(Calls["GetRooms"]["header"], (JToken[] data) =>
                 {
                     string header = Calls["GetRooms"]["header"].ToString();
-
 #if DEBUG
                     OnQueryMeessage(header);
 #endif
+
+                    User user = GetAuthUser(SocketConnection);
+
+                    if (!AuthCheckReport(user, SocketConnection))
+                        return;
+
                     Task.Factory.StartNew(() =>
                     {
+                        GetRoomsHandler getRoomsHandler;
 
-                        User user = GetAuthUser(SocketConnection);
-
-                        if (!AuthCheckReport(user, SocketConnection))
-                            return;
-
-                        string roomname = null;
-
-                        var iterator = data[0].First;
-                        if (data != null && data.Length > 0 && data[0] != null && GetPropValue(ref iterator, "room", out roomname))
+                        try
                         {
+                            getRoomsHandler = data[0].ToObject<GetRoomsHandler>();
+                        }
+                        catch (Exception)
+                        {
+                            ErrorResponseMessage(SocketConnection, header, "invalidData");
+                            return;
                         }
 
-                        var callBacks = _webSocketServiceHandler.GetRooms(header, roomname);
-                        CallbackHandler(SocketConnection, callBacks);
+                        getRoomsHandler.WebSocketService = this;
+
+                        var callBacks = getRoomsHandler.Handle(SocketConnection);
+                        CallbackHandler(SocketConnection, header, callBacks);
 
                     }, TaskCreationOptions.DenyChildAttach);
-
                 });
 
                 socket.On(Calls["ChangeProfile"]["header"], (JToken[] data) =>
@@ -653,49 +682,30 @@ namespace Keyboardchat.Web.WebSocketService
                     OnQueryMeessage(header);
 #endif
 
+                    User user = GetAuthUser(SocketConnection);
+
+                    if (!AuthCheckReport(user, SocketConnection))
+                        return;
+
                     Task.Factory.StartNew(() =>
                     {
 
-                        User user = GetAuthUser(SocketConnection);
+                        ChangeProfileHandler changeProfileHandler;
 
-                        if (!AuthCheckReport(user, SocketConnection))
-                            return;
-
-                        string name = null;
-                        string avatar = null;
-                        byte[] bytes = null;
-
-                        var iterator = data[0].First;
-                        if (data != null && data.Length <= 0 && data[0] != null)
+                        try
                         {
-                            if (GetPropValue(ref iterator, "name", out name))
-                                if (!ValidateDefaultText(name, maxlength: 32))
-                                {
-                                    ServiceResponseMessage(SocketConnection, header, "badName", false);
-                                    return;
-                                }
-
-                            if (GetPropValue(ref iterator, "avatar", out avatar))
-                            {
-                                try
-                                {
-                                    bytes = Convert.FromBase64String(avatar);
-                                }
-                                catch (FormatException)
-                                {
-                                    ErrorResponseMessage(SocketConnection, header, "invalidData");
-                                    return;
-                                }
-                            }
+                            changeProfileHandler = data[0].ToObject<ChangeProfileHandler>();
                         }
-                        else
+                        catch (Exception)
                         {
                             ErrorResponseMessage(SocketConnection, header, "invalidData");
                             return;
                         }
 
-                        var callBacks = _webSocketServiceHandler.ChangeProfile(header, user, name, bytes);
-                        CallbackHandler(SocketConnection, callBacks);
+                        changeProfileHandler.WebSocketService = this;
+
+                        var callBacks = changeProfileHandler.Handle(SocketConnection);
+                        CallbackHandler(SocketConnection, header, callBacks);
 
                     }, TaskCreationOptions.DenyChildAttach);
 
@@ -710,35 +720,34 @@ namespace Keyboardchat.Web.WebSocketService
 #if DEBUG
                     OnQueryMeessage(header);
 #endif
+
+                    User user = GetAuthUser(SocketConnection);
+
+                    if (!AuthCheckReport(user, SocketConnection))
+                        return;
+
                     Task.Factory.StartNew(() =>
                     {
-                        User user = GetAuthUser(SocketConnection);
 
-                        if (!AuthCheckReport(user, SocketConnection))
-                            return;
+                        GetUsersHandler getUsersHandler;
 
-                        List<uint> userids = null;
-                        List<string> select = null;
-
-
-                        var iterator = data[0].First;
-                        if (data != null && data.Length <= 0 && data[0] != null)
+                        try
                         {
-                            try
-                            {
-                                JToken iterateToken = iterator.First;
-                                userids = (List<uint>)JsonConvert.DeserializeObject(iterateToken.First.ToString(), typeof(List<uint>));
-                                select = (List<string>)JsonConvert.DeserializeObject(iterateToken.Next.First.ToString(), typeof(List<string>));
-                            }
-                            catch (Exception)
-                            {
-                            }
+                            getUsersHandler = data[0].ToObject<GetUsersHandler>();
+                        }
+                        catch (Exception)
+                        {
+                            ErrorResponseMessage(SocketConnection, header, "invalidData");
+                            return;
                         }
 
-                        var callBacks = _webSocketServiceHandler.GetUsers(SocketConnection, header, userids, select);
-                        CallbackHandler(SocketConnection, callBacks);
+                        getUsersHandler.WebSocketService = this;
+
+                        var callBacks = getUsersHandler.Handle(SocketConnection);
+                        CallbackHandler(SocketConnection, header, callBacks);
 
                     }, TaskCreationOptions.DenyChildAttach);
+
                 });
 
                 socket.On(Calls["CreateRoom"]["header"], (JToken[] data) =>
@@ -749,57 +758,48 @@ namespace Keyboardchat.Web.WebSocketService
                     OnQueryMeessage(header);
 #endif
 
+                    User user = GetAuthUser(SocketConnection);
 
-                    Task.Factory.StartNew(() =>
+                    if (!AuthCheckReport(user, SocketConnection))
+                        return;
+
+                    CreateRoomHandler createRoomHandler;
+
+                    try
                     {
-                        User user = GetAuthUser(SocketConnection);
+                        createRoomHandler = data[0].ToObject<CreateRoomHandler>();
+                    }
+                    catch (Exception)
+                    {
+                        ErrorResponseMessage(SocketConnection, header, "invalidData");
+                        return;
+                    }
 
-                        if (!AuthCheckReport(user, SocketConnection))
-                            return;
+                    createRoomHandler.WebSocketService = this;
 
-                        string RoomName;
-                        string Password;
-
-
-                        var iterator = data[0].First;
-                        if (data == null || data.Length == 0 || data[0] == null || !GetPropValue(ref iterator, "name", out RoomName))
-                        {
-                            ErrorResponseMessage(SocketConnection, header, "invalidData");
-                            return;
-                        }
-
-                        RoomName = RoomName.Trim();
-
-                        if (!ValidateDefaultText(RoomName))
-                        {
-                            ServiceResponseMessage(SocketConnection, header, "badName", false);
-                            return;
-                        }
-
-                        if (!GetPropValue(ref iterator, "password", out Password))
-                            Password = "";
-
-                        var callBacks = _webSocketServiceHandler.CreateRoom(user, header, RoomName, Password);
-                        CallbackHandler(SocketConnection, callBacks);
-
-                    }, TaskCreationOptions.DenyChildAttach);
+                    var callBacks = createRoomHandler.Handle(SocketConnection);
+                    CallbackHandler(SocketConnection, header, callBacks);
 
                 });
 
 
                 socket.On(SocketIOEvent.DISCONNECT, () =>
                 {
-                    _webSocketServiceHandler.DisconnectAction(SocketConnection, true);
+                    DisconnectAction(SocketConnection);
                 });
 
                 socket.On(SocketIOEvent.ERROR, () =>
                 {
-                    _webSocketServiceHandler.DisconnectAction(SocketConnection, true);
+                    DisconnectAction(SocketConnection);
                 });
 
             });
 
         }
 
+        public void Dispose()
+        {
+            ((IDisposable)server).Dispose();
+        }
     }
 }

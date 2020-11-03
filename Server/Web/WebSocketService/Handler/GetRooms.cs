@@ -1,16 +1,18 @@
 ﻿using Keyboardchat.Models;
 using Keyboardchat.Models.Network;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Keyboardchat.Web.WebSocketService.Handler
 {
-    public partial class WebSocketServiceHandler
+    public class GetRoomsHandler : WebSocketServiceHandler
     {
-        public IEnumerable<HandlerCallBack> GetRooms(string header, string roomname)
+        [JsonProperty("room", Required = Required.AllowNull)]
+        public string RoomName { get; set; }
+
+        public override IEnumerable<HandlerCallBack> Handle(Connection connection)
         {
             var outcallback = new List<HandlerCallBack>();
 
@@ -20,14 +22,15 @@ namespace Keyboardchat.Web.WebSocketService.Handler
 
                 List<(Room room, int qual)> rooms = new List<(Room room, int qual)>();
 
-                lock (_webSocketService._rooms)
+                var webRooms = _webSocketService.Rooms;
+                lock (webRooms)
                 {
-                    foreach (var room in _webSocketService._rooms.Values)
-                        rooms.Add((room, 0));
+                    foreach (var room in webRooms)
+                        rooms.Add((room.Value, 0));
                 }
 
 
-                if (roomname != null)
+                if (RoomName != null)
                 {
 
                     for (int key = 0; key < rooms.Count; key++)
@@ -36,31 +39,28 @@ namespace Keyboardchat.Web.WebSocketService.Handler
 
                         var firstPeace = "";
                         var secondPeace = "";
-                        decimal minQual = Math.Ceiling(roomname.Length * (40 / 100M));
+                        decimal minQual = Math.Ceiling(RoomName.Length * (40 / 100M));
 
-                        for (int i = roomname.Length; i > 0; i--)
+                        for (int i = RoomName.Length; i > 0; i--)
                         {
-                            firstPeace = roomname.Substring(0, i);
-                            secondPeace = roomname.Substring(roomname.Length-i);
+                            firstPeace = RoomName.Substring(0, i);
+                            secondPeace = RoomName.Substring(RoomName.Length - i);
 
                             string roomName = room.room.Name;
-                            lock (roomName)
+
+                            bool PeaceMatch(string peace)
                             {
-
-                                bool PeaceMatch(string peace)
+                                if (Regex.IsMatch(roomName, $"(?i)({peace})+"))
                                 {
-                                    if (Regex.IsMatch(roomName, $"(?i)({peace})+"))
-                                    {
-                                        room.qual = peace.Length;
-                                        rooms[key] = room;
-                                        return true;
-                                    }
-                                    return false;
+                                    room.qual = peace.Length;
+                                    rooms[key] = room;
+                                    return true;
                                 }
-
-                                if (PeaceMatch(firstPeace) || PeaceMatch(secondPeace))
-                                    break;
+                                return false;
                             }
+
+                            if (PeaceMatch(firstPeace) || PeaceMatch(secondPeace))
+                                break;
                         }
 
                         if (room.qual < minQual)
@@ -78,18 +78,11 @@ namespace Keyboardchat.Web.WebSocketService.Handler
 
                 foreach (var room in rooms)
                 {
-                    string roomPassword = room.room.Password;
-
-                    bool haspass;
-                    lock (roomPassword)
-                    {
-                        haspass = roomPassword != "";
-                    }
-
+                    bool haspass = room.room.Password != "";
                     outrooms.Add(new RoomInfo(room.room.Id, room.room.Name, haspass));
                 }
 
-                outcallback.Add(new HandlerCallBack(header: header, data: outrooms, successfull: true, error: false));
+                outcallback.Add(new HandlerCallBack(data: outrooms, error: false));
             })).Invoke();
 
 

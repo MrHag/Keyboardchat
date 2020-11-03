@@ -9,7 +9,6 @@ namespace Keyboardchat.DataBase.Models
         public uint UserId { get; set; }
         public string Name { get; set; }
         public byte[] PasswordHash { get; set; }
-        public byte[] Avatar { get; set; }
-        public byte[] AvatarHash { get; set; }
+        public uint AvatarId { get; set; }
     }
 }

@@ -1,21 +1,25 @@
 ﻿using Keyboardchat.DataBase;
 using Keyboardchat.Models;
-using Keyboardchat.Models.Network;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Keyboardchat.Web.WebSocketService.Handler
 {
-    public partial class WebSocketServiceHandler
+    public class AuthorizationHandler : WebSocketServiceHandler
     {
-        private object AuthorizationLocker = new object();
-        public IEnumerable<HandlerCallBack> Authorization(Connection SocketConnection, string header, string name, string pass)
-        {
 
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("password")]
+        public string Password { get; set; }
+
+        public override IEnumerable<HandlerCallBack> Handle(Connection connection)
+        {
             var outcallback = new List<HandlerCallBack>();
 
             ((Action)(() =>
@@ -27,9 +31,9 @@ namespace Keyboardchat.Web.WebSocketService.Handler
                     try
                     {
                         SHA256 sha256 = SHA256.Create();
-                        var passwordHash = sha256.ComputeHash(Encoding.UTF8.GetBytes(pass));
+                        var passwordHash = sha256.ComputeHash(Encoding.UTF8.GetBytes(Password));
 
-                        var dbUser = dbcontext.Users.Single(user => user.Name == name);
+                        var dbUser = dbcontext.Users.Single(user => user.Name == Name);
 
                         if (!dbUser.PasswordHash.SequenceEqual(passwordHash))
                             throw new InvalidOperationException();
@@ -38,7 +42,7 @@ namespace Keyboardchat.Web.WebSocketService.Handler
                     }
                     catch (InvalidOperationException)
                     {
-                        outcallback.Add(new HandlerCallBack(header, "wrongNamePass", false, false));
+                        outcallback.Add(new HandlerCallBack(data: "wrongNamePass", error: true));
                         return;
                     }
                 }
@@ -46,76 +50,42 @@ namespace Keyboardchat.Web.WebSocketService.Handler
                 User user = _webSocketService.GetAuthUser(UserId);
 
 
-                lock (AuthorizationLocker)
+                if (user != null)
                 {
-                    if (user != null)
+                    Session session = user.Session;
+
+                    var sessionConnections = session.Connections;
+
+                    if (sessionConnections.Contains(connection))
                     {
-                        lock (_webSocketService._connectionConnections)
-                        {
-                            _webSocketService._connectionConnections[SocketConnection.Socket] = SocketConnection;
-                        }
-
-                        var userConnections = user.Connections;
-
-                        lock (userConnections)
-                        {
-                            if (userConnections.Contains(SocketConnection))
-                            {
-                                outcallback.Add(new HandlerCallBack(header, "alreadyInSess", false, false));
-                                return;
-                            }
-
-                            userConnections.Add(SocketConnection);
-                        }
-
-                        Room room = user.Room;
-                        if (room != null)
-                        {
-                            string roomName = room.Name;
-                            lock (roomName)
-                            {
-                                outcallback.Add(new HandlerCallBack(header, "Aunthentication successful", true, false));
-                                outcallback.Add(new HandlerCallBack(_webSocketService.Calls["JoinRoom"]["header"].ToString(), new RespondeRoomInfo(room.Id, roomName, "Join room"), true, false));
-                            }
-                        }
+                        outcallback.Add(new HandlerCallBack(data: "alreadyInSess", error: true));
+                        return;
                     }
-                    else
-                    {
-                        user = new User(SocketConnection, UserId, name);
 
-                        try
-                        {
-                            lock (_webSocketService._authUsers)
-                            {
-                                _webSocketService._authUsers.Add(user.UID, user);
-                            }
-                        }
-                        catch (ArgumentException)
-                        { }
-
-                        Room globalRoom;
-
-                        lock (_webSocketService._globalRooms)
-                        {
-                            globalRoom = _webSocketService._globalRooms[0];
-                        }
-                        _webSocketService.JoinRoom(user, globalRoom);
-
-                        outcallback.Add(new HandlerCallBack(header, "Aunthentication successful", true, false));
-
-                    }
-#if DEBUG
-                    lock (_webSocketService._connectionConnections) lock(user.Connections) lock(_webSocketService._authUsers)
-                    Program.LogService.Log($"Connections: {_webSocketService._connectionConnections.Count}");
-                    Program.LogService.Log($"User {user.Name} has : {user.Connections.Count}");
-                    Program.LogService.Log($"Auth users: {_webSocketService._authUsers.Count}");
-#endif
+                    session.AddConnection(connection);
                 }
+                else
+                {
+                    user = new User(UserId, Name);
+
+                    Session session = _webSocketService.CreateSession();
+                    session.User = user;
+                    session.AddConnection(connection);
+
+                    Room globalRoom;
+                    globalRoom = _webSocketService._globalRooms[0];
+                    globalRoom.AddUser(user);
+                }
+#if DEBUG
+                Program.LogService.Log($"Connections: {_webSocketService._connectionConnections.Count}");
+                Program.LogService.Log($"User {user.Name} has : {user.Session.Connections.Count()}");
+                Program.LogService.Log($"Auth users: {_webSocketService._authUsers.Count}");
+#endif
 
             })).Invoke();
 
             return outcallback;
-
         }
+
     }
 }

@@ -1,4 +1,8 @@
 {
+  "description": [
+    "В случае ошибки response: {data: null, error: {}}.  Если всё хорошо response: {data: {}, error: null}"
+  ],
+
   "Calls": {
 
     "Authorization": {
@@ -14,333 +18,293 @@
       "response": {
         "body": {
           "data": {
-            "successful": ":string:",
-            "unsuccessful": [
-              "badName",
-              "badPassword",
-              "wrongNamePass",
-              "alreadyInSess"
-            ],
-            "error": [
-              "invalidData"
-            ]
           },
-          "successful": true,
-          "error": true
+          "error": [
+            "wrongNamePass",
+            "alreadyInSess",
+            "SERVER-shiza badName",
+            "SERVER-shiza badPassword"
+          ]
         }
       }
     },
 
-    "DeAuthorization": {
+      "DeAuthorization": {
 
-      "header": "deAuth",
-      "request": {
-        "body": {
-        }
-      },
+        "header": "deAuth",
+        "request": {
+          "body": {
+          }
+        },
 
-      "response": {
-        "body": {
-          "data": {
-            "successful": ":string:",
-            "unsuccessful": [
-              "notAuth"
-            ],
+        "response": {
+          "body": {
+            "data": {
+            },
             "error": []
-          },
-          "successful": true,
-          "error": true
-        }
-      }
-    },
-
-    "ChangeProfile": {
-
-      "header": "changeProfile",
-      "request": {
-        "body": {
-          "!name": ":string:",
-          "!avatar": ":base64string:"
+          }
         }
       },
 
-      "response": {
-        "body": {
-          "data": {
-            "successful": ":string:",
-            "unsuccessful": [
-              "notAuth",
-              "badName",
+      "ChangeProfile": {
+
+        "header": "changeProfile",
+        "request": {
+          "body": {
+            "name": ":string: not required",
+            "avatar": ":base64string: not required"
+          }
+        },
+
+        "response": {
+          "body": {
+            "data": {
+            },
+            "error": [
+              "SERVER-shiza badName",
               "badImage",
               "nameExists"
+            ]
+          }
+        }
+      },
+
+      "GetUsers": {
+
+        "header": "getUsers",
+        "request": {
+          "body": {
+            "Users": [
+              [
+                ":uint:"
+              ],
+              ":null: current's user data"
+            ],
+            "Select": [
+              "all",
+              "name",
+              "avatar"
+            ]
+          }
+        },
+
+        "response": {
+          "body": {
+            "data": [
+              {
+                "id": ":uint:",
+                "name": ":string:",
+                "avatar": ":uint: id"
+              }
             ],
             "error": [
               "invalidData"
             ]
-          },
-          "successful": true,
-          "error": true
-        }
-      }
-    },
-
-    "GetUsers": {
-
-      "header": "getUsers",
-      "request": {
-        "body": {
-          "Users": [
-            [
-              ":uint:"
-            ],
-            null
-          ],
-          "Select": [
-            "name",
-            "avatar",
-            "avatarHash"
-          ]
+          }
         }
       },
 
-      "response": {
-        "body": {
-          "data": {
-            "successful": {
-              "data": [
-                {
-                  "id": ":uint:",
-                  "!name": ":string:",
-                  "!avatar": ":base64string:",
-                  "!avatarHash": ":string:"
-                }
-              ]
+      "Registration": {
+
+        "header": "registration",
+        "request": {
+          "body": {
+            "name": ":string:",
+            "password": ":string:"
+          }
+        },
+
+        "response": {
+          "body": {
+            "data": {
             },
-            "unsuccessful": [
-              "notAuth"
-            ],
-            "error": []
-          },
-          "successful": true,
-          "error": true
-        }
-      }
-    },
-
-    "Registration": {
-
-      "header": "registration",
-      "request": {
-        "body": {
-          "name": ":string:",
-          "password": ":string:"
+            "error": [
+              "nameExists",
+              "SERVER-shiza badName",
+              "SERVER-shiza badPassword",
+              "SERVER-shiza invalidData",
+              "SERVER-shiza uknownError"
+            ]
+          }
         }
       },
 
-      "response": {
-        "body": {
-          "data": {
-            "successful": ":string:",
-            "unsuccessful": [
-              "badName",
-              "badPassword",
-              "nameExists"
+      "GetRooms": {
+
+        "description": "Send string to get rooms by name. Send null to get all rooms.",
+        "header": "getRooms",
+
+        "request": {
+          "body": {
+            "room": [
+              ":string:",
+              null
+            ]
+          }
+        },
+
+        "response": {
+          "body": {
+            "data": [
+              {
+                "id": ":int:",
+                "room": ":string:",
+                "haspass": true
+              }
             ],
+            "error": [
+              "invalidData"
+            ]
+          }
+        }
+      },
+
+      "SendMsg": {
+
+        "header": "sendMsg",
+        "request": {
+          "body": {
+            "message": ":string:"
+          }
+        },
+
+        "response": {
+          "body": {
+            "data": {},
+            "error": [
+              "invalidData"
+            ]
+          }
+        }
+      },
+
+      "JoinRoom": {
+
+        "header": "joinRoom",
+        "request": {
+          "body": {
+            "id": ":int:",
+            "password": [
+              ":string:",
+              null
+            ]
+          }
+        },
+
+        "response": {
+          "body": {
+            "data": {
+              "id": ":int:",
+              "room": ":string:",
+              "message": ":string:"
+            },
             "error": [
               "invalidData",
-              "uknownError"
-            ]
-          },
-          "successful": true,
-          "error": true
-        }
-      }
-    },
-
-    "GetRooms": {
-
-      "header": "getRooms",
-
-      "request": {
-        "body": {
-          "room": [
-            ":string:",
-            null
-          ]
-        },
-        "desctiption": "Send string to get rooms by name. Send null to get all rooms."
-      },
-
-      "response": {
-        "body": {
-          "data": [
-            {
-              "id": ":int:",
-              "room": ":string:",
-              "haspass": true
-            }
-          ],
-          "successful": true,
-          "error": true
-        },
-        "desctiption": "Returns array sorted by input string like."
-      }
-
-    },
-
-    "Chat": {
-
-      "header": "chat",
-      "request": {
-        "body": {
-          "message": ":string:"
-        }
-      },
-
-      "response": {
-        "body": {
-          "userid": ":uint:",
-          "roomid": ":int:",
-          "message": ":string:"
-        }
-      }
-    },
-
-    "JoinRoom": {
-
-      "header": "joinRoom",
-      "request": {
-        "body": {
-          "id": ":int:",
-          "password": [
-            ":string:",
-            null
-          ]
-        }
-      },
-
-      "response": {
-        "body": {
-          "data": {
-            "successful": {
-              "id": ":int:",
-              "room": ":string:",
-              "message": ":string:"
-            },
-            "unsuccessful": [
               "invalidPass",
               "roomNotFound"
-            ],
-            "error": [
-              "invalidData"
             ]
-          },
-          "successful": true,
-          "error": true
-        }
-      }
-    },
-
-
-    "LeaveRoom": {
-
-      "header": "leaveRoom",
-      "request": {
-        "body": {
-          "id": ":int:"
+          }
         }
       },
 
-      "response": {
-        "body": {
-          "data": {
-            "successful": {
+
+      "LeaveRoom": {
+
+        "header": "leaveRoom",
+        "request": {
+          "body": {
+            "id": ":int:"
+          }
+        },
+
+        "response": {
+          "body": {
+            "data": {
               "id": ":int:",
               "room": ":string:",
               "message": ":string:"
             },
-            "unsuccessful": [
-              "roomNotFound",
-              "notInRoom"
-            ],
             "error": [
+              "roomNotFound",
+              "notInRoom",
               "invalidData"
             ]
-          },
-          "successful": true,
-          "error": true
-        }
-      }
-    },
-
-
-    "CreateRoom": {
-
-      "header": "createRoom",
-      "request": {
-        "body": {
-          "name": ":string:",
-          "password": [
-            ":string:",
-            null
-          ]
+          }
         }
       },
 
-      "response": {
-        "body": {
-          "data": {
-            "successful": {
+
+      "CreateRoom": {
+
+        "header": "createRoom",
+        "request": {
+          "body": {
+            "name": ":string:",
+            "password": [
+              ":string:",
+              null
+            ]
+          }
+        },
+
+        "response": {
+          "body": {
+            "data": {
               "id": ":int:",
               "name": ":string:",
               "message": ":string:"
             },
-            "unsuccessful": [
-              "roomExists",
-              "badName"
-            ],
             "error": [
+              "roomExists",
+              "badName",
               "invalidData"
             ]
-          },
-          "successful": true,
-          "error": true
+          }
         }
       }
-    }
 
-  },
+    },
 
-  "ServerCalls": {
+    "ServerCalls": {
 
-    "Access": {
-      "header": "access",
-      "response": {
-        "body": {
-          "data": {
-            "successful": ":string:",
+      "OnNewMsg": {
+        "header": "onNewMsg",
+        "description": "On new message in chat",
+
+        "response": {
+          "body": {
+            "data": {
+              "userid": ":uint:",
+              "roomid": ":int:",
+              "message": ":string:"
+            }
+          }
+        }
+      },
+
+      "Access": {
+        "header": "access",
+        "description": "SERVER_SHIZOID",
+
+        "response": {
+          "body": {
+            "data": {},
             "error": [
               "notAuth"
             ]
-          },
-          "successful": true,
-          "error": true
+          }
+        }
+      },
+
+      "RoomListChange": {
+        "header": "roomListChange",
+        "description": "Room list change",
+
+        "response": {
+          "body": {
+            "data": ":string:"
+          }
         }
       }
-    },
-
-    "RoomChange": {
-      "header": "roomChange",
-      "response": {
-        "body": {
-          "data": ":string:",
-          "successful": true,
-          "error": true
-        }
-      }
-
     }
-
-  }
-
 }

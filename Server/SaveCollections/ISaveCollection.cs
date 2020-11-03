@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 
 namespace Keyboardchat.SaveCollections
@@ -34,19 +33,19 @@ namespace Keyboardchat.SaveCollections
                 result = func.Invoke(Interface);
             }
             finally
-            {   
+            {
                 if (!threadEqual)
                 {
                     CurrentThread = null;
                     Mutex.ReleaseMutex();
                 }
-            }         
+            }
 
             return result;
         }
         public void Open<T4, T5>(Action<T4> action) where T4 : ISaveInterface<T5> where T5 : ISaveCollection
         {
-            Open<bool,T4,T5>((T4 Interface) => { action.Invoke(Interface); return true; });
+            Open<bool, T4, T5>((T4 Interface) => { action.Invoke(Interface); return true; });
         }
     }
 }

@@ -28,12 +28,12 @@ namespace Keyboardchat.SaveCollections
 
         public T2 Open<T2>(Func<SaveListInterface, T2> func)
         {
-            return (this as ISaveCollection).Open<T2,SaveListInterface, SaveList<T>>(func);
+            return (this as ISaveCollection).Open<T2, SaveListInterface, SaveList<T>>(func);
         }
 
         public void Open(Action<SaveListInterface> action)
         {
-           (this as ISaveCollection).Open<SaveListInterface, SaveList<T>>(action);
+            (this as ISaveCollection).Open<SaveListInterface, SaveList<T>>(action);
         }
 
         private T this[int index]
@@ -107,7 +107,7 @@ namespace Keyboardchat.SaveCollections
 
         ISaveInterface<T4> ISaveCollection.CreateInterface<T4>()
         {
-            return (ISaveInterface<T4>) new SaveListInterface(this);
+            return (ISaveInterface<T4>)new SaveListInterface(this);
         }
 
         public class SaveListInterface : ISaveInterface<SaveList<T>>, IEnumerable<T>

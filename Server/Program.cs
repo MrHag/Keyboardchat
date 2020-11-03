@@ -3,7 +3,6 @@ using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Buffers.Text;
 
 namespace Keyboardchat
 {
@@ -16,7 +15,7 @@ namespace Keyboardchat
 
         static Program()
         {
-            CurrentPath =  Environment.CurrentDirectory;
+            CurrentPath = Environment.CurrentDirectory;
 
             string allText = System.IO.File.ReadAllText($"{CurrentPath}/../../../API.json");
             API = JsonConvert.DeserializeObject(allText) as JObject;

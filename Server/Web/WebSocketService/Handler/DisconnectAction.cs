@@ -1,21 +1,38 @@
-﻿using Keyboardchat.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Keyboardchat.Web.WebSocketService.Handler
+﻿namespace Keyboardchat.Web.WebSocketService.Handler
 {
-    public partial class WebSocketServiceHandler
+    /*public class DisconnectActionHandler : WebSocketServiceHandler
     {
 
-        public void DisconnectAction(Connection SocketConnection, bool disconnected)
+        public override void DisconnectAction(Connection SocketConnection)
         {
 #if DEBUG
             _webSocketService.OnQueryMeessage("disconnection");
 #endif
 
             try
+            {
+                if (SocketConnection.Session != null)
+                {
+                    SocketConnection.Session.RemoveConnection(SocketConnection);
+                }
+                lock (_webSocketService._connectionConnections)
+                {
+                    _webSocketService._connectionConnections.Remove(SocketConnection.Socket);
+                }
+            }
+            finally
+            {
+#if DEBUG
+                lock (_webSocketService._connectionConnections)
+                {
+                    Program.LogService.Log("Connections:" + _webSocketService._connectionConnections.Count);
+                }
+#endif
+            }
+
+
+
+            *//*try
             {
                 if (disconnected)
                 {
@@ -81,8 +98,8 @@ namespace Keyboardchat.Web.WebSocketService.Handler
                     Program.LogService.Log("Connections:" + _webSocketService._connectionConnections.Count);
                 }
 #endif
-            }
+            }*//*
         }
 
-    }
+    }*/
 }

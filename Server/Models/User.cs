@@ -1,24 +1,35 @@
-﻿using Keyboardchat.SaveCollections;
-using SocketIOSharp.Server.Client;
-using System;
-using System.Collections.Generic;
-
-namespace Keyboardchat.Models
+﻿namespace Keyboardchat.Models
 {
+
     public class User
     {
-        public List<Connection> Connections { get; private set; }
+        public Session Session { get; set; }
         public uint UID { get; private set; }
-        public string Name { get; set; }
-        public Room Room { get; set; }
 
-        public User(Connection Connection, uint id, string Name, Room Room = null)
+        private string _name;
+        public string Name
+        {
+            get
+            { return _name; }
+
+            set
+            {
+                var input = value;
+
+                if (_name == input)
+                    return;
+
+                _name = input;
+                OnNameChanged?.Invoke(this, _name);
+            }
+        }
+
+        public event DataDelegate<string> OnNameChanged;
+
+        public User(uint id, string Name)
         {
             UID = id;
-            this.Name = Name;
-            this.Room = Room;
-            Connections = new List<Connection>();
-            Connections.Add(Connection);
+            _name = Name;
         }
 
     }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
+﻿using System.Collections.Generic;
 
 namespace Keyboardchat.SaveCollections
 {
@@ -14,15 +11,16 @@ namespace Keyboardchat.SaveCollections
             _data = new Queue<T>();
         }
 
-        public int Count { 
-            get 
+        public int Count
+        {
+            get
             {
                 int output;
 
                 output = _data.Count;
 
                 return output;
-            } 
+            }
         }
 
         public virtual T GetElem()

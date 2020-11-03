@@ -1,4 +1,5 @@
 ﻿using Keyboardchat.DataBase;
+using Keyboardchat.DataBase.Models;
 using Keyboardchat.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -7,28 +8,36 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Keyboardchat.Web.WebSocketService.Handler
 {
-    public partial class WebSocketServiceHandler
+    public class GetUsersHandler : WebSocketServiceHandler
     {
-        public IEnumerable<HandlerCallBack> GetUsers(Connection connection, string header, List<uint> userids, List<string> select)
+        [JsonProperty("Users", Required = Required.AllowNull)]
+        public List<uint> Usersids { get; set; }
+
+        [JsonProperty("Select")]
+        public List<string> Select { get; set; }
+
+        public override IEnumerable<HandlerCallBack> Handle(Connection connection)
         {
             var outcallback = new List<HandlerCallBack>();
 
             ((Action)(() =>
             {
-
-                User currentUser = _webSocketService.GetAuthUser(connection);
+                Models.User currentUser;
+                lock (_webSocketService._authUsers)
+                {
+                    currentUser = _webSocketService.GetAuthUser(connection);
+                }
 
                 List<DataBase.Models.User> dbusers = new List<DataBase.Models.User>();
 
                 using (var dbcontext = new DatabaseContext())
                 {
-                    if (userids != null)
+                    if (Usersids != null)
                     {
-                        foreach (var id in userids)
+                        foreach (var id in Usersids)
                         {
                             try
                             {
@@ -43,76 +52,53 @@ namespace Keyboardchat.Web.WebSocketService.Handler
                     {
                         dbusers.Add(dbcontext.Users.Single((user) => user.UserId == currentUser.UID));
                     }
-                }
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    using (StreamWriter streamWriter = new StreamWriter(memoryStream))
-                    using (JsonTextWriter jsonTextWriter = new JsonTextWriter(streamWriter))
+
+                    using (MemoryStream memoryStream = new MemoryStream())
                     {
-
-                        bool reqavatar = true;
-                        bool reqavatarHash = true;
-                        bool reqname = true;
-
-                        if (select != null && select.Count > 0)
+                        using (StreamWriter streamWriter = new StreamWriter(memoryStream))
+                        using (JsonTextWriter jsonTextWriter = new JsonTextWriter(streamWriter))
                         {
-                            reqavatar = select.Contains("avatar");
-                            reqavatarHash = select.Contains("avatarHash");
-                            reqname = select.Contains("name");
-                        }
 
-                        jsonTextWriter.WriteStartArray();
+                            bool reqavatar = true;
+                            bool reqname = true;
 
-                        foreach (var dbuser in dbusers)
-                        {
-                            jsonTextWriter.WriteStartObject();
-                            jsonTextWriter.WritePropertyName("id");
-                            jsonTextWriter.WriteValue(dbuser.UserId);
-
-                            if (reqname)
+                            if (Select != null && Select.Count > 0 && !Select.Contains("all"))
                             {
-                                jsonTextWriter.WritePropertyName("name");
-                                jsonTextWriter.WriteValue(dbuser.Name);
+                                reqavatar = Select.Contains("avatar");
+                                reqname = Select.Contains("name");
                             }
-                            if (reqavatar)
+
+                            jsonTextWriter.WriteStartArray();
+
+                            foreach (var dbuser in dbusers)
                             {
-                                byte[] dbavatar = dbuser.Avatar;
-                                string avatar = "";
+                                jsonTextWriter.WriteStartObject();
+                                jsonTextWriter.WritePropertyName("id");
+                                jsonTextWriter.WriteValue(dbuser.UserId);
 
-
-                                if (dbavatar != null)
+                                if (reqname)
                                 {
-                                    avatar = Convert.ToBase64String(dbavatar);
+                                    jsonTextWriter.WritePropertyName("name");
+                                    jsonTextWriter.WriteValue(dbuser.Name);
                                 }
-                                jsonTextWriter.WritePropertyName("avatar");
-                                jsonTextWriter.WriteValue(avatar);
-                            }
-                            if (reqavatarHash)
-                            {
-                                byte[] dbavatarHash = dbuser.Avatar;
-                                string avatarHash = "";
-
-
-                                if (dbavatarHash != null)
+                                if (reqavatar)
                                 {
-                                    avatarHash = Convert.ToBase64String(dbavatarHash);
+                                    jsonTextWriter.WritePropertyName("avatar");
+                                    jsonTextWriter.WriteValue(dbuser.AvatarId);
                                 }
-
-                                jsonTextWriter.WritePropertyName("avatarHash");
-                                jsonTextWriter.WriteValue(avatarHash);
                                 jsonTextWriter.WriteEndObject();
                             }
+
+                            jsonTextWriter.WriteEndArray();
+
                         }
 
-                        jsonTextWriter.WriteEndArray();
+                        string json = Encoding.UTF8.GetString(memoryStream.ToArray());
 
+                        var jObject = JArray.Parse(json);
+
+                        outcallback.Add(new HandlerCallBack(data: jObject, error: false));
                     }
-
-                    string json = Encoding.UTF8.GetString(memoryStream.ToArray());
-
-                    var jObject = JArray.Parse(json);
-
-                    outcallback.Add(new HandlerCallBack(header: header, data: jObject, successfull: true, error: false));
                 }
 
             })).Invoke();
