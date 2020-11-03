@@ -213,9 +213,10 @@ namespace Keyboardchat.Web.WebSocketService
             foreach (var callBack in callBacks)
             {
                 if (callBack.Error)
-                    ServiceResponseMessage(connection, header, callBack.Data);
-                else
                     ErrorResponseMessage(connection, header, callBack.Data);
+                else
+                    ServiceResponseMessage(connection, header, callBack.Data);
+
             }
         }
 
@@ -250,7 +251,7 @@ namespace Keyboardchat.Web.WebSocketService
 #endif
         }
 
-        internal void ResponseMessage(IEnumerable<Connection> connections, string header, object data, string err = null)
+        internal void ResponseMessage(IEnumerable<Connection> connections, string header, object data, object err = null)
         {
             foreach (var connection in connections)
                 ResponseMessage(connection, header, data, err);
@@ -279,12 +280,12 @@ namespace Keyboardchat.Web.WebSocketService
 
         internal void ServiceResponseMessage(Connection connection, string header, object data)
         {
-            ResponseMessage(connection, header, data);
+            ResponseMessage(connection, header, data, false);
         }
 
         internal void ServiceResponseMessage(IEnumerable<Connection> connections, string header, object data)
         {
-            ResponseMessage(connections, header, data);
+            ResponseMessage(connections, header, data, false);
         }
 
         internal void OnQueryMeessage(string header)
