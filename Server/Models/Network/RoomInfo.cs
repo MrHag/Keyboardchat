@@ -1,4 +1,4 @@
-﻿namespace Keyboardchat.Models.Network
+namespace KeyBoardChat.Models.Network
 {
     public struct RoomInfo
     {

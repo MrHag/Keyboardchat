@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Keyboardchat.DataBase.Models
+namespace KeyBoardChat.DataBase.Models
 {
     public class Avatar
     {

@@ -1,17 +1,15 @@
-using Keyboardchat.DataBase;
-using Keyboardchat.Web.WebSocketService;
+using KeyBoardChat.DataBase;
+using KeyBoardChat.Web.WebSocketService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Buffers;
 using System.Linq;
-using System.Text;
 
-namespace Keyboardchat
+
+namespace KeyBoardChat
 {
     public class Startup
     {
@@ -45,7 +43,7 @@ namespace Keyboardchat
                 endpoints.MapGet("/avatar/{avatarid}", async (context) =>
                 {
                     uint avatarid;
-                    if(!uint.TryParse(context.Request.RouteValues["avatarid"].ToString(), out avatarid))
+                    if (!uint.TryParse(context.Request.RouteValues["avatarid"].ToString(), out avatarid))
                         return;
 
                     using (var dbcontext = new DatabaseContext())

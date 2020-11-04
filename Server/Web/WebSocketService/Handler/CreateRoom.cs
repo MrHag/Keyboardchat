@@ -1,10 +1,10 @@
-﻿using Keyboardchat.Models;
-using Keyboardchat.Models.Network;
+using KeyBoardChat.Models;
+using KeyBoardChat.Models.Network;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
-namespace Keyboardchat.Web.WebSocketService.Handler
+namespace KeyBoardChat.Web.WebSocketService.Handler
 {
     public class CreateRoomHandler : WebSocketServiceHandler
     {
@@ -47,7 +47,7 @@ namespace Keyboardchat.Web.WebSocketService.Handler
 
                 _webSocketService.AddRoom(NewRoom);
 
-                outcallback.Add(new HandlerCallBack(data: new RespondeRoomInfo(NewRoom.Id, NewRoom.Name, "Created room"), error: false));
+                outcallback.Add(new HandlerCallBack(data: new RespondeRoomInfo(NewRoom.Id, NewRoom.Name, "Created room")));
 
                 NewRoom.AddUser(connection.Session.User);
 

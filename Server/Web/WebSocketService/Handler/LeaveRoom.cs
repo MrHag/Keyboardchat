@@ -1,9 +1,9 @@
-﻿using Keyboardchat.Models;
+using KeyBoardChat.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
-namespace Keyboardchat.Web.WebSocketService.Handler
+namespace KeyBoardChat.Web.WebSocketService.Handler
 {
     public class LeaveRoomHandler : WebSocketServiceHandler
     {

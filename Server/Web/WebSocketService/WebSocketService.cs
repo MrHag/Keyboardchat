@@ -1,21 +1,21 @@
-﻿using Keyboardchat.Extensions;
-using Keyboardchat.Models;
-using Keyboardchat.Models.Network;
-using Keyboardchat.UseClasses;
-using Keyboardchat.Web.WebSocketService.Handler;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using SocketIOSharp.Common;
-using SocketIOSharp.Server;
-using SocketIOSharp.Server.Client;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using KeyBoardChat.Extensions;
+using KeyBoardChat.Models;
+using KeyBoardChat.Models.Network;
+using KeyBoardChat.UseClasses;
+using KeyBoardChat.Web.WebSocketService.Handler;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using SocketIOSharp.Common;
+using SocketIOSharp.Server;
+using SocketIOSharp.Server.Client;
 
-namespace Keyboardchat.Web.WebSocketService
+namespace KeyBoardChat.Web.WebSocketService
 {
     public class WebSocketService : IDisposable
     {
@@ -273,19 +273,19 @@ namespace Keyboardchat.Web.WebSocketService
             ResponseMessage(connection, header, data, error);
         }
 
-        internal void ErrorResponseMessage(IEnumerable<Connection> connections, string header, object data, string error)
+        internal void ErrorResponseMessage(IEnumerable<Connection> connections, string header, object data, object error)
         {
             ResponseMessage(connections, header, data, error);
         }
 
         internal void ServiceResponseMessage(Connection connection, string header, object data)
         {
-            ResponseMessage(connection, header, data, false);
+            ResponseMessage(connection, header, data);
         }
 
         internal void ServiceResponseMessage(IEnumerable<Connection> connections, string header, object data)
         {
-            ResponseMessage(connections, header, data, false);
+            ResponseMessage(connections, header, data);
         }
 
         internal void OnQueryMeessage(string header)
@@ -407,7 +407,7 @@ namespace Keyboardchat.Web.WebSocketService
 
 #if DEBUG
 
-            var fakedataPath = $"{Program.CurrentPath}/../../fake_data/fake.json";
+            var fakedataPath = $"{Program.CurrentPath}/Server/fake_data/fake.json";
 
             string allText = File.ReadAllText(fakedataPath);
 
@@ -499,13 +499,13 @@ namespace Keyboardchat.Web.WebSocketService
 
                     if (!ValidateDefaultText(authorizationHandler.Name, maxlength: 32))
                     {
-                        ErrorResponseMessage(SocketConnection, header, "badName", false);
+                        ErrorResponseMessage(SocketConnection, header, "badName");
                         return;
                     }
 
                     if (!ValidateDefaultText(authorizationHandler.Password, maxlength: 64))
                     {
-                        ErrorResponseMessage(SocketConnection, header, "badPass", false);
+                        ErrorResponseMessage(SocketConnection, header, "badPassword");
                         return;
                     }
 
@@ -570,6 +570,8 @@ namespace Keyboardchat.Web.WebSocketService
 
                     if (!ValidateDefaultText(message))
                         return;
+
+                    chatHandler.Message = message;
 
                     chatHandler.Handle(SocketConnection);
 

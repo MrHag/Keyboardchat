@@ -23,7 +23,8 @@
             "wrongNamePass",
             "alreadyInSess",
             "SERVER-shiza badName",
-            "SERVER-shiza badPassword"
+            "SERVER-shiza badPassword",
+            "invalidData"
           ]
         }
       }
@@ -273,11 +274,9 @@
 
         "response": {
           "body": {
-            "data": {
-              "userid": ":uint:",
-              "roomid": ":int:",
-              "message": ":string:"
-            }
+            "userid": ":uint:",
+            "roomid": ":int:",
+            "message": ":string:"
           }
         }
       },

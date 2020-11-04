@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Keyboardchat.SaveCollections
+namespace KeyBoardChat.SaveCollections
 {
     public class QueueDataManager<T>
     {

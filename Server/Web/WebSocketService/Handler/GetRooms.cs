@@ -1,11 +1,10 @@
-﻿using Keyboardchat.Models;
-using Keyboardchat.Models.Network;
+﻿using KeyBoardChat.Models;
+using KeyBoardChat.Models.Network;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
-namespace Keyboardchat.Web.WebSocketService.Handler
+namespace KeyBoardChat.Web.WebSocketService.Handler
 {
     public class GetRoomsHandler : WebSocketServiceHandler
     {
@@ -48,9 +47,10 @@ namespace Keyboardchat.Web.WebSocketService.Handler
 
                             string roomName = room.room.Name;
 
-                            bool PeaceMatch(string peace)
+                            bool PeaceMatch(string peace)//Think about this
                             {
-                                if (Regex.IsMatch(roomName, $"(?i)({peace})+"))
+                                //if (Regex.IsMatch(roomName, $"(?i)({peace})+"))
+                                if(roomName.Contains(peace))
                                 {
                                     room.qual = peace.Length;
                                     rooms[key] = room;
@@ -82,7 +82,7 @@ namespace Keyboardchat.Web.WebSocketService.Handler
                     outrooms.Add(new RoomInfo(room.room.Id, room.room.Name, haspass));
                 }
 
-                outcallback.Add(new HandlerCallBack(data: outrooms, error: false));
+                outcallback.Add(new HandlerCallBack(data: outrooms));
             })).Invoke();
 
 

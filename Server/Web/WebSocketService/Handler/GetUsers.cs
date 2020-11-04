@@ -1,6 +1,5 @@
-﻿using Keyboardchat.DataBase;
-using Keyboardchat.DataBase.Models;
-using Keyboardchat.Models;
+using KeyBoardChat.DataBase;
+using KeyBoardChat.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -9,7 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Keyboardchat.Web.WebSocketService.Handler
+namespace KeyBoardChat.Web.WebSocketService.Handler
 {
     public class GetUsersHandler : WebSocketServiceHandler
     {
@@ -97,7 +96,7 @@ namespace Keyboardchat.Web.WebSocketService.Handler
 
                         var jObject = JArray.Parse(json);
 
-                        outcallback.Add(new HandlerCallBack(data: jObject, error: false));
+                        outcallback.Add(new HandlerCallBack(data: jObject));
                     }
                 }
 

@@ -1,5 +1,5 @@
-﻿using Keyboardchat.DataBase;
-using Keyboardchat.Models;
+using KeyBoardChat.DataBase;
+using KeyBoardChat.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Keyboardchat.Web.WebSocketService.Handler
+namespace KeyBoardChat.Web.WebSocketService.Handler
 {
     public class AuthorizationHandler : WebSocketServiceHandler
     {

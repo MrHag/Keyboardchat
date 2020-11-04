@@ -1,6 +1,6 @@
 ﻿using SocketIOSharp.Server.Client;
 
-namespace Keyboardchat.Models
+namespace KeyBoardChat.Models
 {
     public class Connection
     {
