@@ -47,7 +47,7 @@ namespace Keyboardchat.Web.WebSocketService.Handler
 
                 _webSocketService.AddRoom(NewRoom);
 
-                outcallback.Add(new HandlerCallBack(data: new RespondeRoomInfo(NewRoom.Id, NewRoom.Name, "Created room"), error: false));
+                outcallback.Add(new HandlerCallBack(data: new RespondeRoomInfo(NewRoom.Id, NewRoom.Name, "Created room")));
 
                 NewRoom.AddUser(connection.Session.User);
 

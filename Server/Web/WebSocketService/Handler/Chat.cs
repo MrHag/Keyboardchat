@@ -6,9 +6,6 @@ namespace Keyboardchat.Web.WebSocketService.Handler
 {
     public class ChatHandler : WebSocketServiceHandler
     {
-        [JsonProperty("id")]
-        public uint Id { get; set; }
-
         [JsonProperty("message")]
         public string Message { get; set; }
 

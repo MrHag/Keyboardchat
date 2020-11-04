@@ -84,7 +84,7 @@ namespace Keyboardchat.Web.WebSocketService.Handler
 
                             dbcontext.SaveChanges();
 
-                            outcallback.Add(new HandlerCallBack(data: "Data changed", error: false));
+                            outcallback.Add(new HandlerCallBack(data: "Data changed"));
 
                         }
                     }

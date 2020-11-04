@@ -13,19 +13,26 @@ namespace Keyboardchat
         public static JObject API;
         public static LogService LogService;
 
-        static Program()
+
+        public static void Init(string directory = null)
         {
+            if (directory == null)
+                Environment.CurrentDirectory = $"{Environment.CurrentDirectory}/../../..";
+            else
+                Environment.CurrentDirectory = directory;
+
             CurrentPath = Environment.CurrentDirectory;
 
-            string allText = System.IO.File.ReadAllText($"{CurrentPath}/../../../API.json");
+            string allText = System.IO.File.ReadAllText($"{CurrentPath}/API.json");
             API = JsonConvert.DeserializeObject(allText) as JObject;
             LogService = new LogService();
 
-            FilePath = $"{CurrentPath}/../../../public";
+            FilePath = $"{CurrentPath}/public";
         }
 
         public static void Main(string[] args)
         {
+            Init();
             CreateHostBuilder(args).Build().Run();
         }
 

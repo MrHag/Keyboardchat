@@ -44,7 +44,7 @@ namespace Keyboardchat.Web.WebSocketService.Handler
                         dbcontext.Add(dbUser);
                         if (dbcontext.SaveChanges() > 0)
                         {
-                            outcallback.Add(new HandlerCallBack(data: "Registration successful", error: false));
+                            outcallback.Add(new HandlerCallBack(data: "Registration successful"));
                             return;
                         }
                         else

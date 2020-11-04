@@ -9,6 +9,8 @@
 /Server/UniServerZ/
 /Client/obj/
 /Server/obj/
+UnitTest/obj/
+UnitTest/bin/
 
 Keyboardchat.code-workspace
 /.vscode/

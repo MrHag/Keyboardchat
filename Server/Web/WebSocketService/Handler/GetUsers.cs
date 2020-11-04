@@ -97,7 +97,7 @@ namespace Keyboardchat.Web.WebSocketService.Handler
 
                         var jObject = JArray.Parse(json);
 
-                        outcallback.Add(new HandlerCallBack(data: jObject, error: false));
+                        outcallback.Add(new HandlerCallBack(data: jObject));
                     }
                 }
 

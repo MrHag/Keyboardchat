@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.EntityFrameworkCore.Query.Internal;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 
 namespace Keyboardchat.Extensions
 {
@@ -8,6 +11,5 @@ namespace Keyboardchat.Extensions
         {
             return JsonConvert.SerializeObject(obj);
         }
-
     }
 }
