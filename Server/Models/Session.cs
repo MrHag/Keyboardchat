@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Keyboardchat.Models
+namespace KeyBoardChat.Models
 {
     public class Session
     {

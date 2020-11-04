@@ -1,6 +1,5 @@
-﻿using Keyboardchat.DataBase;
-using Keyboardchat.DataBase.Models;
-using Keyboardchat.Models;
+using KeyBoardChat.DataBase;
+using KeyBoardChat.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -9,7 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Keyboardchat.Web.WebSocketService.Handler
+namespace KeyBoardChat.Web.WebSocketService.Handler
 {
     public class GetUsersHandler : WebSocketServiceHandler
     {

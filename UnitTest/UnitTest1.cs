@@ -1,7 +1,7 @@
 using EngineIOSharp.Client;
-using Keyboardchat;
-using Keyboardchat.Extensions;
-using Keyboardchat.Web.WebSocketService;
+using KeyBoardChat;
+using KeyBoardChat.Extensions;
+using KeyBoardChat.Web.WebSocketService;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

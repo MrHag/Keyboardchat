@@ -1,14 +1,13 @@
-﻿using Keyboardchat.DataBase;
-using Keyboardchat.DataBase.Models;
-using Keyboardchat.Models;
+using KeyBoardChat.DataBase;
+using KeyBoardChat.DataBase.Models;
+using KeyBoardChat.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 
-namespace Keyboardchat.Web.WebSocketService.Handler
+namespace KeyBoardChat.Web.WebSocketService.Handler
 {
     public class ChangeProfileHandler : WebSocketServiceHandler
     {

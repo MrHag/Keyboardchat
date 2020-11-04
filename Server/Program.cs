@@ -1,10 +1,10 @@
+using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 
-namespace Keyboardchat
+namespace KeyBoardChat
 {
     public class Program
     {

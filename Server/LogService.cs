@@ -1,8 +1,8 @@
-﻿using Keyboardchat.Extensions;
-using System;
+﻿using System;
 using System.Diagnostics;
+using KeyBoardChat.Extensions;
 
-namespace Keyboardchat
+namespace KeyBoardChat
 {
     public class LogService
     {
