@@ -37,6 +37,8 @@ namespace KeyBoardChat.Web.WebSocketService
 
         internal List<Room> _globalRooms;
 
+        private User _serverUser;
+
         public WebSocketService()
         {
             Calls = Program.API.SelectToken("Calls");
@@ -46,6 +48,8 @@ namespace KeyBoardChat.Web.WebSocketService
             _connectionConnections = new Dictionary<SocketIOSocket, Connection>();
             _roomUIDmanager = new UIDmanager();
             _rooms = new SortedDictionary<int, Room>();
+
+            _serverUser = new User(0, "Server");
 
             OnRoomAdded += WebSocketService_OnRoomAdded;
             OnRoomRemoved += WebSocketService_OnRoomRemoved;
@@ -143,13 +147,13 @@ namespace KeyBoardChat.Web.WebSocketService
             if (sessRoom != null)
             {
                 ServiceResponseMessage(sessConnections, Calls["LeaveRoom"]["header"].ToString(), new RespondeRoomInfo(sessRoom.Id, sessRoom.Name, "Leaved from room"));
-                SendChatMessage(sessRoom, sess.User.Name + " disconnected", 0);
+                SendChatMessage(sessRoom, sess.User.Name + " disconnected", _serverUser);
             }
 
             if (room != null)
             {
                 ServiceResponseMessage(sessConnections, Calls["JoinRoom"]["header"].ToString(), new RespondeRoomInfo(room.Id, room.Name, "Join room"));
-                SendChatMessage(room, sess.User.Name + " connected", 0);
+                SendChatMessage(room, sess.User.Name + " connected", _serverUser);
             }
         }
 
@@ -257,14 +261,14 @@ namespace KeyBoardChat.Web.WebSocketService
                 ResponseMessage(connection, header, data, err);
         }
 
-        internal void SendChatMessage(Room room, string message, uint userId)
+        internal void SendChatMessage(Room room, string message, User user)
         {
-            var MessageBody = new MessageBody(userId, room.Id, message);
+            var MessageBody = new MessageBody(user.UID, user.Name, room.Id, message);
             server.EmitTo(room, SCalls["OnNewMsg"]["header"].ToString(), MessageBody);
 #if DEBUG
             string name = room.Name;
 
-            Program.LogService.Log($"Message to\n{name}, {message}, from {userId}");
+            Program.LogService.Log($"Message to\n{name}, {message}, from {user.UID}");
 #endif
         }
 

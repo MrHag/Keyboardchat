@@ -11,7 +11,7 @@ namespace KeyBoardChat.Web.WebSocketService.Handler
 
         public override IEnumerable<HandlerCallBack> Handle(Connection connection)
         {
-            _webSocketService.SendChatMessage(connection.Session.Room, Message, connection.Session.User.UID);
+            _webSocketService.SendChatMessage(connection.Session.Room, Message, connection.Session.User);
             return null;
         }
 

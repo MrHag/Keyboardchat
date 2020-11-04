@@ -29,7 +29,7 @@ namespace KeyBoardChat.Web.WebSocketService.Handler
                 {
                     try
                     {
-                        dbcontext.Users.Single(user => user.Name == Name);
+                        _ = dbcontext.Users.Single(user => user.Name == Name);
 
                         outcallback.Add(new HandlerCallBack(data: "nameExists", error: true));
                     }

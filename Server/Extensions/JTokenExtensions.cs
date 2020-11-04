@@ -7,18 +7,20 @@ namespace KeyBoardChat.Extensions
 
         public static JToken Make(params (string name, object data)[] properties)
         {
-            JTokenWriter jTokenWriter = new JTokenWriter();
-            jTokenWriter.WriteStartObject();
-
-            foreach (var property in properties)
+            using (JTokenWriter jTokenWriter = new JTokenWriter())
             {
-                jTokenWriter.WritePropertyName(property.name);
-                jTokenWriter.WriteValue(property.data);
+                jTokenWriter.WriteStartObject();
+
+                foreach (var property in properties)
+                {
+                    jTokenWriter.WritePropertyName(property.name);
+                    jTokenWriter.WriteValue(property.data);
+                }
+
+                jTokenWriter.WriteEndObject();
+
+                return jTokenWriter.Token;
             }
-
-            jTokenWriter.WriteEndObject();
-
-            return jTokenWriter.Token;
         }
 
     }

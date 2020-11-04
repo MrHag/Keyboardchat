@@ -33,13 +33,13 @@ namespace UnitTest
 
             _client = new SocketIOClient(new SocketIOClientOption(EngineIOSharp.Common.Enum.EngineIOScheme.http, "127.0.0.1", 4001));
 
-            webSocketService = new WebSocketService();
-
-
-            Start();
-            NotauthRequests();
-            authRequest();
-            messageRequest();
+            using (webSocketService = new WebSocketService())
+            {
+                Start();
+                NotauthRequests();
+                authRequest();
+                messageRequest();
+            }
 
         }
 
@@ -161,6 +161,7 @@ namespace UnitTest
             sendData = JTokenExtensions.Make(("message", message));
             waitedData = WaitData(header, inputHeader: "onNewMsg", data: sendData);
             Assert.AreNotEqual(waitedData["userid"], null);
+            Assert.AreNotEqual(waitedData["userName"], null);
             Assert.AreNotEqual(waitedData["roomid"], null);
             Assert.AreEqual(waitedData["message"], message);
 

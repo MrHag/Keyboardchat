@@ -275,6 +275,7 @@
         "response": {
           "body": {
             "userid": ":uint:",
+            "userName": ":string:",
             "roomid": ":int:",
             "message": ":string:"
           }
