@@ -1,7 +1,7 @@
-﻿using Keyboardchat.Models;
 using System.Collections.Generic;
+using KeyBoardChat.Models;
 
-namespace Keyboardchat.Web.WebSocketService.Handler
+namespace KeyBoardChat.Web.WebSocketService.Handler
 {
     public class DeauthorizationHandler : WebSocketServiceHandler
     {

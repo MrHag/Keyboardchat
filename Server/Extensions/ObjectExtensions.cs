@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 
-namespace Keyboardchat.Extensions
+namespace KeyBoardChat.Extensions
 {
     public static class ObjectExtensions
     {

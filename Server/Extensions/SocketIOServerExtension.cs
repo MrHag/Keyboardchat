@@ -1,10 +1,8 @@
-﻿using EngineIOSharp.Common;
-using Keyboardchat.Models;
+using KeyBoardChat.Models;
 using SocketIOSharp.Server;
 using SocketIOSharp.Server.Client;
-using System;
 
-namespace Keyboardchat.Extensions
+namespace KeyBoardChat.Extensions
 {
     public static class SocketIOServerExtension
     {

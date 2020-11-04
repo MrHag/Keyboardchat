@@ -1,21 +1,21 @@
-﻿using Keyboardchat.Extensions;
-using Keyboardchat.Models;
-using Keyboardchat.Models.Network;
-using Keyboardchat.UseClasses;
-using Keyboardchat.Web.WebSocketService.Handler;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using SocketIOSharp.Common;
-using SocketIOSharp.Server;
-using SocketIOSharp.Server.Client;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using KeyBoardChat.Extensions;
+using KeyBoardChat.Models;
+using KeyBoardChat.Models.Network;
+using KeyBoardChat.UseClasses;
+using KeyBoardChat.Web.WebSocketService.Handler;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using SocketIOSharp.Common;
+using SocketIOSharp.Server;
+using SocketIOSharp.Server.Client;
 
-namespace Keyboardchat.Web.WebSocketService
+namespace KeyBoardChat.Web.WebSocketService
 {
     public class WebSocketService : IDisposable
     {

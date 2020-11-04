@@ -1,4 +1,4 @@
-﻿namespace Keyboardchat.Models
+namespace KeyBoardChat.Models
 {
 
     public class User

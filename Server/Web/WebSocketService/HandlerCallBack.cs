@@ -1,4 +1,4 @@
-﻿namespace Keyboardchat.Web.WebSocketService
+namespace KeyBoardChat.Web.WebSocketService
 {
     public class HandlerCallBack
     {

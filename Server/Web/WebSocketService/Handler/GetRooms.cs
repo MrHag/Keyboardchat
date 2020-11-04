@@ -1,11 +1,10 @@
-﻿using Keyboardchat.Models;
-using Keyboardchat.Models.Network;
+﻿using KeyBoardChat.Models;
+using KeyBoardChat.Models.Network;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
-namespace Keyboardchat.Web.WebSocketService.Handler
+namespace KeyBoardChat.Web.WebSocketService.Handler
 {
     public class GetRoomsHandler : WebSocketServiceHandler
     {

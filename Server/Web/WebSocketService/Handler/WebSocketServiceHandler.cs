@@ -1,7 +1,7 @@
-﻿using Keyboardchat.Models;
+using KeyBoardChat.Models;
 using System.Collections.Generic;
 
-namespace Keyboardchat.Web.WebSocketService.Handler
+namespace KeyBoardChat.Web.WebSocketService.Handler
 {
     public abstract class WebSocketServiceHandler
     {

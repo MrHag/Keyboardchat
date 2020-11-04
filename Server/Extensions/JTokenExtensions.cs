@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace Keyboardchat.Extensions
+namespace KeyBoardChat.Extensions
 {
     public static class JTokenExtensions
     {
