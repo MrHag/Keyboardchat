@@ -53,6 +53,7 @@ const UserData = {
   inRoom: new Room(undefined, 'globals'),
   setInRoomJSON(json) {
     this.inRoom = Room.fromJSON(json);
+    console.warn('setInRoomJSON = ', this.inRoom);
   },
   setInRoom(room) {
     this.inRoom = room;

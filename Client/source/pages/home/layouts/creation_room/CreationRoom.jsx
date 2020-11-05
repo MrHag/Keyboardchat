@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 import { Input, InputPassword, Button, Form } from 'components';
-import { Socket, UserData } from 'logic';
+import { Socket, SocketManager, UserData } from 'logic';
 import { ROUTES } from 'shared';
 
 import './CreationRoom.scss';
@@ -28,21 +28,18 @@ const CreationRoom = ({ onRoomCreate }) => {
     routeHistory.goBack();
   };
 
-  const socketCreateRoom = (data) => {
-    console.log('Socket create room = ', data);
-    if (data.successful) {
-      UserData.setInRoomJSON(data.data);
+  const socketCreateRoom = (result) => {
+    if (result.error === null) {
+      console.log('Result.data = ', result.data);
+      UserData.setInRoomJSON(result.data);
       routeHistory.push(ROUTES.RoomChat.route);
       onRoomCreate();
-    } else {
-      // Here might be other types of errors
-      setErr('Room with this name already exist!');
     }
   };
 
   useEffect(() => {
-    Socket.on('createRoom', socketCreateRoom);
-    return () => Socket.removeEventListener('createRoom', socketCreateRoom);
+    SocketManager.addCallback('createRoom', socketCreateRoom);
+    return () => SocketManager.removeCallback('createRoom', socketCreateRoom);
   }, []);
 
   const onInputKeydown = (e) => {

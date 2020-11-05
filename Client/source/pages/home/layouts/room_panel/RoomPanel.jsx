@@ -23,7 +23,7 @@ const RoomList = ({ inRoom, rooms, joinRoom, leaveRoom }) => {
   return (
     <div ref={listRef} className="room-panel__list">
       {
-        list.map((room, index) => {
+        list.map((room) => {
           const isActive = room.compare(inRoom);
           return (
             <RoomItem
@@ -77,7 +77,7 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
   };
 
   const socketRoomLeave = (data) => {
-    console.log("ON ROOM LEAVE RESPONSE: ", data);
+    console.log('ON ROOM LEAVE RESPONSE: ', data);
   };
 
   const socketGetrooms = (data) => {
@@ -98,7 +98,6 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
   };
 
   const removeSocketListeners = () => {
-
     SocketManager.removeCallback('getRooms', socketGetrooms);
     SocketManager.removeCallback('joinRoom', socketJoinroom);
     SocketManager.removeCallback('leaveRoom', socketRoomLeave);

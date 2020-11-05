@@ -34,7 +34,7 @@ const SignUp = () => {
     } else {
       setErr(result.error);
     }
-  }
+  };
 
   useEffect(() => {
     SocketManager.addCallback('registration', newSocketReg);

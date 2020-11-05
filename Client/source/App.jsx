@@ -1,6 +1,6 @@
 import { hot } from 'react-hot-loader/root';
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Route, useHistory, Switch } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 
 import { ROUTES } from 'shared';
 import { Welcome, Home } from './pages';

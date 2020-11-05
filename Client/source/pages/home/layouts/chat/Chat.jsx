@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { ChatMessage, ChatInput } from 'components';
-import { UserData, Message, Socket, SocketManager } from 'logic';
+import { UserData, SocketManager } from 'logic';
 
 import ChatHeader from './chat_header/ChatHeader';
 import './Chat.scss';
 
 const ChatHistory = ({ messages, historyRef }) => {
   const historyMessages = messages.map(
-    (msg, index) => <ChatMessage key={index + msg.author.id} msg={msg} />,
+    (msg, index) => <ChatMessage key={index} msg={msg} />,
   );
 
   return (
@@ -42,8 +42,8 @@ const Chat = () => {
   const socketJoinRoom = (result) => {
     if (result.error === null) {
       setState({
-          messages: [],
-          room_name: result.data.room,
+        messages: [],
+        room_name: result.data.room,
       });
     }
   };
@@ -61,7 +61,7 @@ const Chat = () => {
       setState({ room_name: state.room_name, messages: [...state.messages, msg] });
       historyRef.current.scrollTop = historyRef.current.scrollHeight;
     }
-  }
+  };
 
   const initSockets = () => {
     SocketManager.addCallback('onNewMsg', onNewMessage);

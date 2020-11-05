@@ -44,7 +44,7 @@ const Home = () => {
       UserData.user = User.fromJSON(result.data[0]);
       forceUpdate(force + 1);
     }
-  }
+  };
 
   useEffect(() => {
     SocketManager.addCallback('getUsers', socketGetUsers);
@@ -64,7 +64,7 @@ const Home = () => {
         <Route path={ROUTES.UserPanel.route} component={UserPanel} />
         <Route path={ROUTES.CreateRoom.route}>
           <CreationRoom
-            onRoomCreate={(_) => forceUpdate(force + 1)}
+            onRoomCreate={() => forceUpdate(force + 1)}
           />
         </Route>
       </Switch>

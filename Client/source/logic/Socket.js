@@ -23,7 +23,6 @@ const SocketManager = {
   addCallback(event, callback) {
     if (this.callbacks.has(event)) {
       this.callbacks.get(event).push(callback);
-      //console.log('SocketManager: AddCallback finished!', this.callbacks);
     } else {
       console.warn(`SocketManager: you're trying to add callback to not registered event. Event ${event} isn't registered in SocketManager!`);
     }
@@ -31,7 +30,7 @@ const SocketManager = {
 
   removeCallback(event, callback) {
     if (this.callbacks.has(event)) {
-      let callbacks = this.callbacks.get(event);
+      const callbacks = this.callbacks.get(event);
       const index = callbacks.indexOf(callback);
       if (index !== -1) {
         callbacks.splice(index, 1);
@@ -40,7 +39,7 @@ const SocketManager = {
   },
 
   emitResult(event, result) {
-    console.log("SocketManager emitting result: event = ", event);
+    console.log('SocketManager emitting result: event = ', event);
     this.callbacks.get(event).forEach((callback) => {
       callback(result);
     });
@@ -54,7 +53,7 @@ class Result {
   }
 }
 
-(function Subscribe() {
+function Subscribe() {
   function warnCannotHandleError(event, error) {
     console.warn(`SocketManager: Seems SocketManager can't handle error '${error}' of '${event}'`);
   }
@@ -65,13 +64,13 @@ class Result {
     if (data.error !== null) {
       switch (data.error) {
         case 'wrongNamePass':
-          result.error = 'Wrong password or username!'
+          result.error = 'Wrong password or username!';
           break;
         default:
           warnCannotHandleError('auth', data.error);
           result.error = data.error;
           break;
-      }  
+      }
     }
 
     SocketManager.emitResult('auth', result);
@@ -97,17 +96,18 @@ class Result {
   });
 
   Socket.on('getUsers', (data) => {
-    if (data.error) throw data.error; //Here must not be error in the client app
+    if (data.error) throw data.error; // Here must not be error in the client app
     const result = new Result(data.data);
     SocketManager.emitResult('getUsers', result);
   });
 
-  Socket.on('onNewMsg', (data) => {
-    if (data.data != undefined) throw 'Handle data on onNewMsg! There will be a change in the API and this response in the body will return "data" field'; // For futures changes in API
+  Socket.on('onNewMsg', (d) => {
+    const { data } = d;
     const result = new Result(
-       new Message(
+      new Message(
         {
           id: data.userid,
+          userName: data.userName,
           avatar: null,
         },
         {
@@ -115,7 +115,7 @@ class Result {
         },
         data.roomid,
         new Date(),
-      )
+      ),
     );
     SocketManager.emitResult('onNewMsg', result);
   });
@@ -127,7 +127,7 @@ class Result {
       if (data.error === 'invalidPass') {
         result.error = 'Invalid password';
       } else {
-        throw 'SocketManager: joinRoom returns error! This is critical error!!!';
+        throw Error('SocketManager: joinRoom returns error! This is critical error!!!');
       }
     } else {
       result.data = data.data;
@@ -136,13 +136,13 @@ class Result {
   });
 
   Socket.on('roomListChange', (data) => {
-    console.log("SocketManager: roomListChange: ", data.data);
+    console.log('SocketManager: roomListChange: ', data.data);
     const result = new Result(data.data);
     SocketManager.emitResult('roomListChange', result);
   });
 
   Socket.on('getRooms', (data) => {
-    if (data.error !== null) throw 'SocketManager: getRooms critical error! Server returns unhandled error!';
+    if (data.error !== null) throw Error('SocketManager: getRooms critical error! Server returns unhandled error!');
     console.log('SocketManager: getRooms: ', data);
     const result = new Result(data.data);
     SocketManager.emitResult('getRooms', result);
@@ -151,8 +151,24 @@ class Result {
   Socket.on('leaveRoom', (data) => {
     const result = new Result(data);
     SocketManager.emitResult('leaveRoom', result);
-  })
+  });
 
-})();
+  Socket.on('createRoom', (data) => {
+    console.log('Socket create room = ', data);
+    const result = new Result(data.data);
+    if (data.error !== null) {
+      switch (data.error) {
+        case 'roomExists':
+          result.error = 'Room with this name already exist!';
+          break;
+        default:
+          warnCannotHandleError('createRoom', data.error);
+          break;
+      }
+    }
+    SocketManager.emitResult('createRoom', result);
+  });
+}
+Subscribe();
 
-export { SocketManager }
+export { SocketManager };

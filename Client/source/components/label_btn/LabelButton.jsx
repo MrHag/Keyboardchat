@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import classNames from 'class-names';
-import { withStyles } from '@material-ui/core';
 
 import './LabelButton.scss';
 

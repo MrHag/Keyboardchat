@@ -8,10 +8,10 @@ import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
 import { IconButton } from 'components';
 import './Sidebar.scss';
 
-const Sidebar = ({ children, ...props }) => {
+const Sidebar = ({ children }) => {
   const [isHidden, setHidden] = React.useState(false);
 
-  const onArrowBtnHandler = (e) => {
+  const onArrowBtnHandler = () => {
     setHidden(!isHidden);
   };
 

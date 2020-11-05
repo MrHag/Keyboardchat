@@ -31,7 +31,7 @@ const SignIn = () => {
     } else {
       setErr(authData.error);
     }
-  }
+  };
 
   useEffect(() => {
     SocketManager.addCallback('auth', newSocketAuth);
