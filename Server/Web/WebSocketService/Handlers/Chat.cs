@@ -2,7 +2,7 @@ using KeyBoardChat.Models;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace KeyBoardChat.Web.WebSocketService.Handler
+namespace KeyBoardChat.Web.WebSocketService.Handlers
 {
     public class ChatHandler : WebSocketServiceHandler
     {

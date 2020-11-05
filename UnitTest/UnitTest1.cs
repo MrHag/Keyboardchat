@@ -159,7 +159,7 @@ namespace UnitTest
             Assert.AreEqual(waitedData, "invalidData");
 
             sendData = JTokenExtensions.Make(("message", message));
-            waitedData = WaitData(header, inputHeader: "onNewMsg", data: sendData);
+            waitedData = WaitData(header, inputHeader: "onNewMsg", data: sendData)["data"];
             Assert.AreNotEqual(waitedData["userid"], null);
             Assert.AreNotEqual(waitedData["userName"], null);
             Assert.AreNotEqual(waitedData["roomid"], null);

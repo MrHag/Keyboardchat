@@ -8,7 +8,7 @@ using KeyBoardChat.Extensions;
 using KeyBoardChat.Models;
 using KeyBoardChat.Models.Network;
 using KeyBoardChat.UseClasses;
-using KeyBoardChat.Web.WebSocketService.Handler;
+using KeyBoardChat.Web.WebSocketService.Handlers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SocketIOSharp.Common;
@@ -263,7 +263,7 @@ namespace KeyBoardChat.Web.WebSocketService
 
         internal void SendChatMessage(Room room, string message, User user)
         {
-            var MessageBody = new MessageBody(user.UID, user.Name, room.Id, message);
+            var MessageBody = new ResponseBody(new MessageBody(user.UID, user.Name, room.Id, message), null);
             server.EmitTo(room, SCalls["OnNewMsg"]["header"].ToString(), MessageBody);
 #if DEBUG
             string name = room.Name;

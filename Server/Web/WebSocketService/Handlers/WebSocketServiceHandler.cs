@@ -1,7 +1,7 @@
 using KeyBoardChat.Models;
 using System.Collections.Generic;
 
-namespace KeyBoardChat.Web.WebSocketService.Handler
+namespace KeyBoardChat.Web.WebSocketService.Handlers
 {
     public abstract class WebSocketServiceHandler
     {

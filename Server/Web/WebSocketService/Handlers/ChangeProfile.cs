@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace KeyBoardChat.Web.WebSocketService.Handler
+namespace KeyBoardChat.Web.WebSocketService.Handlers
 {
     public class ChangeProfileHandler : WebSocketServiceHandler
     {
