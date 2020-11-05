@@ -11,6 +11,8 @@
 /Server/obj/
 UnitTest/obj/
 UnitTest/bin/
+TestResults/
+TestProject/
 
 Keyboardchat.code-workspace
 /.vscode/

@@ -1,13 +1,9 @@
-using EngineIOSharp.Client;
 using KeyBoardChat;
 using KeyBoardChat.Extensions;
 using KeyBoardChat.Web.WebSocketService;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SocketIOSharp.Client;
-using SocketIOSharp.Common;
-using SocketIOSharp.Server;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -162,6 +158,7 @@ namespace UnitTest
             waitedData = WaitData(header, inputHeader: "onNewMsg", data: sendData)["data"];
             Assert.AreNotEqual(waitedData["userid"], null);
             Assert.AreNotEqual(waitedData["userName"], null);
+            Assert.AreNotEqual(waitedData["avatarId"], null);
             Assert.AreNotEqual(waitedData["roomid"], null);
             Assert.AreEqual(waitedData["message"], message);
 

@@ -263,7 +263,7 @@ namespace KeyBoardChat.Web.WebSocketService
 
         internal void SendChatMessage(Room room, string message, User user)
         {
-            var MessageBody = new ResponseBody(new MessageBody(user.UID, user.Name, room.Id, message), null);
+            var MessageBody = new ResponseBody(new MessageBody(user.UID, user.Name, avatarId: user.UID, room.Id, message), null);
             server.EmitTo(room, SCalls["OnNewMsg"]["header"].ToString(), MessageBody);
 #if DEBUG
             string name = room.Name;
