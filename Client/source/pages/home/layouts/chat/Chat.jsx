@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { ChatMessage, ChatInput } from 'components';
-import { UserData, Message, Socket } from 'logic';
+import { UserData, Message, Socket, SocketManager } from 'logic';
 
 import ChatHeader from './chat_header/ChatHeader';
 import './Chat.scss';
@@ -39,29 +39,11 @@ const Chat = () => {
   });
   const historyRef = React.useRef();
 
-  const onNewMessage = (data) => {
-    console.log('OnNewMessage response data = ', data);
-    const msg = new Message(
-      {
-        id: data.userid,
-        avatar: null,
-      },
-      {
-        text: data.message,
-      },
-      data.roomid,
-      new Date(),
-    );
-    console.log('OnNewMessage data = ', msg);
-    setState({ room_name: state.room_name, messages: [...state.messages, msg] });
-    historyRef.current.scrollTop = historyRef.current.scrollHeight;
-  };
-
-  const socketJoinroom = (data) => {
-    if (data.successful) {
+  const socketJoinRoom = (result) => {
+    if (result.error === null) {
       setState({
-        messages: [],
-        room_name: data.data.room,
+          messages: [],
+          room_name: result.data.room,
       });
     }
   };
@@ -73,16 +55,24 @@ const Chat = () => {
     });
   };
 
+  const onNewMessage = (result) => {
+    if (result.error === null) {
+      const msg = result.data;
+      setState({ room_name: state.room_name, messages: [...state.messages, msg] });
+      historyRef.current.scrollTop = historyRef.current.scrollHeight;
+    }
+  }
+
   const initSockets = () => {
-    Socket.on('onNewMsg', onNewMessage);
-    Socket.on('joinRoom', socketJoinroom);
-    Socket.on('leaveRoom', socketLeaveroom);
+    SocketManager.addCallback('onNewMsg', onNewMessage);
+    SocketManager.addCallback('joinRoom', socketJoinRoom);
+    SocketManager.addCallback('leaveRoom', socketLeaveroom);
   };
 
   const cleanSockets = () => {
-    Socket.removeEventListener('onNewMsg', onNewMessage);
-    Socket.removeEventListener('joinRoom', socketJoinroom);
-    Socket.removeEventListener('leaveRoom', socketLeaveroom);
+    SocketManager.removeCallback('onNewMsg', onNewMessage);
+    SocketManager.removeCallback('joinRoom', socketJoinRoom);
+    SocketManager.removeCallback('leaveRoom', socketLeaveroom);
   };
 
   useEffect(() => {

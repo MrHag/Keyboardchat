@@ -28,22 +28,6 @@ const SignUp = () => {
     }
   };
 
-  const socketRegistration = (data) => {
-    console.log('Auth response!');
-    console.log('Response data = ', data);
-    if (data.error === null) {
-      routeHistory.push('/');
-    } else {
-      switch (data.data) {
-        case 'nameExists':
-          setErr('This name is already taken');
-          break;
-        default:
-          break;
-      }
-    }
-  };
-
   const newSocketReg = (result) => {
     if (result.error === null) {
       routeHistory.push('/');
@@ -53,10 +37,8 @@ const SignUp = () => {
   }
 
   useEffect(() => {
-    // Socket.on('registration', socketRegistration);
     SocketManager.addCallback('registration', newSocketReg);
     return () => Socket.removeEventListener('registration', newSocketReg);
-    // return () => Socket.removeEventListener('registration', socketRegistration);
   }, []);
 
   const onLoginKeyupHandler = (e) => {

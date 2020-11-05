@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
 
 import { Input, RoomItem, LabelButton, IconButton } from 'components';
-import { Socket, UserData, Room } from 'logic';
+import { Socket, SocketManager, UserData, Room } from 'logic';
 
 import './RoomPanel.scss';
 
@@ -61,14 +61,10 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
     Socket.emit('joinRoom', request);
   };
 
-  const socketJoinroom = (data) => {
-    console.log('socketJoinroom data = ', data);
-    if (data.error === null) {
-      console.log("You've joined to room = ", data.data);
-      UserData.setInRoomJSON(data.data);
+  const socketJoinroom = (result) => {
+    if (result.error === null) {
+      UserData.setInRoomJSON(result.data);
       setInRoom(UserData.inRoom);
-    } else {
-      console.log("Can't joint room!", data);
     }
   };
 
@@ -85,30 +81,27 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
   };
 
   const socketGetrooms = (data) => {
-    console.log('Getrooms data = ', data);
     UserData.existingRooms.setRoomsJSON(data);
-    console.log('UserData.existingRooms.rooms = ', UserData.existingRooms.rooms);
     setRooms(UserData.existingRooms.rooms);
   };
 
   const socketRoomchange = (data) => {
-    console.log('SocketRoomchange...');
     Socket.emit('getRooms', { room: null });
   };
 
   const initSocketsListeners = () => {
-    Socket.on('getRooms', socketGetrooms);
-    Socket.on('roomChange', socketRoomchange);
-    Socket.on('joinRoom', socketJoinroom);
-    Socket.on('leaveRoom', socketRoomLeave);
+    SocketManager.addCallback('getRooms', socketGetrooms);
+    SocketManager.addCallback('roomListChange', socketRoomchange);
+    SocketManager.addCallback('joinRoom', socketJoinroom);
+    SocketManager.addCallback('leaveRoom', socketRoomLeave);
     Socket.emit('getRooms', { room: null }); // TODO: Uncomment this in
   };
 
   const removeSocketListeners = () => {
-    Socket.removeEventListener('getRooms', socketGetrooms);
-    Socket.removeEventListener('joinRoom', socketJoinroom);
-    Socket.removeEventListener('roomChange', socketRoomchange);
-    Socket.removeEventListener('leaveRoom', socketRoomLeave);
+
+    SocketManager.removeCallback('getRooms', socketGetrooms);
+    SocketManager.removeCallback('joinRoom', socketJoinroom);
+    SocketManager.removeCallback('leaveRoom', socketRoomLeave);
   };
 
   useEffect(() => {

@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
 
 import { Button, IconButton, InputPassword } from 'components';
-import { Socket, Room } from 'logic';
+import { Socket, SocketManager, Room } from 'logic';
 
 import './RoomItem.scss';
 
@@ -14,12 +14,11 @@ const RoomItemForm = ({ roomId, onCancel, onJoin }) => {
   const [password, setPassword] = useState('');
   const [err, setErr] = useState('');
 
-  const socketJoinroom = (data) => {
-    if (data.successful) {
+  const socketJoinroom = (result) => {
+    if (result.error === null) {
       onJoin();
     } else {
-      // Here might be other types of errors
-      setErr('Invalid password!');
+      setErr(result.error);
     }
   };
 
@@ -33,8 +32,8 @@ const RoomItemForm = ({ roomId, onCancel, onJoin }) => {
   };
 
   useEffect(() => {
-    Socket.on('joinRoom', socketJoinroom);
-    return () => Socket.removeEventListener('joinRoom', socketJoinroom);
+    SocketManager.addCallback('joinRoom', socketJoinroom);
+    return () => SocketManager.removeCallback('joinRoom', socketJoinroom);
   }, []);
 
   return (
