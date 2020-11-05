@@ -11,17 +11,19 @@ namespace KeyBoardChat.Extensions
 
         public static JArray Make(params object[] data)
         {
-            JTokenWriter jTokenWriter = new JTokenWriter();
-            jTokenWriter.WriteStartArray();
-
-            foreach (var variable in data)
+            using (JTokenWriter jTokenWriter = new JTokenWriter())
             {
-                jTokenWriter.WriteValue(variable);
+                jTokenWriter.WriteStartArray();
+
+                foreach (var variable in data)
+                {
+                    jTokenWriter.WriteValue(variable);
+                }
+
+                jTokenWriter.WriteEndArray();
+
+                return jTokenWriter.Token as JArray;
             }
-
-            jTokenWriter.WriteEndArray();
-
-            return jTokenWriter.Token as JArray;
         }
 
     }

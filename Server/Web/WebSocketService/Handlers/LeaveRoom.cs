@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
-namespace KeyBoardChat.Web.WebSocketService.Handler
+namespace KeyBoardChat.Web.WebSocketService.Handlers
 {
     public class LeaveRoomHandler : WebSocketServiceHandler
     {

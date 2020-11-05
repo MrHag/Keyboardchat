@@ -68,14 +68,17 @@ namespace KeyBoardChat
                 FileProvider = new PhysicalFileProvider(Program.FilePath),
             });
 
-            WebSocketService = new WebSocketService();
-            try
+            using (WebSocketService)
             {
-                WebSocketService.Start();
-            }
-            catch (InvalidOperationException ex)
-            {
-                Program.LogService.Log(ex);
+                WebSocketService = new WebSocketService();
+                try
+                {
+                    WebSocketService.Start();
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Program.LogService.Log(ex);
+                }
             }
         }
     }

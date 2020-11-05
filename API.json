@@ -22,8 +22,8 @@
           "error": [
             "wrongNamePass",
             "alreadyInSess",
-            "SERVER-shiza badName",
-            "SERVER-shiza badPassword",
+            "badName",
+            "badPassword",
             "invalidData"
           ]
         }
@@ -62,7 +62,7 @@
             "data": {
             },
             "error": [
-              "SERVER-shiza badName",
+              "badName",
               "badImage",
               "nameExists"
             ]
@@ -121,10 +121,10 @@
             },
             "error": [
               "nameExists",
-              "SERVER-shiza badName",
-              "SERVER-shiza badPassword",
-              "SERVER-shiza invalidData",
-              "SERVER-shiza uknownError"
+              "badName",
+              "badPassword",
+              "invalidData",
+              "uknownError"
             ]
           }
         }
@@ -274,16 +274,19 @@
 
         "response": {
           "body": {
-            "userid": ":uint:",
-            "roomid": ":int:",
-            "message": ":string:"
+            "data": {
+              "userid": ":uint:",
+              "userName": ":string:",
+              "roomid": ":int:",
+              "message": ":string:"
+            },
+            "error": []
           }
         }
       },
 
       "Access": {
         "header": "access",
-        "description": "SERVER_SHIZOID",
 
         "response": {
           "body": {
@@ -302,7 +305,8 @@
         "response": {
           "body": {
             "data": ":string:"
-          }
+          },
+          "error": []
         }
       }
     }

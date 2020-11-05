@@ -14,8 +14,6 @@ UnitTest/bin/
 
 Keyboardchat.code-workspace
 /.vscode/
-
-/.vs/Keyboardchat/DesignTimeBuild/
-/.vs/Keyboardchat/v16/
+/.vs/
 
 packages/*
