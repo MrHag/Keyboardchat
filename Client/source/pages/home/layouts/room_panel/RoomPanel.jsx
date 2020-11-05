@@ -5,14 +5,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
 
 import { Input, RoomItem, LabelButton, IconButton } from 'components';
-import { Socket, UserData, Room } from 'logic';
+import { Socket, SocketManager, UserData, Room } from 'logic';
 
 import './RoomPanel.scss';
 
 const RoomList = ({ inRoom, rooms, joinRoom, leaveRoom }) => {
   const listRef = useRef();
 
-  console.log("RoomList.InRoomObject = ", inRoom);
+  // console.log("RoomList.InRoomObject = ", inRoom);
 
   const activeRooms = rooms.filter((room) => room.compare(inRoom));
   const list = rooms.filter((room) => !room.compare(inRoom));
@@ -23,7 +23,7 @@ const RoomList = ({ inRoom, rooms, joinRoom, leaveRoom }) => {
   return (
     <div ref={listRef} className="room-panel__list">
       {
-        list.map((room, index) => {
+        list.map((room) => {
           const isActive = room.compare(inRoom);
           return (
             <RoomItem
@@ -61,14 +61,10 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
     Socket.emit('joinRoom', request);
   };
 
-  const socketJoinroom = (data) => {
-    console.log('socketJoinroom data = ', data);
-    if (data.successful) {
-      console.log("You've joined to room = ", data.data);
-      UserData.setInRoomJSON(data.data);
+  const socketJoinroom = (result) => {
+    if (result.error === null) {
+      UserData.setInRoomJSON(result.data);
       setInRoom(UserData.inRoom);
-    } else {
-      console.error("Can't joint room!", data);
     }
   };
 
@@ -81,34 +77,30 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
   };
 
   const socketRoomLeave = (data) => {
-    console.log("ON ROOM LEAVE RESPONSE: ", data);
+    console.log('ON ROOM LEAVE RESPONSE: ', data);
   };
 
   const socketGetrooms = (data) => {
-    console.log('Getrooms data = ', data);
     UserData.existingRooms.setRoomsJSON(data);
-    console.log('UserData.existingRooms.rooms = ', UserData.existingRooms.rooms);
     setRooms(UserData.existingRooms.rooms);
   };
 
   const socketRoomchange = (data) => {
-    console.warn('SocketRoomchange...');
     Socket.emit('getRooms', { room: null });
   };
 
   const initSocketsListeners = () => {
-    Socket.on('getRooms', socketGetrooms);
-    Socket.on('roomChange', socketRoomchange);
-    Socket.on('joinRoom', socketJoinroom);
-    Socket.on('leaveRoom', socketRoomLeave);
+    SocketManager.addCallback('getRooms', socketGetrooms);
+    SocketManager.addCallback('roomListChange', socketRoomchange);
+    SocketManager.addCallback('joinRoom', socketJoinroom);
+    SocketManager.addCallback('leaveRoom', socketRoomLeave);
     Socket.emit('getRooms', { room: null }); // TODO: Uncomment this in
   };
 
   const removeSocketListeners = () => {
-    Socket.removeEventListener('getRooms', socketGetrooms);
-    Socket.removeEventListener('joinRoom', socketJoinroom);
-    Socket.removeEventListener('roomChange', socketRoomchange);
-    Socket.removeEventListener('leaveRoom', socketRoomLeave);
+    SocketManager.removeCallback('getRooms', socketGetrooms);
+    SocketManager.removeCallback('joinRoom', socketJoinroom);
+    SocketManager.removeCallback('leaveRoom', socketRoomLeave);
   };
 
   useEffect(() => {

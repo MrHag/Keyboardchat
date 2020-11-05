@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import './Form.scss';
 
-const Form = ({ name, children, ...props }) => (
+const Form = ({ name, children }) => (
   <div className="form">
     <h2 className="form__name">{name}</h2>
     {children}
@@ -11,6 +11,10 @@ const Form = ({ name, children, ...props }) => (
 );
 
 Form.propTypes = {
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node),
+    PropTypes.node,
+  ]).isRequired,
   name: PropTypes.string.isRequired,
 };
 

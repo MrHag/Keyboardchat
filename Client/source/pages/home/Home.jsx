@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useHistory, Route, Switch, Redirect } from 'react-router-dom';
 
 import { Sidebar } from 'components';
-import { Socket, UserData, User, Room } from 'logic';
+import { Socket, SocketManager, UserData, User, Room } from 'logic';
 import ROUTES from 'shared/Routes';
 import { Chat, RoomPanel, CreationRoom, ScreenSelector, UserPanel } from './layouts';
 
@@ -39,19 +39,20 @@ const RoomChat = () => {
 const Home = () => {
   const [force, forceUpdate] = useState(0);
 
-  const socketGetUsers = (data) => {
-    UserData.user = User.fromJSON(data.data[0]);
-    forceUpdate(force + 1);
-    console.log("socketGetUsers userData = ", UserData.user);
+  const socketGetUsers = (result) => {
+    if (result.error === null) {
+      UserData.user = User.fromJSON(result.data[0]);
+      forceUpdate(force + 1);
+    }
   };
 
   useEffect(() => {
-    Socket.addEventListener('getUsers', socketGetUsers);
+    SocketManager.addCallback('getUsers', socketGetUsers);
     Socket.emit('getUsers', {
       Users: null,
-      Select: ['name', 'avatar', 'avatarHash'],
+      Select: null, // ['name', 'avatar', 'avatarHash'],
     });
-    return () => Socket.removeEventListener('getUsers', socketGetUsers);
+    return () => SocketManager.removeCallback('getUsers', socketGetUsers);
   }, []);
 
   return (
@@ -63,7 +64,7 @@ const Home = () => {
         <Route path={ROUTES.UserPanel.route} component={UserPanel} />
         <Route path={ROUTES.CreateRoom.route}>
           <CreationRoom
-            onRoomCreate={(_) => forceUpdate(force + 1)}
+            onRoomCreate={() => forceUpdate(force + 1)}
           />
         </Route>
       </Switch>

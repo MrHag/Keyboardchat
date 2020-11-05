@@ -39,8 +39,7 @@ class User {
     return new User(
       json.id,
       json.name,
-      // json.avatar,
-      "Hello",
+      json.avatar,
       json.avatarHash,
     );
   }
@@ -54,6 +53,7 @@ const UserData = {
   inRoom: new Room(undefined, 'globals'),
   setInRoomJSON(json) {
     this.inRoom = Room.fromJSON(json);
+    console.warn('setInRoomJSON = ', this.inRoom);
   },
   setInRoom(room) {
     this.inRoom = room;
@@ -71,7 +71,7 @@ const UserData = {
     },
   },
 
-  toDefault: function() {
+  toDefault() {
     this.user = null;
     this.inRoom = new Room(undefined, 'globals');
     this.existingRooms.rooms = [];

@@ -1,24 +1,24 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import classNames from 'classnames';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as FontAwesomeIcons from '@fortawesome/free-solid-svg-icons';
-import { IconButton } from '../index';
 
+import { IconButton } from 'components';
 import './Sidebar.scss';
 
-const Sidebar = ({ children, ...props }) => {
+const Sidebar = ({ children }) => {
   const [isHidden, setHidden] = React.useState(false);
 
-  const onArrowBtnHandler = (e) => {
+  const onArrowBtnHandler = () => {
     setHidden(!isHidden);
   };
 
   const icon = (isHidden) ? FontAwesomeIcons.faAngleRight : FontAwesomeIcons.faAngleLeft;
 
   return (
-    <div className={classNames('sidebar')} {...props}>
+    <div className={classNames('sidebar')}>
       <IconButton
         className={classNames('sidebar__arrow-btn', { 'hidden': isHidden })}
         onClick={onArrowBtnHandler}
@@ -32,6 +32,13 @@ const Sidebar = ({ children, ...props }) => {
       </div>
     </div>
   );
+};
+
+Sidebar.propTypes = {
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node),
+    PropTypes.node,
+  ]).isRequired,
 };
 
 export default Sidebar;

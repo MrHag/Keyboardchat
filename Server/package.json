@@ -6,7 +6,8 @@
   "dependencies": {},
   "devDependencies": {},
   "scripts": {
-    "start": "cd Build/netcoreapp3.1/ && Keyboardchat.exe"
+    "start": "cd Build/netcoreapp3.1/ && Keyboardchat.exe",
+    "start-dev": "dotnet build --source Keyboardchat.csproj --configuration Debug --output Build/netcoreapp3.1/ && npm start"
   },
   "repository": {
     "type": "git",

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useHistory, NavLink } from 'react-router-dom';
 
-import { Socket } from 'logic';
+import { Socket, SocketManager } from 'logic';
 import { Button, Input, InputPassword, Form } from 'components';
 
 import './SignUp.scss';
@@ -28,25 +28,17 @@ const SignUp = () => {
     }
   };
 
-  const socketRegistration = (data) => {
-    console.log('Auth response!');
-    console.log('Response data = ', data);
-    if (data.successful) {
+  const newSocketReg = (result) => {
+    if (result.error === null) {
       routeHistory.push('/');
     } else {
-      switch (data.data) {
-        case 'nameExists':
-          setErr('This name is already taken');
-          break;
-        default:
-          break;
-      }
+      setErr(result.error);
     }
   };
 
   useEffect(() => {
-    Socket.on('registration', socketRegistration);
-    return () => Socket.removeEventListener('registration', socketRegistration);
+    SocketManager.addCallback('registration', newSocketReg);
+    return () => Socket.removeEventListener('registration', newSocketReg);
   }, []);
 
   const onLoginKeyupHandler = (e) => {

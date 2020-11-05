@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useHistory, NavLink } from 'react-router-dom';
 
-import { Socket } from 'logic';
+import { Socket, SocketManager } from 'logic';
 import { ROUTES } from 'shared';
 import { Button, Input, InputPassword, Form } from 'components';
 
@@ -17,36 +17,25 @@ const SignIn = () => {
   const passwordRef = useRef();
 
   const onLoginHandler = () => {
+    console.log('Socket.emit("auth", ...)');
     const request = {
       name: login,
       password,
     };
-    console.log('Socket.emit("auth", ...)');
     Socket.emit('auth', request);
   };
 
-  const socketAuth = (data) => {
-    console.log('Auth response!');
-    console.log('Response data = ', data);
-    if (data.successful) {
+  const newSocketAuth = (authData) => {
+    if (authData.error === null) {
       routeHistory.push(ROUTES.Home.route);
     } else {
-      switch (data.data) {
-        case 'badName':
-          setErr('Bad name!');
-          break;
-        case 'invalidData':
-          setErr('Invalid data!');
-          break;
-        default:
-          break;
-      }
+      setErr(authData.error);
     }
   };
 
   useEffect(() => {
-    Socket.on('auth', socketAuth);
-    return () => Socket.removeEventListener('auth', socketAuth);
+    SocketManager.addCallback('auth', newSocketAuth);
+    return () => SocketManager.removeCallback('auth', newSocketAuth);
   }, []);
 
   const onLoginKeyupHandler = (e) => {

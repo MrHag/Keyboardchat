@@ -2,11 +2,9 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { ChatMessage, ChatInput } from 'components';
-import { Socket } from 'logic';
+import { UserData, SocketManager } from 'logic';
 
 import ChatHeader from './chat_header/ChatHeader';
-import { UserData, Message }  from 'logic';
-
 import './Chat.scss';
 
 const ChatHistory = ({ messages, historyRef }) => {
@@ -27,10 +25,11 @@ const ChatHistory = ({ messages, historyRef }) => {
 
 ChatHistory.propTypes = {
   messages: PropTypes.arrayOf(PropTypes.shape).isRequired,
-  historyRef: PropTypes.oneOfType([
-    PropTypes.func, 
-    PropTypes.shape({ current: PropTypes.any })
-  ]),
+  historyRef: PropTypes.any.isRequired,
+  // historyRef: PropTypes.oneOfType([
+  //   PropTypes.func,
+  //   PropTypes.shape({ current: PropTypes.shape }),
+  // ]).isRequired,
 };
 
 const Chat = () => {
@@ -40,28 +39,11 @@ const Chat = () => {
   });
   const historyRef = React.useRef();
 
-  const onNewMessage = (data) => {
-    const msg = new Message(
-      {
-        id: data.userid,
-        avatar: null,
-      },
-      {
-        text: data.message,
-      },
-      data.roomid,
-      new Date(),
-    );
-    console.log('OnNewMessage data = ', msg);
-    setState({ room_name: state.room_name, messages: [...state.messages, msg] });
-    historyRef.current.scrollTop = historyRef.current.scrollHeight;
-  };
-
-  const socketJoinroom = (data) => {
-    if (data.successful) {
+  const socketJoinRoom = (result) => {
+    if (result.error === null) {
       setState({
         messages: [],
-        room_name: data.data.room,
+        room_name: result.data.room,
       });
     }
   };
@@ -73,16 +55,24 @@ const Chat = () => {
     });
   };
 
+  const onNewMessage = (result) => {
+    if (result.error === null) {
+      const msg = result.data;
+      setState({ room_name: state.room_name, messages: [...state.messages, msg] });
+      historyRef.current.scrollTop = historyRef.current.scrollHeight;
+    }
+  };
+
   const initSockets = () => {
-    Socket.on('chat', onNewMessage);
-    Socket.on('joinRoom', socketJoinroom);
-    Socket.on('leaveRoom', socketLeaveroom);
+    SocketManager.addCallback('onNewMsg', onNewMessage);
+    SocketManager.addCallback('joinRoom', socketJoinRoom);
+    SocketManager.addCallback('leaveRoom', socketLeaveroom);
   };
 
   const cleanSockets = () => {
-    Socket.removeEventListener('chat', onNewMessage);
-    Socket.removeEventListener('joinRoom', socketJoinroom);
-    Socket.removeEventListener('leaveRoom', socketLeaveroom);
+    SocketManager.removeCallback('onNewMsg', onNewMessage);
+    SocketManager.removeCallback('joinRoom', socketJoinRoom);
+    SocketManager.removeCallback('leaveRoom', socketLeaveroom);
   };
 
   useEffect(() => {
