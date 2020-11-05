@@ -39,8 +39,7 @@ class User {
     return new User(
       json.id,
       json.name,
-      // json.avatar,
-      "Hello",
+      json.avatar,
       json.avatarHash,
     );
   }

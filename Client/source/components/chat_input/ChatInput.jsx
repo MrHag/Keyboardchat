@@ -14,7 +14,7 @@ const ChatInput = () => {
 
   const sendMessage = () => {
     setText('');
-    Socket.emit('chat', {
+    Socket.emit('sendMsg', {
       message: text,
     });
   };

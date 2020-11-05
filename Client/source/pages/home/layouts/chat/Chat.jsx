@@ -25,10 +25,11 @@ const ChatHistory = ({ messages, historyRef }) => {
 
 ChatHistory.propTypes = {
   messages: PropTypes.arrayOf(PropTypes.shape).isRequired,
-  historyRef: PropTypes.oneOfType([
-    PropTypes.func,
-    PropTypes.shape({ current: PropTypes.shape }),
-  ]).isRequired,
+  historyRef: PropTypes.any.isRequired,
+  // historyRef: PropTypes.oneOfType([
+  //   PropTypes.func,
+  //   PropTypes.shape({ current: PropTypes.shape }),
+  // ]).isRequired,
 };
 
 const Chat = () => {
@@ -39,6 +40,7 @@ const Chat = () => {
   const historyRef = React.useRef();
 
   const onNewMessage = (data) => {
+    console.log('OnNewMessage response data = ', data);
     const msg = new Message(
       {
         id: data.userid,
@@ -72,13 +74,13 @@ const Chat = () => {
   };
 
   const initSockets = () => {
-    Socket.on('chat', onNewMessage);
+    Socket.on('onNewMsg', onNewMessage);
     Socket.on('joinRoom', socketJoinroom);
     Socket.on('leaveRoom', socketLeaveroom);
   };
 
   const cleanSockets = () => {
-    Socket.removeEventListener('chat', onNewMessage);
+    Socket.removeEventListener('onNewMsg', onNewMessage);
     Socket.removeEventListener('joinRoom', socketJoinroom);
     Socket.removeEventListener('leaveRoom', socketLeaveroom);
   };

@@ -49,7 +49,7 @@ const Home = () => {
     Socket.addEventListener('getUsers', socketGetUsers);
     Socket.emit('getUsers', {
       Users: null,
-      Select: ['name', 'avatar', 'avatarHash'],
+      Select: null,//['name', 'avatar', 'avatarHash'],
     });
     return () => Socket.removeEventListener('getUsers', socketGetUsers);
   }, []);

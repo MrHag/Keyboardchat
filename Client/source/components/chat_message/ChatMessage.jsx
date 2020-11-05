@@ -8,11 +8,11 @@ import { Message } from 'logic';
 import './ChatMessage.scss';
 
 const ChatMessage = ({ msg, ...props }) => {
-  console.log('ChatMessage msg = ', msg);
+  // console.log('ChatMessage msg = ', msg);
   const { date, content, author } = msg;
-  console.log('Date = ', date);
-  console.log('Content = ', content);
-  console.log('Author = ', author);
+  // console.log('Date = ', date);
+  // console.log('Content = ', content);
+  // console.log('Author = ', author);
   return (
     <div className="chat-msg">
       <div className="chat-msg__info">

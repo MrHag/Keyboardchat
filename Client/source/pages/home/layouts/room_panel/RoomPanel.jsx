@@ -63,12 +63,12 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
 
   const socketJoinroom = (data) => {
     console.log('socketJoinroom data = ', data);
-    if (data.successful) {
+    if (data.error === null) {
       console.log("You've joined to room = ", data.data);
       UserData.setInRoomJSON(data.data);
       setInRoom(UserData.inRoom);
     } else {
-      console.error("Can't joint room!", data);
+      console.log("Can't joint room!", data);
     }
   };
 
