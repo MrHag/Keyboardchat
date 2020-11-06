@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
@@ -12,7 +13,8 @@ namespace KeyBoardChat
         public static string FilePath;
         public static JObject API;
         public static LogService LogService;
-
+        public static byte[] _serverAvatar;
+        public static byte[] _unkownAvatar;
 
         public static void Init(string directory = null)
         {
@@ -28,6 +30,13 @@ namespace KeyBoardChat
             LogService = new LogService();
 
             FilePath = $"{CurrentPath}/public";
+
+            var avatarsPath = $"{CurrentPath}/Server/avatars";
+
+            _serverAvatar = System.IO.File.ReadAllBytes($"{avatarsPath}/server.png");
+            _unkownAvatar = System.IO.File.ReadAllBytes($"{avatarsPath}/uknown.png");
+
+
         }
 
         public static void Main(string[] args)

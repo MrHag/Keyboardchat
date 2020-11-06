@@ -40,7 +40,7 @@ namespace KeyBoardChat.Web.WebSocketService.Handlers
 
                         var passwordHash = sha256.ComputeHash(Encoding.UTF8.GetBytes(Password));
 
-                        var dbUser = new DataBase.Models.User() { Name = Name, PasswordHash = passwordHash, AvatarId = 1 };
+                        var dbUser = new DataBase.Models.User() { Name = Name, PasswordHash = passwordHash, AvatarId = 2};
                         dbcontext.Add(dbUser);
                         if (dbcontext.SaveChanges() > 0)
                         {

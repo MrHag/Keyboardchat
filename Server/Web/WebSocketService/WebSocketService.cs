@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using KeyBoardChat.DataBase;
 using KeyBoardChat.Extensions;
 using KeyBoardChat.Models;
 using KeyBoardChat.Models.Network;
@@ -263,7 +264,15 @@ namespace KeyBoardChat.Web.WebSocketService
 
         internal void SendChatMessage(Room room, string message, User user)
         {
-            var MessageBody = new ResponseBody(new MessageBody(user.UID, user.Name, avatarId: user.UID, room.Id, message), null);
+            uint avatarid = 1;
+
+            if (user.UID != 0)
+            {
+                var dbuser = GetDbUser(user.UID);
+                avatarid = dbuser.AvatarId;
+            }
+
+            var MessageBody = new ResponseBody(new MessageBody(user.UID, user.Name, avatarId: avatarid, room.Id, message), null);
             server.EmitTo(room, SCalls["OnNewMsg"]["header"].ToString(), MessageBody);
 #if DEBUG
             string name = room.Name;
@@ -271,6 +280,28 @@ namespace KeyBoardChat.Web.WebSocketService
             Program.LogService.Log($"Message to\n{name}, {message}, from {user.UID}");
 #endif
         }
+
+
+        internal DataBase.Models.User GetDbUser(uint id)
+        {
+            DataBase.Models.User dbuser = null;
+            using (DatabaseContext dbcontext = new DatabaseContext())
+            {
+                try
+                {
+                    dbuser = dbcontext.Users.Single(user => user.UserId == id);
+                }
+                catch (InvalidOperationException ex)
+                {
+#if DEBUG
+                    Program.LogService.Log(ex);
+#endif
+                }
+            }
+
+            return dbuser;
+        }
+
 
         internal void ErrorResponseMessage(Connection connection, string header, object error, object data = null)
         {

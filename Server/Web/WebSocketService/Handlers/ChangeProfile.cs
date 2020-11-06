@@ -80,23 +80,28 @@ namespace KeyBoardChat.Web.WebSocketService.Handlers
                                     try
                                     {
                                         dbAvatar = dbcontext.Avatars.Single(avatar => avatar.Id == dbuser.AvatarId);
-                                    }
-                                    catch (InvalidOperationException)
-                                    {
-                                        dbAvatar = new Avatar();
 
-                                        dbcontext.Avatars.Add(dbAvatar);
+                                        if (dbAvatar.Id == 2)
+                                        {
+                                            dbAvatar = new Avatar();
+
+                                            dbcontext.Avatars.Add(dbAvatar);
+                                        }
+
+                                        dbAvatar.AvatarData = bytes;
+
+                                        dbcontext.SaveChanges();
 
                                         dbuser.AvatarId = dbAvatar.Id;
+
                                     }
-
-                                    dbAvatar.AvatarData = bytes;
-
-                                    dbcontext.SaveChanges();
+                                    catch (InvalidOperationException)
+                                    {      
+                                    }
 
                                 }
 
-                            }                        
+                            }
 
                             outcallback.Add(new HandlerCallBack(data: "Data changed"));
 

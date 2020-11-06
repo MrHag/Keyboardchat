@@ -1,4 +1,5 @@
 using KeyBoardChat.DataBase;
+using KeyBoardChat.DataBase.Models;
 using KeyBoardChat.Web.WebSocketService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -18,6 +19,21 @@ namespace KeyBoardChat
 
         public Startup()
         {
+
+            using (DatabaseContext dbcontext = new DatabaseContext())
+            {
+                Avatar serverAvatar = new Avatar() { Id = 1, AvatarData = Program._serverAvatar };
+                Avatar uknownAvatar = new Avatar() { Id = 2, AvatarData = Program._unkownAvatar };
+                dbcontext.Avatars.Add(serverAvatar);
+                dbcontext.Avatars.Add(uknownAvatar);
+
+                try
+                {
+                    dbcontext.SaveChanges();
+                }
+                catch (Exception)
+                { }
+            }
 
         }
 
@@ -43,8 +59,11 @@ namespace KeyBoardChat
                 endpoints.MapGet("/avatar/{avatarid}", async (context) =>
                 {
                     uint avatarid;
+
                     if (!uint.TryParse(context.Request.RouteValues["avatarid"].ToString(), out avatarid))
+                    {
                         return;
+                    }
 
                     using (var dbcontext = new DatabaseContext())
                     {
