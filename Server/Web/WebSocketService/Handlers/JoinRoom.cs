@@ -7,10 +7,10 @@ namespace KeyBoardChat.Web.WebSocketService.Handlers
 {
     public class JoinRoomHandler : WebSocketServiceHandler
     {
-        [JsonProperty("id")]
+        [JsonProperty("id", Required = Required.Always)]
         public int Id { get; set; }
 
-        [JsonProperty("password", Required = Required.AllowNull)]
+        [JsonProperty("password")]
         public string Password { get; set; }
 
         public override IEnumerable<HandlerCallBack> Handle(Connection connection)

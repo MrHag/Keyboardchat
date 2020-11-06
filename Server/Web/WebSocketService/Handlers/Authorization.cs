@@ -12,10 +12,10 @@ namespace KeyBoardChat.Web.WebSocketService.Handlers
     public class AuthorizationHandler : WebSocketServiceHandler
     {
 
-        [JsonProperty("name")]
+        [JsonProperty("name", Required = Required.Always)]
         public string Name { get; set; }
 
-        [JsonProperty("password")]
+        [JsonProperty("password", Required = Required.Always)]
         public string Password { get; set; }
 
         public override IEnumerable<HandlerCallBack> Handle(Connection connection)

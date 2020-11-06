@@ -8,7 +8,7 @@ namespace KeyBoardChat.Web.WebSocketService.Handlers
 {
     public class GetRoomsHandler : WebSocketServiceHandler
     {
-        [JsonProperty("room", Required = Required.AllowNull)]
+        [JsonProperty("room")]
         public string RoomName { get; set; }
 
         public override IEnumerable<HandlerCallBack> Handle(Connection connection)

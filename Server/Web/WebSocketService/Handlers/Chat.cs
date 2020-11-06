@@ -6,7 +6,7 @@ namespace KeyBoardChat.Web.WebSocketService.Handlers
 {
     public class ChatHandler : WebSocketServiceHandler
     {
-        [JsonProperty("message")]
+        [JsonProperty("message", Required = Required.Always)]
         public string Message { get; set; }
 
         public override IEnumerable<HandlerCallBack> Handle(Connection connection)

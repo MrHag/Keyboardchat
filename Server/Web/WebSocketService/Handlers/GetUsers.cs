@@ -15,7 +15,7 @@ namespace KeyBoardChat.Web.WebSocketService.Handlers
         [JsonProperty("Users", Required = Required.AllowNull)]
         public List<uint> Usersids { get; set; }
 
-        [JsonProperty("Select")]
+        [JsonProperty("Select", Required = Required.Always)]
         public List<string> Select { get; set; }
 
         public override IEnumerable<HandlerCallBack> Handle(Connection connection)
@@ -61,7 +61,7 @@ namespace KeyBoardChat.Web.WebSocketService.Handlers
                             bool reqavatar = true;
                             bool reqname = true;
 
-                            if (Select != null && Select.Count > 0 && !Select.Contains("all"))
+                            if (Select.Count > 0 && !Select.Contains("all"))
                             {
                                 reqavatar = Select.Contains("avatar");
                                 reqname = Select.Contains("name");

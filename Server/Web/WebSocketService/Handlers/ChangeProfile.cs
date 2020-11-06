@@ -23,18 +23,21 @@ namespace KeyBoardChat.Web.WebSocketService.Handlers
         {
             var outcallback = new List<HandlerCallBack>();
 
-            byte[] bytes;
+            byte[] bytes = null;
 
             ((Action)(() =>
             {
-                try
+                if (Avatar != null)
                 {
-                    bytes = Convert.FromBase64String(Avatar);
-                }
-                catch (FormatException)
-                {
-                    outcallback.Add(new HandlerCallBack(data: "invalidData", error: true));
-                    return;
+                    try
+                    {
+                        bytes = Convert.FromBase64String(Avatar);
+                    }
+                    catch (Exception)
+                    {
+                        outcallback.Add(new HandlerCallBack(data: "invalidData", error: true));
+                        return;
+                    }
                 }
 
                 var user = connection.Session.User;
@@ -72,11 +75,24 @@ namespace KeyBoardChat.Web.WebSocketService.Handlers
                                         return;
                                     }
 
-                                    var dbAvatar = new Avatar() { Id = dbuser.UserId, AvatarData = bytes };
+                                    Avatar dbAvatar;
 
-                                    dbcontext.Avatars.Add(dbAvatar);
+                                    try
+                                    {
+                                        dbAvatar = dbcontext.Avatars.Single(avatar => avatar.Id == dbuser.AvatarId);
+                                    }
+                                    catch (InvalidOperationException)
+                                    {
+                                        dbAvatar = new Avatar();
 
-                                    dbuser.AvatarId = dbAvatar.Id;
+                                        dbcontext.Avatars.Add(dbAvatar);
+
+                                        dbuser.AvatarId = dbAvatar.Id;
+                                    }
+
+                                    dbAvatar.Id = dbuser.UserId;
+                                    dbAvatar.AvatarData = bytes;
+
                                 }
 
                             }
