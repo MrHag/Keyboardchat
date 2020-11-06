@@ -90,14 +90,13 @@ namespace KeyBoardChat.Web.WebSocketService.Handlers
                                         dbuser.AvatarId = dbAvatar.Id;
                                     }
 
-                                    dbAvatar.Id = dbuser.UserId;
                                     dbAvatar.AvatarData = bytes;
+
+                                    dbcontext.SaveChanges();
 
                                 }
 
-                            }
-
-                            dbcontext.SaveChanges();
+                            }                        
 
                             outcallback.Add(new HandlerCallBack(data: "Data changed"));
 
