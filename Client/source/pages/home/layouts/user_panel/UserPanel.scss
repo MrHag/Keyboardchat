@@ -1,12 +1,36 @@
 @import 'styles/globals.scss';
 
 .user-panel {
-  @include flex-layout(column, flex-start, center);
+  @include flex-layout(column, center, center);
   width: 100%;
   height: 100%;
   padding: 8px;
 
-  &__username {
-    margin-bottom: 64px;
+  & &__logout {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  &__container {
+    @include flex-layout(column, flex-start, center);
+  }
+
+  &__field {
+    label {
+      width: 128px;
+      text-align: right;
+      margin-right: 16px;
+    }
+  }
+
+  &__error {
+    margin-top: 8px;
+    color: red;
+  }
+
+  & &__save {
+    margin-top: 32px;
+    width: 100%;
   }
 }

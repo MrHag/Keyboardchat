@@ -17,6 +17,7 @@ const SocketManager = {
     ['onNewMsg', []],
     ['roomListChange', []],
     ['leaveRoom', []],
+    ['changeProfile', []],
   ]),
   socket: Socket,
 
@@ -39,7 +40,7 @@ const SocketManager = {
   },
 
   emitResult(event, result) {
-    console.log('SocketManager emitting result: event = ', event);
+    // console.log('SocketManager emitting result: event = ', event);
     this.callbacks.get(event).forEach((callback) => {
       callback(result);
     });
@@ -96,6 +97,7 @@ function Subscribe() {
   });
 
   Socket.on('getUsers', (data) => {
+    console.log('SocketManager: getUser data = ', data);
     if (data.error) throw data.error; // Here must not be error in the client app
     const result = new Result(data.data);
     SocketManager.emitResult('getUsers', result);
@@ -103,12 +105,13 @@ function Subscribe() {
 
   Socket.on('onNewMsg', (d) => {
     const { data } = d;
+    console.log('onNewMsg = ', data);
     const result = new Result(
       new Message(
         {
           id: data.userid,
           userName: data.userName,
-          avatar: null,
+          avatar: data.avatarId,
         },
         {
           text: data.message,
@@ -154,7 +157,7 @@ function Subscribe() {
   });
 
   Socket.on('createRoom', (data) => {
-    console.log('Socket create room = ', data);
+    console.log('SocketManager: create room = ', data);
     const result = new Result(data.data);
     if (data.error !== null) {
       switch (data.error) {
@@ -168,6 +171,22 @@ function Subscribe() {
     }
     SocketManager.emitResult('createRoom', result);
   });
+
+  Socket.on('changeProfile', (data) => {
+    console.log('SocketManager: change profile data = ', data);
+    const result = new Result();
+    if (data.error !== null) {
+      switch (data.error) {
+        case 'nameExists':
+          result.error = 'This name alrady taken!';
+          break;
+        default:
+          warnCannotHandleError('changeProfile', data.error);
+          break;
+      }
+    }
+    SocketManager.emitResult('changeProfile', result);
+  })
 }
 Subscribe();
 

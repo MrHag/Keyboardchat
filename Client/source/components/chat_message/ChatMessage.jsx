@@ -3,31 +3,35 @@ import PropTypes from 'prop-types';
 
 import dateFnsFormat from 'date-fns/format';
 
-import { Message } from 'logic';
-
 import './ChatMessage.scss';
 
-const ChatMessage = ({ msg }) => {
-  console.log('ChatMessage msg = ', msg);
-  const { date, content, author } = msg;
+const ChatMessage = ({ 
+  avatarUrl,
+  authorName,
+  text,
+  date,
+ }) => {
   return (
     <div className="chat-msg">
       <div className="chat-msg__info">
-        <img className="chat-msg__av" alt="avatar" src={author.avatar} />
+        <img className="chat-msg__av" alt="avatar" src={avatarUrl} />
         <div className="chat-msg__name-date">
-          <span className="chat-msg__name">{`${author.userName}`}</span>
+          <span className="chat-msg__name">{`${authorName}`}</span>
           <span className="chat-msg__date" title={date}>{dateFnsFormat(date, 'HH:mm:ss dd.MM.yyyy')}</span>
         </div>
       </div>
       <div className="chat-msg__content">
-        <span className="chat-msg__text">{content.text}</span>
+        <span className="chat-msg__text">{text}</span>
       </div>
     </div>
   );
 };
 
 ChatMessage.propTypes = {
-  msg: PropTypes.instanceOf(Message).isRequired,
+  avatarUrl: PropTypes.string.isRequired,
+  authorName: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
+  date: PropTypes.instanceOf(Date).isRequired,
 };
 
 export default ChatMessage;
