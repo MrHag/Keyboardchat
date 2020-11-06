@@ -50,7 +50,7 @@ const Home = () => {
     SocketManager.addCallback('getUsers', socketGetUsers);
     Socket.emit('getUsers', {
       Users: null,
-      Select: null, // ['name', 'avatar', 'avatarHash'],
+      Select: ["all"],
     });
     return () => SocketManager.removeCallback('getUsers', socketGetUsers);
   }, []);

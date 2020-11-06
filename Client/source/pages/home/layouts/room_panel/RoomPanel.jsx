@@ -99,13 +99,14 @@ const RoomPanel = ({ onCreateRoom, onRoomLeave }) => {
 
   const removeSocketListeners = () => {
     SocketManager.removeCallback('getRooms', socketGetrooms);
+    SocketManager.removeCallback('roomListChange', socketRoomchange);
     SocketManager.removeCallback('joinRoom', socketJoinroom);
     SocketManager.removeCallback('leaveRoom', socketRoomLeave);
   };
 
   useEffect(() => {
     initSocketsListeners();
-    return removeSocketListeners;
+    return () => removeSocketListeners();
   }, []);
 
   const onClearSearchBtn = () => {

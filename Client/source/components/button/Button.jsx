@@ -23,12 +23,12 @@ const styles = {
 };
 
 const Button = (props) => {
-  const { disabled } = props;
+  const { className, disabled } = props;
   return (
     <BaseButton
       {...props}
       variant="contained"
-      className={classNames('button', { 'disabled': disabled })}
+      className={classNames('button', className, { 'disabled': disabled })}
     />
   );
 };
